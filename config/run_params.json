@@ -1,0 +1,6 @@
+{
+"queries"      :  "/Users/mefron/ir/topics/topics.401-450.json",
+"stopper"      :  "/Users/mefron/ir/indexes/stoplist.indri",
+"index"        :  "/Users/mefron/ir/indexes/trec8.temporal",
+"count"        :  1000
+}
