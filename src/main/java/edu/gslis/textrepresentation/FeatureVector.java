@@ -160,7 +160,7 @@ public class FeatureVector  {
 		while(it.hasNext()) {
 			KeyValuePair kvp = it.next();
 			newMap.put((String)kvp.getKey(), kvp.getScore());
-			if(i++ > k)
+			if(++i>= k)
 				break;
 		}
 
@@ -312,19 +312,17 @@ public class FeatureVector  {
 	}
 
 	public static void main(String[] args) {
-		String text = "This. This is NOT a test, nor is it better than 666!";
+		String text = "four score seven years ago forefathers fathers mothers kids";
 
 		Stopper stopper = new Stopper();
 		stopper.addStopword("this");
 		stopper.addStopword("is");
 		stopper.addStopword("better");
 		
-		FeatureVector featureVector = new FeatureVector(stopper);
-		List<String> terms = featureVector.analyze(text);
-		Iterator<String> termIterator = terms.iterator();
-		while(termIterator.hasNext()) {
-			System.out.println(termIterator.next());
-		}
+		FeatureVector featureVector = new FeatureVector(text, stopper);
+		System.out.println(featureVector.getDimensions());
+		featureVector.pruneToSize(5);
+		System.out.println(featureVector.getDimensions());
 	}
 
 
