@@ -4,10 +4,8 @@ public interface CorpusStats {
 
 	public double docCount();
 	
-	public double termTokenCount();
-	
-	public double termTypeCount();
-	
+	public double termCount();
+		
 	public double docFreq(String term);
 	
 	public double termFreq(String term);

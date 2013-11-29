@@ -1,2 +1,2 @@
 #!/bin/sh
-mvn compile; mvn package; mvn install
+mvn install

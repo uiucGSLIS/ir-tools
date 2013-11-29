@@ -75,12 +75,8 @@ public class CorpusStatsFromTextFileImpl implements CorpusStats {
 		return this.docCount;
 	}
 
-	public double termTokenCount() {
+	public double termCount() {
 		return this.tokCount;
-	}
-
-	public double termTypeCount() {
-		return Double.NEGATIVE_INFINITY;
 	}
 
 	public double docFreq(String term) {

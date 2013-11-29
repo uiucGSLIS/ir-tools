@@ -2,7 +2,6 @@ package edu.gslis.demo;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Iterator;
@@ -18,7 +17,12 @@ import edu.gslis.utils.ParameterBroker;
 import edu.gslis.utils.Stopper;
 
 
-
+/**
+ * Mimics the behavior of IndriRunQuery
+ * 
+ * @author mefron
+ *
+ */
 
 public class GslisRunQueries {
 
@@ -39,15 +43,15 @@ public class GslisRunQueries {
 
 		
 		GQueries        queries   = new GQueriesJsonImpl();
-					    queries.read(params.getParamValue(params.QUERY_PATH_PARAM));
-		IndexWrapper    index     = new IndexWrapperIndriImpl(params.getParamValue(params.INDEX_PATH_PARAM));
+					    queries.read(params.getParamValue(ParameterBroker.QUERY_PATH_PARAM));
+		IndexWrapper    index     = new IndexWrapperIndriImpl(params.getParamValue(ParameterBroker.INDEX_PATH_PARAM));
 		String          runId     = "gslis";
 
-		String      countString   = params.getParamValue(params.COUNT_PARAM);
+		String      countString   = params.getParamValue(ParameterBroker.COUNT_PARAM);
 		if(countString==null)
 			countString="1000";
 		int count = Integer.parseInt(countString);
-		Stopper stopper = new Stopper(params.getParamValue(params.STOPPER_PARAM));
+		Stopper stopper = new Stopper(params.getParamValue(ParameterBroker.STOPPER_PARAM));
 		
 		Writer outputWriter = new BufferedWriter(new OutputStreamWriter(System.out));
 		FormattedOutputTrecEval output = FormattedOutputTrecEval.getInstance(runId, outputWriter);

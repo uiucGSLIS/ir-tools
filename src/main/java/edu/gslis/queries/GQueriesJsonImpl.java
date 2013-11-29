@@ -150,7 +150,7 @@ public class GQueriesJsonImpl implements GQueries {
 			
 			JsonArray modelArray = new JsonArray();
 			FeatureVector featureVector = query.getFeatureVector();
-			List<KeyValuePair> pairs = new ArrayList<KeyValuePair>(featureVector.getDimensions());
+			List<KeyValuePair> pairs = new ArrayList<KeyValuePair>(featureVector.getFeatureCount());
 			Iterator<String> featureIterator = featureVector.iterator();
 			while(featureIterator.hasNext()) {
 				String feature = featureIterator.next();

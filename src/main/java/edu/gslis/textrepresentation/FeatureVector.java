@@ -39,7 +39,6 @@ public class FeatureVector  {
 	private Stopper stopper;
 	private double length = 0.0;
 
-	private boolean isLanguageModel = false;	// do the weights sum to 1 and all >= 0?
 
 	// CONSTRUCTORS  
 	public FeatureVector(String text, Stopper stopper) {
@@ -118,10 +117,7 @@ public class FeatureVector  {
 	public void setTerm(String term, double weight) {
 		if(stopper != null && stopper.isStopWord(term))
 			return;
-		
-		if(! features.containsKey(term)) 
-			length += 1.0;
-			
+		length += weight;
 		features.put(term, new Double(weight));
 		
 	}
@@ -142,14 +138,6 @@ public class FeatureVector  {
 		length += weight;
 	}
 
-	/**
-	 * in case we want to override the derived length.
-	 * @param length
-	 */
-	public void setLength(double length) {
-		this.length = length;
-	}
-
 	public void pruneToSize(int k) {
 		List<KeyValuePair> kvpList = getOrderedFeatures();
 
@@ -168,19 +156,27 @@ public class FeatureVector  {
 
 	}
 
-	public void toLanguageModel() {
+	public void normalize() {
 		Map<String,Double> f = new HashMap<String,Double>(features.size());
 
+		double sum = 0.0;
+		
 		Iterator<String> it = features.keySet().iterator();
 		while(it.hasNext()) {
 			String feature = it.next();
 			double obs = features.get(feature);
-			f.put(feature, obs/length);
+			sum += obs;
 		}
-
-		features = f;
 		
-		isLanguageModel = true;
+		it = features.keySet().iterator();
+		while(it.hasNext()) {
+			String feature = it.next();
+			double obs = features.get(feature);
+			f.put(feature, obs/sum);
+		}
+		
+		features = f;
+		length = 1.0;
 	}
 
 
@@ -194,7 +190,7 @@ public class FeatureVector  {
 		return length;
 	}
 
-	public int getDimensions() {
+	public int getFeatureCount() {
 		return features.size();
 	}
 
@@ -220,9 +216,6 @@ public class FeatureVector  {
 		return Math.sqrt(norm);
 	}
 
-	public boolean isLanguageModel() {
-		return isLanguageModel;
-	}
 
 
 	// VIEWING
@@ -263,7 +256,7 @@ public class FeatureVector  {
 
 
 	// UTILS
-	public List<String> analyze(String text) {
+	private List<String> analyze(String text) {
 		List<String> result = new LinkedList<String>();
 		try {
 			TokenStream stream = null;
@@ -320,9 +313,9 @@ public class FeatureVector  {
 		stopper.addStopword("better");
 		
 		FeatureVector featureVector = new FeatureVector(text, stopper);
-		System.out.println(featureVector.getDimensions());
+		System.out.println(featureVector.getFeatureCount());
 		featureVector.pruneToSize(5);
-		System.out.println(featureVector.getDimensions());
+		System.out.println(featureVector.getFeatureCount());
 	}
 
 

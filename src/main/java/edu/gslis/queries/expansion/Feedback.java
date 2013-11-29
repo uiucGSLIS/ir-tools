@@ -12,6 +12,7 @@ import edu.gslis.queries.GQuery;
 import edu.gslis.searchhits.SearchHits;
 import edu.gslis.textrepresentation.FeatureVector;
 import edu.gslis.utils.KeyValuePair;
+import edu.gslis.utils.KeyValuePairs;
 import edu.gslis.utils.ScorableComparator;
 import edu.gslis.utils.Stopper;
 
@@ -23,14 +24,12 @@ public abstract class Feedback {
 	protected GQuery originalQuery;
 	protected int fbDocCount  = 20;
 	protected int fbTermCount = 20;
-	protected List<KeyValuePair> features;		// these will be KeyValuePair objects
+	protected KeyValuePairs features;		// these will be KeyValuePair objects
 	protected Stopper stopper;
 	
 	
 	
-	public void build() {
-		
-	}
+	public abstract void build();
 	
 
 	
@@ -41,8 +40,7 @@ public abstract class Feedback {
 		
 		FeatureVector finalVector = new FeatureVector(stopper);
 		
-		ScorableComparator comparator = new ScorableComparator(true);
-		Collections.sort(features, comparator);
+		features.sort(true);
 		Iterator<KeyValuePair> it = features.iterator();
 		
 		int i=0;
@@ -93,12 +91,7 @@ public abstract class Feedback {
 	
 	public String toString(int k) {
 		DecimalFormat format = new DecimalFormat("#.#####################");
-
-
-		
-		ScorableComparator comparator = new ScorableComparator(true);
-		Collections.sort(features, comparator);
-		
+		features.sort(true);
 		double sum = 0.0;
 		Iterator<KeyValuePair> it = features.iterator();
 		int i=0;

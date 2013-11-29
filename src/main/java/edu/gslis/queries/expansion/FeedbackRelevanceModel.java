@@ -9,6 +9,7 @@ import java.util.Set;
 import edu.gslis.searchhits.SearchHit;
 import edu.gslis.textrepresentation.FeatureVector;
 import edu.gslis.utils.KeyValuePair;
+import edu.gslis.utils.KeyValuePairs;
 
 
 
@@ -43,7 +44,7 @@ public class FeedbackRelevanceModel extends Feedback {
 				fbDocVectors.add(docVector);
 			}
 
-			features = new LinkedList<KeyValuePair>();
+			features = new KeyValuePairs();
 
 			
 			Iterator<String> it = vocab.iterator();

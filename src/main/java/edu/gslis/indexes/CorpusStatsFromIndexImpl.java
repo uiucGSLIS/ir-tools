@@ -3,20 +3,18 @@ package edu.gslis.indexes;
 public class CorpusStatsFromIndexImpl implements CorpusStats {
 	private IndexWrapper index;
 	
+	
 	public CorpusStatsFromIndexImpl(IndexWrapper index) {
 		this.index = index;
 	}
+	
 	
 	public double docCount() {
 		return index.docCount();
 	}
 
-	public double termTokenCount() {
-		return index.termTokenCount();
-	}
-
-	public double termTypeCount() {
-		return index.termTypeCount();
+	public double termCount() {
+		return index.termCount();
 	}
 
 	public double docFreq(String term) {

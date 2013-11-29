@@ -27,6 +27,8 @@ public class ParameterBroker {
 	public static final String FB_TERMS_PARAM   = "fbTerms";
 	public static final String COUNT_PARAM      = "count";
 	public static final String STOPPER_PARAM    = "stopper";
+	public static final String MU_PARAM         = "mu";
+	public static final String QRELS_PATH_PARAM = "qrels";
 	
 	private static final JsonParser JSON_PARSER = new JsonParser();
 	private Map<String,String> params;
@@ -70,5 +72,9 @@ public class ParameterBroker {
 		params.put(name, value);
 	}
 
+	// needed if we have a bunch of unusual params to sort through (e.g. multiple indexes, ind1, ind2, ...)
+	public Map<String,String> getAllParams() {
+		return params;
+	}
 	
 }

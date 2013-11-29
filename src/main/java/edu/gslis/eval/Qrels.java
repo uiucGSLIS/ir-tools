@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,28 +13,59 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 
+/**
+ * Container for <code>trec_eval</code> -type qrels.
+ * 
+ * @author mefron
+ *
+ */
 public class Qrels {
 
 	public static final Pattern SPACE_PATTERN = Pattern.compile(" ", Pattern.DOTALL);
-	
+
+	// remember.  this is an assumption of format based on TREC qrels.
 	private static final int QUERY_COLUMN = 0;
 	private static final int DOCNO_COLUMN = 2;
 	private static final int REL_COLUMN   = 3;
-	
+
+	/**
+	 * A map of queryName to set_of_rel_docnos
+	 */
 	private Map<String,Set<String>> rel;
-	private int minRel = 1;
 	
-	public Qrels(String pathToQrelsFile) {
+	/**
+	 * A map of queryName to set_of_non_rel_docnos.  Probably unused.
+	 */
+	private Map<String,Set<String>> nonRel;
+	
+	/**
+	 * needed if we want to walk over queries in order.
+	 */
+	private List<String> orderedQueryNames;
+
+
+	/**
+	 * 
+	 * @param pathToQrelsFile
+	 * @param storeNonRel
+	 * @param minRel           what is the minimum score for "relevance"?  e.g. 1?  2?
+	 */
+	public Qrels(String pathToQrelsFile, boolean storeNonRel, int minRel) {
+		orderedQueryNames = new LinkedList<String>();
 		try {
-			
+
 			rel = new HashMap<String,Set<String>>();
-			
+
+			if(storeNonRel)
+				nonRel = new HashMap<String,Set<String>>();
+
 			List<String> lines = IOUtils.readLines(new FileReader(new File(pathToQrelsFile)));
 			Iterator<String> linesIt = lines.iterator();
 			while(linesIt.hasNext()) {
-				String[] toks = SPACE_PATTERN.split(linesIt.next());
+				String line = linesIt.next();
+				String[] toks = SPACE_PATTERN.split(line);
 				if(toks==null || toks.length != 4) {
-					System.err.println("bad qrels line");
+					System.err.println("bad qrels line: " + line + ":");
 					continue;
 				}
 				String query = toks[QUERY_COLUMN];
@@ -49,13 +81,26 @@ public class Qrels {
 					relDocs.add(docno);
 					rel.put(query, relDocs);
 				} else {
+					if(storeNonRel) {
+						Set<String> nonRelDocs = null;
+						if(!nonRel.containsKey(query)) {
+							nonRelDocs = new HashSet<String>();
+						} else {
+							nonRelDocs = nonRel.get(query);
+						}
+						nonRelDocs.add(docno);
+						nonRel.put(query, nonRelDocs);
+					}
 				}
+				
+				if(! orderedQueryNames.contains(query))
+					orderedQueryNames.add(query);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public boolean isRel(String query, String docno) {
 		if(!rel.containsKey(query)) {
 			System.err.println("no relevant documents found for query " + query);
@@ -63,7 +108,12 @@ public class Qrels {
 		}
 		return rel.get(query).contains(docno);
 	}
-	
+
+	/**
+	 * 
+	 * @param query just the query title
+	 * @return      a Set of docnos for relevant docs
+	 */
 	public Set<String> getRelDocs(String query) {
 		if(!rel.containsKey(query)) {
 			System.err.println("no relevant documents found for query " + query);
@@ -71,7 +121,34 @@ public class Qrels {
 		}
 		return rel.get(query);
 	}
-	
+
+	public Set<String> getNonRelDocs(String query) {
+		if(!nonRel.containsKey(query)) {
+			System.err.println("no non-relevant documents found for query " + query);
+			return null;
+		}
+		return nonRel.get(query);
+	}
+
+	/**
+	 * Needed if we want ALL documents (relevant and non) in the pool for this query.
+	 * @param query
+	 * @return
+	 */
+	public Set<String> getPool(String query) {
+		if(!nonRel.containsKey(query) && !rel.containsKey(query)) {
+			System.err.println("no judgments found for query " + query);
+			return null;
+		}
+		Set<String> pool = new HashSet<String>();
+		if(nonRel.containsKey(query))
+			pool.addAll(nonRel.get(query));
+		if(rel.containsKey(query))
+			pool.addAll(rel.get(query));
+
+		return pool;
+	}
+
 	public double numRel(String query) {
 		if(!rel.containsKey(query)) {
 			System.err.println("no relevant documents found for query " + query);
@@ -79,4 +156,9 @@ public class Qrels {
 		}
 		return (double)rel.get(query).size();
 	}
+
+	public List<String> getOrderedQueryList() {
+		return orderedQueryNames;
+	}
+
 }

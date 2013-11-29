@@ -15,9 +15,12 @@ public class ScoreSupportBackgroundLm implements ScoreSupport {
 		this.corpusStats = corpusStats;
 	}
 
+	/**
+	 * N.B. returns 0 if term isn't in the collection.  this isn't considered an error.
+	 */
 	public double supportForFeature(String feature) {
 		feature = feature.toLowerCase();
-		double prob = corpusStats.termFreq(feature) / corpusStats.termTokenCount();
+		double prob = corpusStats.termFreq(feature) / corpusStats.termCount();
 		return prob;
 	}
 

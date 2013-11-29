@@ -115,7 +115,7 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 		return -1.0;
 	}
 
-	public double termTokenCount() {
+	public double termCount() {
 		try {
 			return (double)index.termCount();
 		} catch (Exception e) {
