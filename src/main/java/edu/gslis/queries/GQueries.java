@@ -21,4 +21,7 @@ public interface GQueries {
 	public int numQueries();
 	
 	public void addQuery(GQuery query);
+	
+	public void setMetadataField(String fieldName);
+	
 }

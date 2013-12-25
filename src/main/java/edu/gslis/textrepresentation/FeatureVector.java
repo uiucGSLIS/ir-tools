@@ -20,6 +20,7 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.util.Version;
 
+import edu.gslis.indexes.IndexWrapper;
 import edu.gslis.utils.KeyValuePair;
 import edu.gslis.utils.ScorableComparator;
 import edu.gslis.utils.Stopper;
@@ -138,18 +139,20 @@ public class FeatureVector  {
 		length += weight;
 	}
 
-	public void pruneToSize(int k) {
+	public void clip(int k) {
 		List<KeyValuePair> kvpList = getOrderedFeatures();
 
 		Iterator<KeyValuePair> it = kvpList.iterator();
-
+		
 		Map<String,Double> newMap = new HashMap<String,Double>(k);
 		int i=0;
+		length = 0;
 		while(it.hasNext()) {
-			KeyValuePair kvp = it.next();
-			newMap.put((String)kvp.getKey(), kvp.getScore());
-			if(++i>= k)
+			if(i++ >= k)
 				break;
+			KeyValuePair kvp = it.next();
+			length += kvp.getScore();
+			newMap.put((String)kvp.getKey(), kvp.getScore());
 		}
 
 		features = (HashMap<String, Double>) newMap;
@@ -178,6 +181,42 @@ public class FeatureVector  {
 		features = f;
 		length = 1.0;
 	}
+	
+	public void l2Normalize() {
+		Map<String,Double> f = new HashMap<String,Double>(features.size());
+		double l2Norm = getVectorNorm();
+		
+		Iterator<String> it = features.keySet().iterator();
+		while(it.hasNext()) {
+			String feature = it.next();
+			double obs = features.get(feature);
+			f.put(feature, obs / l2Norm);
+		}
+		
+		
+		features = f;
+		length = 1.0;
+	}
+	
+	public void toIdf(IndexWrapper index, boolean logTf) {
+		Map<String,Double> f = new HashMap<String,Double>(features.size());
+		double len = 0.0;
+		
+		Iterator<String> it = features.keySet().iterator();
+		while(it.hasNext()) {
+			String feature = it.next();
+			double obs = features.get(feature);
+			if(logTf)
+				obs = Math.log(obs + 1.0);
+			double idf = Math.log(index.docCount() / (index.docFreq(feature) + 1.0));
+			double tfidf = obs * idf;
+			len += tfidf;
+			f.put(feature, tfidf);
+		}
+		
+		features = f;
+		length = len;
+	}
 
 
 	// ACCESSORS
@@ -194,7 +233,7 @@ public class FeatureVector  {
 		return features.size();
 	}
 
-	public double getFeaturetWeight(String feature) {
+	public double getFeatureWeight(String feature) {
 		Double w = (Double)features.get(feature);
 		return (w==null) ? 0.0 : w.doubleValue();
 	}
@@ -284,9 +323,9 @@ public class FeatureVector  {
 			String feature = features.next();
 			double weight  = 0.0;
 			if(xWeight > 0) {
-				weight = xWeight*x.getFeaturetWeight(feature) + (1.0-xWeight)*y.getFeaturetWeight(feature);
+				weight = xWeight*x.getFeatureWeight(feature) + (1.0-xWeight)*y.getFeatureWeight(feature);
 			} else {
-				weight = x.getFeaturetWeight(feature) + y.getFeaturetWeight(feature);
+				weight = x.getFeatureWeight(feature) + y.getFeatureWeight(feature);
 			}
 			z.addTerm(feature, weight);
 		}
@@ -314,7 +353,7 @@ public class FeatureVector  {
 		
 		FeatureVector featureVector = new FeatureVector(text, stopper);
 		System.out.println(featureVector.getFeatureCount());
-		featureVector.pruneToSize(5);
+		featureVector.clip(5);
 		System.out.println(featureVector.getFeatureCount());
 	}
 

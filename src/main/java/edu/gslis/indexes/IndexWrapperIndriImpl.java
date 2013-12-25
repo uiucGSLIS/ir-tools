@@ -139,7 +139,7 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 
 	public double termFreq(String term) {
 		try {
-			return (double)index.documentCount(term);
+			return (double)index.termCount(term);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -190,6 +190,20 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 			e.printStackTrace();
 		}
 		return length;
+	}
+
+	public int getDocId(String docno) {
+		try {
+			String[] d = {docno};
+			int[] docIds = index.documentIDsFromMetadata("docno", d);
+			if(docIds == null || docIds.length == 0)
+				return -1;
+			return docIds[0];
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return -1;
 	}
 
 

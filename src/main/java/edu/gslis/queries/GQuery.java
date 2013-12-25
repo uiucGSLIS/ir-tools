@@ -52,7 +52,7 @@ public class GQuery {
 			String feature = it.next();
 			if(stopper.isStopWord(feature))
 				continue;
-			temp.addTerm(feature, featureVector.getFeaturetWeight(feature));
+			temp.addTerm(feature, featureVector.getFeatureWeight(feature));
 		}
 		featureVector = temp;
 	}
@@ -68,6 +68,15 @@ public class GQuery {
 			b.append(text + "\n");
 		if(featureVector != null)
 			b.append(featureVector);
+		
+		if(metadata != null) {
+			Iterator<String> it = metadata.keySet().iterator();
+			while(it.hasNext()) {
+				String key = it.next();
+				String value = metadata.get(key);
+				b.append(key + ":: " + value + "\n");
+			}
+		}
 		return b.toString();
 	}
 	public FeatureVector getFeatureVector() {

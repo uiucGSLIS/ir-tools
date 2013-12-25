@@ -42,7 +42,7 @@ public class ScorerDirichlet implements Scorer {
 			double docLength = doc.getLength();
 			double collectionProb = collectionModel.supportForFeature(feature) + EPSILON;
 			double pr = (docFreq + mu*collectionProb) / (docLength + mu);
-			double queryWeight = gQuery.getFeatureVector().getFeaturetWeight(feature);
+			double queryWeight = gQuery.getFeatureVector().getFeatureWeight(feature);
 			logLikelihood += queryWeight * Math.log(pr);
 		}
 		return logLikelihood;
@@ -55,9 +55,10 @@ public class ScorerDirichlet implements Scorer {
 	private boolean verify() {
 		Iterator<String> queryTerms = gQuery.getFeatureVector().iterator();
 		while(queryTerms.hasNext()) {
-			if(! (collectionModel.supportForFeature(queryTerms.next()) > 0)) {
-				System.err.println("query and bg model don't match in ScorerDirichlet.");
-				System.exit(-1);
+			String queryTerm = queryTerms.next();
+			if(! (collectionModel.supportForFeature(queryTerm) > 0)) {
+				System.err.println("no background stats for term: " + queryTerm);
+				//System.exit(-1);
 			}
 		}
 		return true;

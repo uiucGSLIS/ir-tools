@@ -103,7 +103,7 @@ public class Qrels {
 
 	public boolean isRel(String query, String docno) {
 		if(!rel.containsKey(query)) {
-			System.err.println("no relevant documents found for query " + query);
+			//System.err.println("no relevant documents found for query " + query);
 			return false;
 		}
 		return rel.get(query).contains(docno);
@@ -116,7 +116,7 @@ public class Qrels {
 	 */
 	public Set<String> getRelDocs(String query) {
 		if(!rel.containsKey(query)) {
-			System.err.println("no relevant documents found for query " + query);
+			//System.err.println("no relevant documents found for query " + query);
 			return null;
 		}
 		return rel.get(query);
@@ -124,7 +124,7 @@ public class Qrels {
 
 	public Set<String> getNonRelDocs(String query) {
 		if(!nonRel.containsKey(query)) {
-			System.err.println("no non-relevant documents found for query " + query);
+			//System.err.println("no non-relevant documents found for query " + query);
 			return null;
 		}
 		return nonRel.get(query);
@@ -151,7 +151,7 @@ public class Qrels {
 
 	public double numRel(String query) {
 		if(!rel.containsKey(query)) {
-			System.err.println("no relevant documents found for query " + query);
+			//System.err.println("no relevant documents found for query " + query);
 			return 0.0;
 		}
 		return (double)rel.get(query).size();

@@ -49,7 +49,7 @@ public class DocumentTermMatrix {
 			FeatureVector docVector = docIterator.next();
 			for(int column=0; column<vocab.size(); column++) {
 				String term = indexToTermMap.get(column);
-				double queryTermWeight = docVector.getFeaturetWeight(term);
+				double queryTermWeight = docVector.getFeatureWeight(term);
 				matrix[row][column] = queryTermWeight;
 			}
 			row++;

@@ -6,6 +6,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,6 +16,8 @@ import java.util.Map;
 
 
 
+
+import java.util.Set;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -39,13 +42,20 @@ public class GQueriesJsonImpl implements GQueries {
 	private static final JsonParser JSON_PARSER = new JsonParser();
 	private List<GQuery> queryList;
 	private Map<String,Integer> nameToIndex;
+	private Set<String> metadataFields;
+	
 
+	public GQueriesJsonImpl() {
+		metadataFields = new HashSet<String>();
+	}
+	
 	public void read(String pathToQueries) {
 		JsonObject obj = null;
 		try {
 			obj = (JsonObject) JSON_PARSER.parse(new BufferedReader(new FileReader(pathToQueries)));
 		} catch (Exception e) {
 			System.err.println("died reading queries from json file");
+			e.printStackTrace();
 			System.exit(-1);
 		}
 
@@ -86,6 +96,15 @@ public class GQueriesJsonImpl implements GQueries {
 			if(queryObject.get("group") != null) {
 				gQuery.setMetadata("group", queryObject.get("group").getAsString());
 			}
+			
+			Iterator<String> fields = metadataFields.iterator();
+			while(fields.hasNext()) {
+				String field = fields.next();
+				if(queryObject.get(field) != null) {
+					gQuery.setMetadata(field, queryObject.get(field).getAsString());
+				}
+			}
+			
 			queryList.add(gQuery);
 			
 		}	
@@ -148,13 +167,20 @@ public class GQueriesJsonImpl implements GQueries {
 			if(query.getMetadata("group") != null)
 				outputQueryObject.addProperty("group", query.getMetadata("group"));
 			
+			Iterator<String> fields = metadataFields.iterator();
+			while(fields.hasNext()) {
+				String field = fields.next();
+				if(query.getMetadata(field) != null)
+					outputQueryObject.addProperty(field, query.getMetadata(field));
+			}
+			
 			JsonArray modelArray = new JsonArray();
 			FeatureVector featureVector = query.getFeatureVector();
 			List<KeyValuePair> pairs = new ArrayList<KeyValuePair>(featureVector.getFeatureCount());
 			Iterator<String> featureIterator = featureVector.iterator();
 			while(featureIterator.hasNext()) {
 				String feature = featureIterator.next();
-				double weight  = featureVector.getFeaturetWeight(feature);
+				double weight  = featureVector.getFeatureWeight(feature);
 				KeyValuePair tuple = new KeyValuePair(feature,weight);
 				pairs.add(tuple);
 			}
@@ -182,6 +208,10 @@ public class GQueriesJsonImpl implements GQueries {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		String json = gson.toJson(outputObjects);
 		return json;
+	}
+
+	public void setMetadataField(String fieldName) {
+		metadataFields.add(fieldName);
 	}
 
 	

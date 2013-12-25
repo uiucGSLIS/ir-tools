@@ -28,6 +28,8 @@ public interface IndexWrapper {
 	
 	public String getMetadataValue(String docno, String metadataName);
 	
+	public int getDocId(String docno);
+	
 	public double getDocLength(int docID);
 	
 	// really shouldn't use this

@@ -7,11 +7,12 @@ import java.util.List;
 import java.util.Map;
 
 import edu.gslis.searchhits.SearchHit;
+import edu.gslis.searchhits.SearchHits;
 
 
 
 public class FilterEvaluation {
-	private List<SearchHit> results;
+	private SearchHits results;
 	private Qrels qrels;
 
 	private Map<String,List<Double>> aggregateStats;
@@ -20,11 +21,13 @@ public class FilterEvaluation {
 	public FilterEvaluation(Qrels qrels) {
 		this.qrels = qrels;
 		
+		
 		aggregateStats = new HashMap<String,List<Double>>();
+
 	}
 	
 
-	public void setResults(List<SearchHit> results) {
+	public void setResults(SearchHits results) {
 		this.results = results;
 	}
 	
@@ -44,8 +47,8 @@ public class FilterEvaluation {
 		
 		double numRet    = (double)results.size();
 
-		
-		return numRelRet / numRet;
+		double p = numRelRet / numRet;
+		return p;
 		
 	}
 	
@@ -56,10 +59,7 @@ public class FilterEvaluation {
 			return 0.0;
 		}
 		
-		double numRel = qrels.numRel(queryName);
-
-		//System.err.println("numRel: " + numRel);
-		
+		double numRel = qrels.numRel(queryName);		
 		return numRelRet / numRel;
 		
 	}
@@ -70,6 +70,9 @@ public class FilterEvaluation {
 		
 		double relRet  = 0.0;
 		
+		if(results == null)
+			return 0.0;
+		
 		Iterator<SearchHit> resultIterator = results.iterator();
 		while(resultIterator.hasNext()) {
 			SearchHit result = resultIterator.next();
@@ -79,6 +82,13 @@ public class FilterEvaluation {
 		}
 		
 		return (double)relRet;
+	}
+	
+	public double numRet(String queryName) {
+		if(results == null)
+			return 0.0;
+		
+		return (double)results.size();
 	}
 	
 	/**
@@ -124,6 +134,9 @@ public class FilterEvaluation {
 	}
 	
 	public double t11su(String queryName) {
+		if(results == null)
+			return 0.0;
+		
 		double t = 0.0;
 		double minU = 0.5;
 		double truePos  = this.numRelRet(queryName);
@@ -140,6 +153,9 @@ public class FilterEvaluation {
 	}
 	
 	public double utility(String queryName, double truePosWeight) {
+		if(results == null)
+			return 0.0;
+		
 		double truePos  = this.numRelRet(queryName);
 		double falsePos = (double)results.size() - truePos;
 		
