@@ -27,6 +27,8 @@ public class Qrels {
 	private static final int QUERY_COLUMN = 0;
 	private static final int DOCNO_COLUMN = 2;
 	private static final int REL_COLUMN   = 3;
+	
+	private static boolean killRepeats = true;
 
 	/**
 	 * A map of queryName to set_of_rel_docnos
@@ -78,9 +80,23 @@ public class Qrels {
 					} else {
 						relDocs = rel.get(query);
 					}
+
+					
 					relDocs.add(docno);
 					rel.put(query, relDocs);
 				} else {
+					if(killRepeats) {
+						Set<String> relDocs = null;
+						if(!rel.containsKey(query)) {
+							relDocs = new HashSet<String>();
+						} else {
+							relDocs = rel.get(query);
+						}
+						if(relDocs.contains(docno))
+							relDocs.remove(docno);						
+						rel.put(query, relDocs);
+					}
+					
 					if(storeNonRel) {
 						Set<String> nonRelDocs = null;
 						if(!nonRel.containsKey(query)) {

@@ -35,6 +35,10 @@ public class TextSimilarityMeasure {
 			String term = terms.next();
 			double xTerm = x.getFeatureWeight(term);
 			double yTerm = y.getFeatureWeight(term);
+			
+			if(Double.isInfinite(xTerm) || Double.isNaN(xTerm) || Double.isInfinite(yTerm) || Double.isNaN(yTerm))
+			continue;
+			
 			z += xTerm * yTerm;
 		}
 		return z;

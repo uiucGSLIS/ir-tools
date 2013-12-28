@@ -45,6 +45,10 @@ public class FormattedOutputTrecEval {
 		try {
 			while(hitIterator.hasNext()) {
 				SearchHit hit = hitIterator.next();
+				
+				if(hit.getDocno() == null || hit.getDocno().length()<2)
+					continue;
+				
 				String r = queryName + " Q0 " + hit.getDocno() + " " + k++ + " " + 
 						hit.getScore() + " "  + " " + runId + System.getProperty("line.separator");
 				
