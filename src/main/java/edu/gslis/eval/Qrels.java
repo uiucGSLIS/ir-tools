@@ -176,5 +176,20 @@ public class Qrels {
 	public List<String> getOrderedQueryList() {
 		return orderedQueryNames;
 	}
+	
+	public void removeQrel(String queryName, String docno) {
+		if(!rel.containsKey(queryName)) {
+			System.err.println("can't remove docno " + docno + " from qrels for query " + queryName + " because the query has no qrels.");
+			return;
+		}
+		rel.get(queryName).remove(docno);
+	}
+	public void addQrel(String queryName, String docno) {
+		if(!rel.containsKey(queryName)) {
+			Set<String> qrels = new HashSet<String>();
+			rel.put(queryName, qrels);
+		}
+		rel.get(queryName).add(docno);
+	}
 
 }
