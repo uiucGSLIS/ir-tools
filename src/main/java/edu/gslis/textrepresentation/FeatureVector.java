@@ -138,6 +138,14 @@ public class FeatureVector  {
 		}
 		length += weight;
 	}
+	
+	public void removeTerm(String term) {
+		Double w = ((Double)features.get(term));
+		if(w != null) {
+			length -= w;
+			features.remove(term);
+		}
+	}
 
 	public void clip(int k) {
 		List<KeyValuePair> kvpList = getOrderedFeatures();

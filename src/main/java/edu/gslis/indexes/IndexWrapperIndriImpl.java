@@ -173,7 +173,7 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 			String[] v = index.documentMetadata(i, metadataName);
 			if(v.length != d.length) {
 				System.err.println("got mismatch of metadata and docnos in IndexWrapperIndriImpl.getMetadataValue()");
-				System.exit(-1);
+				return null;
 			}
 			value = v[0];
 		} catch (Exception e) {

@@ -41,9 +41,7 @@ public class SearchHits {
 	}
 	
 	public Iterator<SearchHit> iterator() {
-		if(iter == null || !iter.hasNext()) {
-			iter = hits.iterator();
-		}
+		iter = hits.iterator();
 		return iter;
 	}
 	

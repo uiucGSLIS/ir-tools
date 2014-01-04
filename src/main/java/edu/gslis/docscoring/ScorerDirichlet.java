@@ -57,7 +57,7 @@ public class ScorerDirichlet implements Scorer {
 		while(queryTerms.hasNext()) {
 			String queryTerm = queryTerms.next();
 			if(! (collectionModel.supportForFeature(queryTerm) > 0)) {
-				System.err.println("no background stats for term: " + queryTerm);
+				//System.err.println("no background stats for term: " + queryTerm);
 				//System.exit(-1);
 			}
 		}

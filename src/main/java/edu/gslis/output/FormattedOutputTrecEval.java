@@ -50,7 +50,10 @@ public class FormattedOutputTrecEval {
 					continue;
 				
 				String r = queryName + " Q0 " + hit.getDocno() + " " + k++ + " " + 
-						hit.getScore() + " "  + " " + runId + System.getProperty("line.separator");
+						hit.getScore() + " " + runId + System.getProperty("line.separator");
+				
+				if(r.contains(" "))
+					continue;
 				
 				//writer.printf("%s Q0 %s %i %f %s", queryName, hit.getDocno(), k++, 
 				//		hit.getScore(), runId);
