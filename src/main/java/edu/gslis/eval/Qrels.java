@@ -46,6 +46,11 @@ public class Qrels {
 	private List<String> orderedQueryNames;
 
 
+	public Qrels() {
+		orderedQueryNames = new LinkedList<String>();
+		rel = new HashMap<String,Set<String>>();
+	}
+	
 	/**
 	 * 
 	 * @param pathToQrelsFile
