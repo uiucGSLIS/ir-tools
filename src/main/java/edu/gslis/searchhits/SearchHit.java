@@ -3,6 +3,7 @@ package edu.gslis.searchhits;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.gslis.textrepresentation.FeatureVector;
 import edu.gslis.utils.Scorable;
 
 
@@ -15,12 +16,12 @@ public class SearchHit implements Scorable {
 	private int docID;
 	private double score;
 	private double length;
-	private Map<String,Double> data;		// e.g. a term vector representing this doc
+	private FeatureVector docVector;		// e.g. a term vector representing this doc
 	private Map<String,Object> metadata;	// e.g. info such as a unix epoch
 	
 	public SearchHit() {
-		data = new HashMap<String,Double>();
 		metadata = new HashMap<String,Object>();
+		docVector = new FeatureVector(null);
 	}
 	
 	
@@ -53,19 +54,11 @@ public class SearchHit implements Scorable {
 	public void setDocID(int docID) {
 		this.docID = docID;
 	}
-	public Double getVal(String key) {
-		if(! data.containsKey(key))
-			return 0.0;
-		return this.data.get(key);
+	public void setFeatureVector(FeatureVector docVector) {
+		this.docVector = docVector;
 	}
-	public void setField(String key, double value) {
-		data.put(key, value);
-	}
-	public void setData(Map<String,Double> dataMap) {
-		this.data = dataMap;
-	}
-	public Map<String,Double> getFields() {
-		return data;
+	public FeatureVector getFeatureVector() {
+		return docVector;
 	}
 	public void setLength(double length) {
 		this.length = length;
@@ -73,11 +66,9 @@ public class SearchHit implements Scorable {
 	public double getLength() {
 		return length;
 	}
-
 	public void setScore(double score) {
 		this.score = score;
 	}
-
 	public double getScore() {
 		return score;
 	}

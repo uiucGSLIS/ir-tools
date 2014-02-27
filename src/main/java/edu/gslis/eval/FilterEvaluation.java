@@ -81,6 +81,7 @@ public class FilterEvaluation {
 			}
 		}
 		
+
 		return (double)relRet;
 	}
 	
@@ -105,6 +106,8 @@ public class FilterEvaluation {
 		
 		double f = 2 * (precision * recall) / (precision + recall);
 		
+		//System.err.println("EVAL: " + results.size() + " " + f);
+
 		if(Double.isNaN(f)) {
 			return 0.0;
 		}

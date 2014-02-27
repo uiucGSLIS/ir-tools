@@ -1,10 +1,8 @@
 package edu.gslis.queries.expansion;
 
 import java.text.DecimalFormat;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import edu.gslis.indexes.IndexWrapper;
@@ -13,7 +11,6 @@ import edu.gslis.searchhits.SearchHits;
 import edu.gslis.textrepresentation.FeatureVector;
 import edu.gslis.utils.KeyValuePair;
 import edu.gslis.utils.KeyValuePairs;
-import edu.gslis.utils.ScorableComparator;
 import edu.gslis.utils.Stopper;
 
 

@@ -14,7 +14,7 @@ import edu.gslis.queries.GQueriesJsonImpl;
 import edu.gslis.queries.GQuery;
 import edu.gslis.searchhits.SearchHits;
 import edu.gslis.utils.ParameterBroker;
-import edu.gslis.utils.Stopper;
+//import edu.gslis.utils.Stopper;
 
 
 /**
@@ -24,7 +24,7 @@ import edu.gslis.utils.Stopper;
  *
  */
 
-public class GslisRunQueries {
+public class RunRetrieval {
 
 	
 	/**
@@ -51,7 +51,7 @@ public class GslisRunQueries {
 		if(countString==null)
 			countString="1000";
 		int count = Integer.parseInt(countString);
-		Stopper stopper = new Stopper(params.getParamValue(ParameterBroker.STOPPER_PARAM));
+		//Stopper stopper = new Stopper(params.getParamValue(ParameterBroker.STOPPER_PARAM));
 		
 		Writer outputWriter = new BufferedWriter(new OutputStreamWriter(System.out));
 		FormattedOutputTrecEval output = FormattedOutputTrecEval.getInstance(runId, outputWriter);

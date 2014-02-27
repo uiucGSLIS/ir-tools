@@ -12,17 +12,12 @@ import edu.gslis.searchhits.SearchHits;
 
 public class FormattedOutputTrecEval {
 
-	private static SearchHits results;
 	private static Writer writer;
 	private static String runId;
 	private static FormattedOutputTrecEval formattedOutputTrecEval;
 
-	private FormattedOutputTrecEval() {
-		;
-	}
-	private void setResults(SearchHits results) {
-		FormattedOutputTrecEval.results = results;
-	}
+
+
 	private void setWriter(Writer writer) {
 		FormattedOutputTrecEval.writer = writer;
 	}
@@ -39,7 +34,6 @@ public class FormattedOutputTrecEval {
 	}
 
 	public void write(SearchHits results, String queryName) {
-		formattedOutputTrecEval.setResults(results);
 		Iterator<SearchHit> hitIterator = results.iterator();
 		int k=1;
 		try {
@@ -52,11 +46,9 @@ public class FormattedOutputTrecEval {
 				String r = queryName + " Q0 " + hit.getDocno() + " " + k++ + " " + 
 						hit.getScore() + " " + runId + System.getProperty("line.separator");
 				
-				if(r.contains(" "))
+				if(r.contains("  "))
 					continue;
 				
-				//writer.printf("%s Q0 %s %i %f %s", queryName, hit.getDocno(), k++, 
-				//		hit.getScore(), runId);
 				
 				IOUtils.write(r, writer);
 			}

@@ -11,23 +11,14 @@ import edu.gslis.searchhits.SearchHit;
  * @author mefron
  *
  */
-public class ScorerDirichlet implements Scorer {
-	// shouldn't need this.  avoid divide by (or log of) 0.
-	private static final double EPSILON = Math.pow(10.0, -7.0);
-
-	private ScoreSupportBackgroundLm collectionModel;
-	private GQuery gQuery;
-	private double mu = 2500.0;
+public class ScorerDirichlet extends QueryDocScorer {
+	public String PARAMETER_NAME = "mu";
 	
-	/**
-	 * 
-	 * @param gQuery
-	 * @param collectionModel a {@link ScoreSupport} with bg probabilities for each term in <code>gQuery</code> 
-	 */
-	public ScorerDirichlet(GQuery gQuery, ScoreSupportBackgroundLm collectionModel) {
-		this.gQuery = gQuery;
-		this.collectionModel = collectionModel;
-		verify();
+	public ScorerDirichlet() {
+		setParameter(PARAMETER_NAME, 2500);
+	}
+	public void setQuery(GQuery query) {
+		this.gQuery = query;
 	}
 	
 	/**
@@ -38,39 +29,22 @@ public class ScorerDirichlet implements Scorer {
 		Iterator<String> queryIterator = gQuery.getFeatureVector().iterator();
 		while(queryIterator.hasNext()) {
 			String feature = queryIterator.next();
-			double docFreq = doc.getVal(feature);
+			double docFreq = doc.getFeatureVector().getFeatureWeight(feature);
 			double docLength = doc.getLength();
-			double collectionProb = collectionModel.supportForFeature(feature) + EPSILON;
-			double pr = (docFreq + mu*collectionProb) / (docLength + mu);
+			double collectionProb = collectionStats.termCount(feature) / collectionStats.getTokCount();
+			double pr = (docFreq + 
+					paramTable.get(PARAMETER_NAME)*collectionProb) / 
+					(docLength + paramTable.get(PARAMETER_NAME)*collectionProb);
 			double queryWeight = gQuery.getFeatureVector().getFeatureWeight(feature);
 			logLikelihood += queryWeight * Math.log(pr);
 		}
 		return logLikelihood;
 	}
 	
-	/**
-	 * assure the the bg model features match the query
-	 * @return
-	 */
-	private boolean verify() {
-		Iterator<String> queryTerms = gQuery.getFeatureVector().iterator();
-		while(queryTerms.hasNext()) {
-			String queryTerm = queryTerms.next();
-			if(! (collectionModel.supportForFeature(queryTerm) > 0)) {
-				//System.err.println("no background stats for term: " + queryTerm);
-				//System.exit(-1);
-			}
-		}
-		return true;
-	}
+
 	
-	/**
-	 * set smoothing parameter
-	 * @param mu Dirichlet hyperparameter (pseudo-counts)
-	 */
-	public void setMu(double mu) {
-		this.mu = mu;
-	}
+
+
 	
 	
 

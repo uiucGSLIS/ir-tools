@@ -1,13 +1,13 @@
 package edu.gslis.indexes;
 
+import lemurproject.indri.QueryEnvironment;
+import lemurproject.indri.ScoredExtentResult;
 import edu.gslis.queries.GQuery;
 import edu.gslis.searchhits.SearchHit;
 import edu.gslis.searchhits.SearchHits;
 import edu.gslis.textrepresentation.FeatureVector;
 import edu.gslis.textrepresentation.IndriDocument;
 import edu.gslis.utils.Stopper;
-import lemurproject.indri.QueryEnvironment;
-import lemurproject.indri.ScoredExtentResult;
 
 
 

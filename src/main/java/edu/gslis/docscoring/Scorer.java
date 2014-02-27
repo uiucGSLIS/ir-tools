@@ -13,4 +13,6 @@ public interface Scorer {
 
 	public double score(SearchHit doc);
 	
+	public void setParameter(String paramName, double paramValue);
+	
 }

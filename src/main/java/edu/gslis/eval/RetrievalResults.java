@@ -26,7 +26,7 @@ public class RetrievalResults implements RunResults {
 	private static final int DOCNO_COLUMN = 2;
 	private static final int SCORE_COLUMN = 4;
 	
-	private static final int MAX_TO_READ = 1000;
+	private static final long MAX_TO_READ = 100000000000000L;
 
 	private Map<String,SearchHits> allResults;
 	

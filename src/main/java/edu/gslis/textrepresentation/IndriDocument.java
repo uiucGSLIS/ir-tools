@@ -1,9 +1,9 @@
 package edu.gslis.textrepresentation;
 
-import edu.gslis.utils.Stopper;
 import lemurproject.indri.DocumentVector;
 import lemurproject.indri.ParsedDocument;
 import lemurproject.indri.QueryEnvironment;
+import edu.gslis.utils.Stopper;
 
 
 
