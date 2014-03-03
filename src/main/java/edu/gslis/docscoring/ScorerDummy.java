@@ -20,7 +20,7 @@ public class ScorerDummy extends QueryDocScorer {
 	
 
 	public double score(SearchHit doc) {
-		return Double.NEGATIVE_INFINITY;
+		return Double.POSITIVE_INFINITY;
 	}
 	
 
