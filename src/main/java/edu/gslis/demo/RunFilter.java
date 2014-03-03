@@ -96,7 +96,8 @@ public class RunFilter {
 		//  the name of a variable pointing to a dumpindex-type file
 		// default
 		String corpusStatsPath = params.getParamValue("bg-source-path");
-		corpusStats.setStatSource(corpusStatsPath);
+		if(corpusStatsPath != null)
+			corpusStats.setStatSource(corpusStatsPath);
 		
 		// set up our document scorer
 		String scorerType = "edu.gslis.docscoring.ScorerDirichlet";
