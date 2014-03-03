@@ -83,7 +83,7 @@ public class SimpleFilterSessionImpl implements FilterSession {
 			double score = scorer.score(hit);
 			hit.setScore(score);
 			
-			if(thresholder.emit(score))
+			if(Double.isInfinite(thresholder.getThreshold()) || thresholder.emit(score))
 				testingEmitted.add(hit); 
 			
 			
