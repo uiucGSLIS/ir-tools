@@ -11,7 +11,7 @@ import edu.gslis.searchhits.SearchHits;
 
 
 
-public class ThresholdFinderParamSweep {
+public class ThresholdFinderParamSweep extends ThresholdFinder{
 	public static final String STAT_TO_OPTIMIZE = "f1";
 	public static final double DELTA = 0.05;
 	private double threshold = Double.NEGATIVE_INFINITY;
@@ -24,13 +24,15 @@ public class ThresholdFinderParamSweep {
 	private double bestObservedPerformance = 0.0;
 	
 	
-	public ThresholdFinderParamSweep(String queryName, SearchHits resultsForQuery, Qrels qrels) {
+
+	public void init(String queryName, SearchHits resultsForQuery, Qrels qrels) {
 		this.queryName = queryName;
 		this.resultsForQuery = resultsForQuery;
 		this.evaluation = new FilterEvaluation(qrels);
 		evaluation.setResults(resultsForQuery);
 	}
 	
+	@Override
 	public double getThreshold() {
 		optimize();
 		return threshold;

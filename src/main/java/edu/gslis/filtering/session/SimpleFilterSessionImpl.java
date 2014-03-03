@@ -8,6 +8,7 @@ import edu.gslis.docscoring.Scorer;
 import edu.gslis.eval.Qrels;
 import edu.gslis.filtering.threshold.SimpleCutoffThresholdClassifier;
 import edu.gslis.filtering.threshold.ThresholdClassifier;
+import edu.gslis.filtering.threshold.ThresholdFinder;
 import edu.gslis.filtering.threshold.ThresholdFinderParamSweep;
 import edu.gslis.indexes.IndexWrapper;
 import edu.gslis.indexes.IndexWrapperIndriImpl;
@@ -22,21 +23,22 @@ public class SimpleFilterSessionImpl implements FilterSession {
 	private Qrels trainQrels;
 	private ThresholdClassifier thresholder;
 	private Scorer scorer;
-	
+	private ThresholdFinder optimizer;
 	private GQuery query;
 	
 	public  SimpleFilterSessionImpl(GQuery query, 
 			IndexWrapper trainIndex,
 			IndexWrapper testIndex,
 			Qrels trainQrels,
-			Scorer scorer) {
+			Scorer scorer,
+			ThresholdFinder optimizer) {
 		
 		this.query = query;
 		this.trainIndex = trainIndex;
 		this.trainQrels = trainQrels;
 		this.testIndex  = testIndex;
 		this.scorer = scorer;
-		
+		this.optimizer = optimizer;
 	}
 
 
@@ -45,8 +47,6 @@ public class SimpleFilterSessionImpl implements FilterSession {
 		ResultAccumulator accumulator = new ResultAccumulator((IndexWrapperIndriImpl)trainIndex, 
 				query.getText(), query.getMetadata(NAME_OF_CONSTRAINT_FIELD));
 		
-		//ResultAccumulatorFullText accumulator = new ResultAccumulatorFullText((IndexWrapperIndriImpl) trainIndex, 
-		//		query);
 		
 		accumulator.accumulate();
 		List<UnscoredSearchHit> trainingAccumulated = accumulator.getChronologicallyOrderedDocs();
@@ -61,9 +61,9 @@ public class SimpleFilterSessionImpl implements FilterSession {
 			hit.setScore(score);
 			trainingHits.add(hit); 
 		}	
-
 		
-		ThresholdFinderParamSweep optimizer = new ThresholdFinderParamSweep(query.getTitle(), trainingHits, trainQrels);
+		
+		optimizer.init(query.getTitle(), trainingHits, trainQrels);
 		thresholder = new SimpleCutoffThresholdClassifier();
 		((SimpleCutoffThresholdClassifier)thresholder).setThreshold(optimizer.getThreshold());
 	}

@@ -226,6 +226,19 @@ public class FeatureVector  {
 		length = len;
 	}
 
+	public double clarity(IndexWrapper index) {
+		double kld = 0.0;
+		
+		Iterator<String> it = features.keySet().iterator();
+		while(it.hasNext()) {
+			String feature = it.next();
+			double obs = features.get(feature) / length;
+			double bg  = (index.termFreq(feature) + 1) / index.termCount();
+			kld += obs * Math.log(obs / bg);
+		}
+		return kld;
+	}
+	
 
 	// ACCESSORS
 

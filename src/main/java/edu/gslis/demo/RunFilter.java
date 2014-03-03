@@ -11,6 +11,9 @@ import edu.gslis.docscoring.support.CollectionStats;
 import edu.gslis.eval.Qrels;
 import edu.gslis.filtering.session.FilterSession;
 import edu.gslis.filtering.session.SimpleFilterSessionImpl;
+import edu.gslis.filtering.threshold.SimpleCutoffThresholdClassifier;
+import edu.gslis.filtering.threshold.ThresholdFinder;
+import edu.gslis.filtering.threshold.ThresholdFinderParamSweep;
 import edu.gslis.indexes.IndexWrapper;
 import edu.gslis.indexes.IndexWrapperIndriImpl;
 import edu.gslis.output.FormattedOutputTrecEval;
@@ -111,6 +114,14 @@ public class RunFilter {
 			docScorer.setParameter(paramName, paramValue);
 		}
 		
+		String optimizerType = "edu.gslis.filtering.threshold.ThresholdFinderParamSweep";
+		if(params.getParamValue("optimizer-name") != null)
+			optimizerType = params.getParamValue("optimizer-name");
+		ThresholdFinder optimizer = (ThresholdFinder)loader.loadClass(optimizerType).newInstance();
+		
+		
+		
+		
 		Writer outputWriter = new BufferedWriter(new OutputStreamWriter(System.out));
 		FormattedOutputTrecEval output = FormattedOutputTrecEval.getInstance(runId, outputWriter);
 		
@@ -130,11 +141,14 @@ public class RunFilter {
 			
 			docScorer.setQuery(query);
 
+			
+			
 			FilterSession filterSession = new SimpleFilterSessionImpl(query, 
 					trainIndex,
 					testIndex,
 					trainQrels,
-					docScorer);
+					docScorer,
+					optimizer);
 			
 			filterSession.train();
 			SearchHits results = filterSession.filter();

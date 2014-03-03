@@ -6,18 +6,15 @@ import edu.gslis.searchhits.SearchHits;
 
 
 
-public class ThresholdFinderDummy {
-	private double threshold = Double.NEGATIVE_INFINITY;
+public class ThresholdFinderDummy extends ThresholdFinder {
 
 	
-	
-	public ThresholdFinderDummy(String queryName, SearchHits resultsForQuery, Qrels qrels) {
-		;
+	@Override
+	public void init(String queryName, SearchHits resultsForQuery, Qrels qrels) {
+		threshold = Double.NEGATIVE_INFINITY;
 	}
 	
-	public double getThreshold() {
-		return threshold;
-	}
+
 
 	
 	
