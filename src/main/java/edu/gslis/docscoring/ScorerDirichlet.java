@@ -13,6 +13,7 @@ import edu.gslis.searchhits.SearchHit;
  */
 public class ScorerDirichlet extends QueryDocScorer {
 	public String PARAMETER_NAME = "mu";
+	public double EPSILON = 1.0;
 	
 	public ScorerDirichlet() {
 		setParameter(PARAMETER_NAME, 2500);
@@ -31,7 +32,7 @@ public class ScorerDirichlet extends QueryDocScorer {
 			String feature = queryIterator.next();
 			double docFreq = doc.getFeatureVector().getFeatureWeight(feature);
 			double docLength = doc.getLength();
-			double collectionProb = collectionStats.termCount(feature) / collectionStats.getTokCount();
+			double collectionProb = (EPSILON + collectionStats.termCount(feature)) / collectionStats.getTokCount();
 			double pr = (docFreq + 
 					paramTable.get(PARAMETER_NAME)*collectionProb) / 
 					(docLength + paramTable.get(PARAMETER_NAME)*collectionProb);
