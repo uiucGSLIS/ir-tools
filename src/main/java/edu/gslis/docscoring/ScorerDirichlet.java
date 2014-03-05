@@ -26,6 +26,7 @@ public class ScorerDirichlet extends QueryDocScorer {
 	 * retrieves the log-likelihood.  assumes the search hit is populated w term counts.
 	 */
 	public double score(SearchHit doc) {
+		System.err.println("BLAH BLAH");
 		double logLikelihood = 0.0;
 		Iterator<String> queryIterator = gQuery.getFeatureVector().iterator();
 		while(queryIterator.hasNext()) {
