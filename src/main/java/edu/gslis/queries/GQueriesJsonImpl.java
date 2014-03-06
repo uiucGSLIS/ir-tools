@@ -17,6 +17,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -69,7 +70,10 @@ public class GQueriesJsonImpl implements GQueries {
 			JsonArray modelObjectArray = queryObject.getAsJsonArray("model");
 			Iterator<JsonElement> featureIterator = modelObjectArray.iterator();
 			while(featureIterator.hasNext()) {
-				JsonObject featureObject = (JsonObject)featureIterator.next();
+			    Object elem = featureIterator.next();
+			    if (elem instanceof JsonNull)
+			        continue;
+				JsonObject featureObject = (JsonObject)elem;
 				double weight  = featureObject.get("weight").getAsDouble();
 				String feature = featureObject.get("feature").getAsString();
 				featureVector.addTerm(feature, weight);
