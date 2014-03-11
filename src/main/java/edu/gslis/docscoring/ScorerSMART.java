@@ -69,10 +69,10 @@ import edu.gslis.utils.Stopper;
  *                      
  *                      
  * Sources:
- *  SMART 11.0 (see details at bottom of this file)
+ *  SMART 11.0 (ftp://ftp.cs.cornell.edu/pub/smart)
  *  Salton, G. and Buckley, C. (1988). Term-weighting approaches in
  *     automatic text retrieval. Information Processing and Management 24 (5). 
- *  Singhal, A. (1997). Term weighting revisited. Dissertation.
+ *  Singhal, A. (1998). Pivoted document length normalization. SIGIR 96.
  *  
  */
 
@@ -105,33 +105,7 @@ public class ScorerSMART implements Scorer
 
     Stopper stopper = new Stopper();
     
-    public static void main(String[] args) throws Exception {
-        // Quick test
-        Stopper stopper = new Stopper();
-        
-        FeatureVector qfv = new FeatureVector(stopper);
-        qfv.addTerm("falkland");
-        qfv.addTerm("petroleum");
-        qfv.addTerm("exploration");
-        
-        GQuery query = new GQuery();
-        query.setTitle("351");
-        query.setText("falkland petroleum exploration");
-        query.setFeatureVector(qfv);
-        
-        String indexPath = "/Users/cwillis/dev/uiucGSLIS/indexes/FT.test";
-        double uniqueTerms = 263757;
-        IndexWrapper index = new IndexWrapperIndriImpl(indexPath);
-        String spec = "ltc.lnc";
-        Scorer scorer = new ScorerSMART(query, index, spec, stopper, uniqueTerms);
-        SearchHits hits = index.runQuery(query, 10);
-        Iterator<SearchHit> it = hits.iterator();
-        while (it.hasNext()) {
-            SearchHit hit = it.next();
-            double score = scorer.score(hit);
-            System.out.println (hit.getDocID() + ": " + score);
-        }
-    }
+
     
     /**
      * Constructor
@@ -152,6 +126,8 @@ public class ScorerSMART implements Scorer
         this.avgDocLength = totalTerms/numDocs;
         this.avgUniqueTerms = uniqueTerms/numDocs;
         this.stopper = stopper;
+        
+        // Initialize the weights and normalizers based on the SMART spec
         initWeights(spec);
     }
     
@@ -163,6 +139,8 @@ public class ScorerSMART implements Scorer
      */
     void initWeights(String spec) throws Exception 
     {
+        // e.g., ltu.Lnu
+        
         this.docTF = TFWeights.getTFWeight(spec.charAt(0));
         this.docIDF = IDFWeights.getIDFWeight(spec.charAt(1));
         docIDF.setNumDocs(numDocs);
@@ -178,6 +156,7 @@ public class ScorerSMART implements Scorer
         queryNormalizer.setAvgDocLen(avgDocLength); 
         queryNormalizer.setAvgUniqueTerms(avgUniqueTerms);
         
+        // Initialize the query vector, apply weights and normalize
         qfv = gQuery.getFeatureVector();
         queryTF.weight(qfv);
         queryIDF.weight(qfv);
@@ -187,7 +166,8 @@ public class ScorerSMART implements Scorer
     
     
     /**
-     * Get the document vector for the current document.
+     * Get the document vector for the current document. This 
+     * is (sadly) needed for some of the max TF calculations.
      * @param doc
      * @return
      * @throws Exception
@@ -212,6 +192,9 @@ public class ScorerSMART implements Scorer
             
             FeatureVector dfv = getDocumentVector(doc);
             
+            // Note: query weighting is handled in initWeights() above
+            //       (only once per Scorer, since the Scorer is bound
+            //        to the query).
             docTF.weight(dfv);
             docIDF.weight(dfv);
             docNormalizer.normalize(dfv);
@@ -233,8 +216,9 @@ public class ScorerSMART implements Scorer
    
 
     public void setParameter(String paramName, double paramValue) {
-        // Not used 
+        // Not currently used 
     }
+    
     /* Set/get the query TF weight*/
     public void setQueryTFWeight(TFWeight weight) {
         this.queryTF = weight;
@@ -282,5 +266,34 @@ public class ScorerSMART implements Scorer
     }
     public Normalizer getDocNormalizer() {
         return docNormalizer;
+    }
+    
+    
+    public static void main(String[] args) throws Exception {
+        // Quick test
+        Stopper stopper = new Stopper();
+        
+        FeatureVector qfv = new FeatureVector(stopper);
+        qfv.addTerm("falkland");
+        qfv.addTerm("petroleum");
+        qfv.addTerm("exploration");
+        
+        GQuery query = new GQuery();
+        query.setTitle("351");
+        query.setText("falkland petroleum exploration");
+        query.setFeatureVector(qfv);
+        
+        String indexPath = "/Users/cwillis/dev/uiucGSLIS/indexes/FT.test";
+        double uniqueTerms = 263757;
+        IndexWrapper index = new IndexWrapperIndriImpl(indexPath);
+        String spec = "ltc.lnc";
+        Scorer scorer = new ScorerSMART(query, index, spec, stopper, uniqueTerms);
+        SearchHits hits = index.runQuery(query, 10);
+        Iterator<SearchHit> it = hits.iterator();
+        while (it.hasNext()) {
+            SearchHit hit = it.next();
+            double score = scorer.score(hit);
+            System.out.println (hit.getDocID() + ": " + score);
+        }
     }
 }
