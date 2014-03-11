@@ -155,8 +155,9 @@ public class Normalizers {
     
     /**
      * Pivoted unique normalization as described by Singhal (1996). 
-     * Note, this is simply the "u" normalization scheme and 
-     * does not account for the "L" (log average) weighting.
+     * This uses the average number of unique terms per document as
+     * the pivot. At this time, the value must be provided through 
+     * configuration (e.g., output of dumpindex for index).
      */
     class PivotedUniqueNormalizer extends Normalizer {
         public void normalize(FeatureVector fv, int docLen) throws Exception 
