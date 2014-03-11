@@ -12,6 +12,7 @@ import edu.gslis.textrepresentation.FeatureVector;
  * convert.wt_norm.s Reweight vector by normalization with sum of weights
  * convert.wt_norm.C Reweight vector by cosine normalization and store length
  * convert.wt_norm.P Reweight vector by cosine normalization of last stored length
+ * u - Pivoted unique normalization (not implemented in SMART 11.0)
  */
 public class Normalizers {
 
@@ -37,9 +38,13 @@ public class Normalizers {
     // Simple interface for Normalizers
     public class Normalizer {
         double avgDocLen = 0;
+        double avgUniqueTerms = 0;
         public void normalize(FeatureVector fv) throws Exception {}
         public void setAvgDocLen(double avgDocLen) {
             this.avgDocLen = avgDocLen;
+        }
+        public void setAvgUniqueTerms(double avgUniqueTerms) {
+            this.avgUniqueTerms = avgUniqueTerms;
         }
     }
     
@@ -148,16 +153,22 @@ public class Normalizers {
         }   
     }    
     
+    /**
+     * Pivoted unique normalization as described by Singhal (1996). 
+     * Note, this is simply the "u" normalization scheme and 
+     * does not account for the "L" (log average) weighting.
+     */
     class PivotedUniqueNormalizer extends Normalizer {
         public void normalize(FeatureVector fv, int docLen) throws Exception 
         {
+            // The pivot is the average number of unique terms per document.
             double slope = 2.0;
             Iterator<String> it = fv.iterator();
             it = fv.iterator();
             while (it.hasNext()) {
                 String term = it.next();
                 double weight = fv.getFeatureWeight(term);
-                weight = (1.0 - slope) + (slope*(docLen/avgDocLen));
+                weight = (1.0 - slope)*avgUniqueTerms + (slope*(docLen/fv.getLength()));
                 fv.setTerm(term,  weight);
             }
         }

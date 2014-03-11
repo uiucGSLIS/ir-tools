@@ -91,6 +91,8 @@ public class ScorerSMART implements Scorer
     double totalTerms = 0;
     /* Average document length */
     double avgDocLength = 0;
+    /* Average unique terms per document */
+    double avgUniqueTerms = 0;
     
     /* Weights and normalizers */
     FeatureVector qfv = null;
@@ -118,9 +120,10 @@ public class ScorerSMART implements Scorer
         query.setFeatureVector(qfv);
         
         String indexPath = "/Users/cwillis/dev/uiucGSLIS/indexes/FT.test";
+        double uniqueTerms = 263757;
         IndexWrapper index = new IndexWrapperIndriImpl(indexPath);
         String spec = "ltc.lnc";
-        Scorer scorer = new ScorerSMART(query, index, spec, stopper);
+        Scorer scorer = new ScorerSMART(query, index, spec, stopper, uniqueTerms);
         SearchHits hits = index.runQuery(query, 10);
         Iterator<SearchHit> it = hits.iterator();
         while (it.hasNext()) {
@@ -135,10 +138,11 @@ public class ScorerSMART implements Scorer
      * @param query     Query for this instance
      * @param qe        Query environment for collection statistics
      * @param spec      SMART notation specification (e.g., ltc.lnc)
+     * @param uniqeTerms    Number of unique terms (output from dumpindex)
      * @throws Exception
      */
     public ScorerSMART(GQuery query, IndexWrapper index, 
-            String spec, Stopper stopper) 
+            String spec, Stopper stopper, double uniqueTerms) 
             throws Exception 
     {
         this.gQuery = query;
@@ -146,6 +150,7 @@ public class ScorerSMART implements Scorer
         this.numDocs = index.docCount();
         this.totalTerms = index.termCount();
         this.avgDocLength = totalTerms/numDocs;
+        this.avgUniqueTerms = uniqueTerms/numDocs;
         this.stopper = stopper;
         initWeights(spec);
     }
@@ -164,12 +169,14 @@ public class ScorerSMART implements Scorer
         docIDF.setIndex(index);
         this.docNormalizer = Normalizers.getNormalizer(spec.charAt(2));
         docNormalizer.setAvgDocLen(avgDocLength);
+        docNormalizer.setAvgUniqueTerms(avgUniqueTerms);
         this.queryTF = TFWeights.getTFWeight(spec.charAt(4));
         this.queryIDF = IDFWeights.getIDFWeight(spec.charAt(5));
         queryIDF.setNumDocs(numDocs);
         queryIDF.setIndex(index);
         this.queryNormalizer = Normalizers.getNormalizer(spec.charAt(6));
         queryNormalizer.setAvgDocLen(avgDocLength); 
+        queryNormalizer.setAvgUniqueTerms(avgUniqueTerms);
         
         qfv = gQuery.getFeatureVector();
         queryTF.weight(qfv);
