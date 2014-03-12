@@ -8,6 +8,8 @@ import edu.gslis.docscoring.smart.Normalizers;
 import edu.gslis.docscoring.smart.Normalizers.Normalizer;
 import edu.gslis.docscoring.smart.TFWeights;
 import edu.gslis.docscoring.smart.TFWeights.TFWeight;
+import edu.gslis.docscoring.support.CollectionStats;
+import edu.gslis.docscoring.support.IndexBackedCollectionStats;
 import edu.gslis.indexes.IndexWrapper;
 import edu.gslis.indexes.IndexWrapperIndriImpl;
 import edu.gslis.queries.GQuery;
@@ -77,22 +79,9 @@ import edu.gslis.utils.Stopper;
  */
 
 
-public class ScorerSMART implements Scorer 
+public class ScorerSMART extends QueryDocScorer 
 {    
-    /* Query for this scorer instance */
-    GQuery gQuery;
-
-    /* Query environment to for collection statistics */ 
-    IndexWrapper index = null;
-   
-    /* Number of documents in collection*/
-    double numDocs = 0;
-    /* Total terms in collection */
-    double totalTerms = 0;
-    /* Average document length */
-    double avgDocLength = 0;
-    /* Average unique terms per document */
-    double avgUniqueTerms = 0;
+    public static final String PARAM_SMART_SPEC = "scorer-param-smartspec";
     
     /* Weights and normalizers */
     FeatureVector qfv = null;
@@ -103,79 +92,48 @@ public class ScorerSMART implements Scorer
     Normalizer queryNormalizer = null;
     Normalizer docNormalizer = null;
 
-    Stopper stopper = new Stopper();
+    String smartSpec = "ltc.lnc";
     
 
-    
-    /**
-     * Constructor
-     * @param query     Query for this instance
-     * @param qe        Query environment for collection statistics
-     * @param spec      SMART notation specification (e.g., ltc.lnc)
-     * @param uniqeTerms    Number of unique terms (output from dumpindex)
-     * @throws Exception
-     */
-    public ScorerSMART(GQuery query, IndexWrapper index, 
-            String spec, Stopper stopper, double uniqueTerms) 
-            throws Exception 
-    {
-        this.gQuery = query;
-        this.index = index;
-        this.numDocs = index.docCount();
-        this.totalTerms = index.termCount();
-        this.avgDocLength = totalTerms/numDocs;
-        this.avgUniqueTerms = uniqueTerms/numDocs;
-        this.stopper = stopper;
-        
-        // Initialize the weights and normalizers based on the SMART spec
-        initWeights(spec);
-    }
-    
     /**
      * Instantiates weights and normalizers based on the
      * SMART notation spec.
-     * @param spec
-     * @throws Exception
      */
-    void initWeights(String spec) throws Exception 
+    public void init()  
     {
-        // e.g., ltu.Lnu
-        
-        this.docTF = TFWeights.getTFWeight(spec.charAt(0));
-        this.docIDF = IDFWeights.getIDFWeight(spec.charAt(1));
-        docIDF.setNumDocs(numDocs);
-        docIDF.setIndex(index);
-        this.docNormalizer = Normalizers.getNormalizer(spec.charAt(2));
-        docNormalizer.setAvgDocLen(avgDocLength);
-        docNormalizer.setAvgUniqueTerms(avgUniqueTerms);
-        this.queryTF = TFWeights.getTFWeight(spec.charAt(4));
-        this.queryIDF = IDFWeights.getIDFWeight(spec.charAt(5));
-        queryIDF.setNumDocs(numDocs);
-        queryIDF.setIndex(index);
-        this.queryNormalizer = Normalizers.getNormalizer(spec.charAt(6));
-        queryNormalizer.setAvgDocLen(avgDocLength); 
-        queryNormalizer.setAvgUniqueTerms(avgUniqueTerms);
-        
-        // Initialize the query vector, apply weights and normalize
-        qfv = gQuery.getFeatureVector();
-        queryTF.weight(qfv);
-        queryIDF.weight(qfv);
-        queryNormalizer.normalize(qfv);
-
+        try
+        {
+            double numDocs = collectionStats.getDocCount();
+            double tokenCount = collectionStats.getTokCount();
+            double termTypeCount = collectionStats.getTermTypeCount();
+            double avgDocLen = tokenCount/numDocs;
+            double avgUniqueTerms = termTypeCount/numDocs;
+                        
+            this.docTF = TFWeights.getTFWeight(smartSpec.charAt(0));
+            this.docIDF = IDFWeights.getIDFWeight(smartSpec.charAt(1));
+            docIDF.setNumDocs(numDocs);
+            docIDF.setCollectionStats(collectionStats);
+            this.docNormalizer = Normalizers.getNormalizer(smartSpec.charAt(2));
+            docNormalizer.setAvgDocLen(avgDocLen);
+            docNormalizer.setAvgUniqueTerms(avgUniqueTerms);
+            this.queryTF = TFWeights.getTFWeight(smartSpec.charAt(4));
+            this.queryIDF = IDFWeights.getIDFWeight(smartSpec.charAt(5));
+            queryIDF.setNumDocs(numDocs);
+            queryIDF.setCollectionStats(collectionStats);
+            this.queryNormalizer = Normalizers.getNormalizer(smartSpec.charAt(6));
+            queryNormalizer.setAvgDocLen(avgDocLen); 
+            queryNormalizer.setAvgUniqueTerms(avgUniqueTerms);
+            
+            // Initialize the query vector, apply weights and normalize
+            qfv = gQuery.getFeatureVector();
+            queryTF.weight(qfv);
+            queryIDF.weight(qfv);
+            queryNormalizer.normalize(qfv);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
-    
-    /**
-     * Get the document vector for the current document. This 
-     * is (sadly) needed for some of the max TF calculations.
-     * @param doc
-     * @return
-     * @throws Exception
-     */
-    public FeatureVector getDocumentVector(SearchHit doc) throws Exception 
-    {    
-        return index.getDocVector(doc.getDocID(), stopper);
-    }
 
     /**
      * CosineSimilarity score
@@ -186,15 +144,14 @@ public class ScorerSMART implements Scorer
      */
     public double score(SearchHit doc) 
     {
-        double score = 0.0;        
+        double score = 0.0; 
+
         try 
         {
+            FeatureVector dfv = doc.getFeatureVector();
             
-            FeatureVector dfv = getDocumentVector(doc);
+            // Note: query vector weights handled during init()
             
-            // Note: query weighting is handled in initWeights() above
-            //       (only once per Scorer, since the Scorer is bound
-            //        to the query).
             docTF.weight(dfv);
             docIDF.weight(dfv);
             docNormalizer.normalize(dfv);
@@ -213,10 +170,12 @@ public class ScorerSMART implements Scorer
         
         return score;        
     }
-   
+    
 
-    public void setParameter(String paramName, double paramValue) {
-        // Not currently used 
+    public void setParameter(String paramName, String paramValue) {
+        if (paramName.equals(PARAM_SMART_SPEC)) {
+            this.smartSpec = paramValue;
+        }
     }
     
     /* Set/get the query TF weight*/
@@ -283,11 +242,17 @@ public class ScorerSMART implements Scorer
         query.setText("falkland petroleum exploration");
         query.setFeatureVector(qfv);
         
-        String indexPath = "/Users/cwillis/dev/uiucGSLIS/indexes/FT.test";
-        double uniqueTerms = 263757;
-        IndexWrapper index = new IndexWrapperIndriImpl(indexPath);
+        String indexPath = "/Users/cwillis/dev/uiucGSLIS/indexes/FT.train";
+        CollectionStats stats = new IndexBackedCollectionStats();
+        stats.setStatSource(indexPath);
         String spec = "ltc.lnc";
-        Scorer scorer = new ScorerSMART(query, index, spec, stopper, uniqueTerms);
+        QueryDocScorer scorer = new ScorerSMART();
+        scorer.setQuery(query);
+        scorer.setCollectionStats(stats);
+        scorer.setParameter(ScorerSMART.PARAM_SMART_SPEC, spec);
+        
+        String testIndexPath = "/Users/cwillis/dev/uiucGSLIS/indexes/FT.test";
+        IndexWrapper index = new IndexWrapperIndriImpl(testIndexPath);
         SearchHits hits = index.runQuery(query, 10);
         Iterator<SearchHit> it = hits.iterator();
         while (it.hasNext()) {
@@ -296,4 +261,6 @@ public class ScorerSMART implements Scorer
             System.out.println (hit.getDocID() + ": " + score);
         }
     }
+    
+
 }

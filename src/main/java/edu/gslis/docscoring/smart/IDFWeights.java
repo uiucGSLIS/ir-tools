@@ -2,7 +2,7 @@ package edu.gslis.docscoring.smart;
 
 import java.util.Iterator;
 
-import edu.gslis.indexes.IndexWrapper;
+import edu.gslis.docscoring.support.CollectionStats;
 import edu.gslis.textrepresentation.FeatureVector;
 
 /** 
@@ -22,19 +22,26 @@ import edu.gslis.textrepresentation.FeatureVector;
 public class IDFWeights {
     
 
+    public static final char IDF_NO_OP = 'n';
+    public static final char IDF_LOG_WEIGHT = 't';
+    public static final char IDF_PROB_WEIGHT = 'p';
+    public static final char IDF_FREQ_WEIGHT = 'f';
+    public static final char IDF_SQUARE_WEIGHT = 's';
+    public static final char IDF_PHRASE_WEIGHT = 'P';
+
     public static IDFWeight getIDFWeight(char type) throws Exception
     { 
-        if (type == 't')
+        if (type == IDF_LOG_WEIGHT)
             return new IDFWeights().new LogIDFWeight();
-        else if (type == 'p')
+        else if (type == IDF_PROB_WEIGHT)
             return new IDFWeights().new IDFProbWeight();
-        else if (type == 'f')
+        else if (type == IDF_FREQ_WEIGHT)
             return new IDFWeights().new IDFFreqWeight();
-        else if (type == 's')
+        else if (type == IDF_SQUARE_WEIGHT)
             return new IDFWeights().new IDFSquareWeight();
-        else if (type == 'P')
+        else if (type == IDF_PHRASE_WEIGHT)
             throw new Exception("IDF weight not implemented '" + type + "'");
-        else if (type == 'x' || type == 'n')
+        else if (type == IDF_NO_OP)
             return new IDFWeights().new IDFWeight();
         else 
             throw new Exception("Unsupported IDF weight type '" + type + "'");
@@ -43,15 +50,15 @@ public class IDFWeights {
     // Simple interface for IDFWeights
     public class IDFWeight {
         double numDocs = 0;
-        IndexWrapper index = null;
+        CollectionStats collectionStats = null;
 
         public void weight(FeatureVector fv) throws Exception {}
         public void setNumDocs(double numDocs) {
             this.numDocs = numDocs;
         }
         
-        public void setIndex(IndexWrapper index) {
-            this.index = index;
+        public void setCollectionStats(CollectionStats collectionStats) {
+            this.collectionStats = collectionStats;
         }
     }
     
@@ -63,7 +70,7 @@ public class IDFWeights {
             while (it.hasNext()) {
                 String term = it.next();
                 double weight = fv.getFeatureWeight(term);
-                double docFreq = index.docFreq(term);
+                double docFreq = collectionStats.docCount(term);
                 weight = weight * Math.log(numDocs/docFreq);
                 fv.setTerm(term, weight);
             } 
@@ -78,7 +85,7 @@ public class IDFWeights {
             while (it.hasNext()) {
                 String term = it.next();
                 double weight = fv.getFeatureWeight(term);
-                double docFreq = index.docFreq(term);
+                double docFreq = collectionStats.docCount(term);
                 weight = weight * Math.log((numDocs - docFreq)/docFreq);
                 fv.setTerm(term, weight);
             }         
@@ -106,7 +113,7 @@ public class IDFWeights {
             while (it.hasNext()) {
                 String term = it.next();
                 double weight = fv.getFeatureWeight(term);
-                double docFreq = index.docFreq(term);
+                double docFreq = collectionStats.docCount(term);
                 weight = weight * Math.pow(Math.log(numDocs/docFreq), 2);
                 fv.setTerm(term, weight);
             }         

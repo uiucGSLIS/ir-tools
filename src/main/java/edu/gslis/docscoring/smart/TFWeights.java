@@ -17,24 +17,32 @@ import edu.gslis.textrepresentation.FeatureVector;
  * convert.wt_tf.s  Reweight vector by squaring each weight
  * convert.wt_tf.l  Reweight vector by logrithmic term freq
  */
-public class TFWeights {
+public class TFWeights 
+{
     
-    
+    public static final char TF_NO_OP = 'n';
+    public static final char TF_LOG_WEIGHT = 'l';
+    public static final char TF_AUGMENTED_WEIGHT = 'a';
+    public static final char TF_BINARY_WEIGHT = 'b';
+    public static final char TF_AVERAGE_WEIGHT = 'L';
+    public static final char TF_MAX_WEIGHT = 'm';
+    public static final char TF_SQUARE_WEIGHT = 's';
+        
     public static TFWeight getTFWeight(char type) throws Exception
     { 
-        if (type == 'l')
+        if (type == TF_LOG_WEIGHT)
             return new TFWeights().new TFLogWeight();
-        else if (type == 'a')
+        else if (type == TF_AUGMENTED_WEIGHT)
             return new TFWeights().new TFAugmentedWeight();
-        else if (type == 'b')
+        else if (type == TF_BINARY_WEIGHT)
             return new TFWeights().new TFBinaryWeight();
-        else if (type == 'L')
+        else if (type == TF_AVERAGE_WEIGHT)
             return new TFWeights().new TFAverageWeight();
-        else if (type == 'm')
+        else if (type == TF_MAX_WEIGHT)
             return new TFWeights().new TFMaxWeight();
-        else if (type == 's')
+        else if (type == TF_SQUARE_WEIGHT)
             return new TFWeights().new TFSquareWeight();
-        else if (type == 'x' || type == 'n')
+        else if (type == TF_NO_OP)
             return new TFWeights().new TFWeight();
         else 
             throw new Exception("Unsupported TF weight type '" + type + "'");

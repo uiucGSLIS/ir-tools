@@ -16,20 +16,28 @@ import edu.gslis.textrepresentation.FeatureVector;
  */
 public class Normalizers {
 
+    public static final char NORM_NO_OP = 'n';
+    public static final char NORM_COSINE = 'c';
+    public static final char NORM_PIVOTED_UNIQUE = 'u';
+    public static final char NORM_BYTE_SIZE = 'b';
+    public static final char NORM_MAX = 'm';
+    public static final char NORM_FOURTH = 'f';
+    public static final char NORM_SUM = 's';
+    
     public static Normalizer getNormalizer(char type) throws Exception
     { 
-        if (type == 'c')
+        if (type == NORM_COSINE)
             return new Normalizers().new CosineNormalizer();
-        else if (type == 'u')
+        else if (type == NORM_PIVOTED_UNIQUE)
             return new Normalizers().new PivotedUniqueNormalizer();
-        else if (type == 'b')
+        else if (type == NORM_BYTE_SIZE)
             throw new Exception("Normalizer not implemented");
             //return new Normalizers().new ByteSizeNormalizer();
-        else if (type == 'f')
+        else if (type == NORM_FOURTH)
             return new Normalizers().new FourthNormalizer();
-        else if (type == 'm')
+        else if (type == NORM_MAX)
             return new Normalizers().new MaxNormalizer();
-        else if (type == 's')
+        else if (type == NORM_SUM)
             return new Normalizers().new SumWeightNormalizer();
         else 
             throw new Exception("Unsupported normalizer");
