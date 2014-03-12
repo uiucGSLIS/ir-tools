@@ -1,10 +1,13 @@
 package edu.gslis.demo;
 
 import java.io.BufferedWriter;
+
 import java.io.File;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Iterator;
+
+import org.apache.commons.validator.GenericValidator;
 
 import edu.gslis.docscoring.QueryDocScorer;
 import edu.gslis.docscoring.support.CollectionStats;
@@ -105,14 +108,22 @@ public class RunFilter {
 			scorerType = params.getParamValue("scorer-name");
 		QueryDocScorer docScorer = (QueryDocScorer)loader.loadClass(scorerType).newInstance();
 		docScorer.setCollectionStats(corpusStats);
+		docScorer.init();
+		
 		Iterator<String> parameterIt = params.getAllParams().keySet().iterator();
 		while(parameterIt.hasNext()) {
 			String paramName = parameterIt.next();
 			if(! paramName.startsWith("scorer-param-"))
 				continue;
-			double paramValue = Double.parseDouble(params.getParamValue(paramName));
-			paramName = paramName.replaceFirst("scorer-param-", "");
-			docScorer.setParameter(paramName, paramValue);
+			String paramValue = params.getParamValue(paramName);
+			if (GenericValidator.isDouble(paramValue)) {
+			    double doubleValue = Double.parseDouble(params.getParamValue(paramName));
+		        paramName = paramName.replaceFirst("scorer-param-", "");
+		        docScorer.setParameter(paramName, doubleValue);
+			} else {
+	            paramName = paramName.replaceFirst("scorer-param-", "");
+	            docScorer.setParameter(paramName, paramValue);
+			}
 		}
 		
 		String optimizerType = "edu.gslis.filtering.threshold.ThresholdFinderParamSweep";
