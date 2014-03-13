@@ -11,6 +11,7 @@ public class IndexBackedCollectionStats extends CollectionStats {
 	public void setStatSource(String statSource) {
 		this.index = new IndexWrapperIndriImpl(statSource);
 		tokCount = index.termCount();
+		docCount = index.docCount();
 		termTypeCount = index.termTypeCount();
 	}
 
