@@ -68,8 +68,8 @@ public class ResultAccumulatorUnconstrained {
 														
 					hit.addFeature(feature, count);
 					accumulatedFilteredDocs.put(docId, hit);
+		            k++;
 				}
-				k++;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
