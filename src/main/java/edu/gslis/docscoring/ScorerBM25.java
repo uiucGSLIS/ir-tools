@@ -10,20 +10,24 @@ import edu.gslis.searchhits.SearchHit;
 // Default parameters from Manning, Raghavan & Schutze,
 //	http://nlp.stanford.edu/IR-book/html/htmledition/okapi-bm25-a-non-binary-model-1.html
 public class ScorerBM25 extends QueryDocScorer {
-	public final String PARAM_K1_NAME = "k1";
-	public final String PARAM_K2_NAME = "k2";
-	public final String PARAM_B_NAME = "b";
+	public static final String PARAM_K1_NAME = "k1";
+	public static final String PARAM_K2_NAME = "k2";
+	public static final String PARAM_B_NAME = "b";
 	
-	private final static double K1_DEFAULT = 1.2;
-	private final static double B_DEFAULT = 0.75;
-	private final static double K2_DEFAULT = 2.0;
+	private static final double K1_DEFAULT = 1.2;
+	private static final double B_DEFAULT = 0.75;
+	private static final double K2_DEFAULT = 2.0;
 	
 	public ScorerBM25(GQuery query, CollectionStats stats, double k1, double b, double k2) {
-		super.gQuery = query;
-		super.collectionStats = stats;
-		super.paramTable.put(PARAM_K1_NAME, k1);
-		super.paramTable.put(PARAM_B_NAME, b);
-		super.paramTable.put(PARAM_K2_NAME, k2);
+		gQuery = query;
+		collectionStats = stats;
+		paramTable.put(PARAM_K1_NAME, k1);
+		paramTable.put(PARAM_B_NAME, b);
+		paramTable.put(PARAM_K2_NAME, k2);
+	}
+	
+	public ScorerBM25() {
+		
 	}
 	
 	// Manning states that the query weight term is unnecessary for short queries.
@@ -38,8 +42,8 @@ public class ScorerBM25 extends QueryDocScorer {
 	}
 
 	public double score(SearchHit doc) {
-		double N = super.collectionStats.getDocCount();
-		double totalTerms = super.collectionStats.getTokCount();
+		double N = collectionStats.getDocCount();
+		double totalTerms = collectionStats.getTokCount();
 		double avgDocLength = totalTerms / N;
 
 		double docLength = doc.getLength();
@@ -52,19 +56,19 @@ public class ScorerBM25 extends QueryDocScorer {
 			
 			double termFreq = doc.getFeatureVector().getFeatureWeight(term);
 			
-			double n = super.collectionStats.docCount(term);
+			double n = collectionStats.docCount(term);
 			double idf = Math.log((N - n + 0.5) / n + 0.5);
 			
-			double K = super.paramTable.get(PARAM_K1_NAME) * ((1 - super.paramTable.get(PARAM_B_NAME)) + super.paramTable.get(PARAM_B_NAME) * (docLength / avgDocLength));
-			double documentScaling = ((termFreq * (super.paramTable.get(PARAM_K1_NAME) + 1)) / (K + termFreq));
+			double K = paramTable.get(PARAM_K1_NAME) * ((1 - paramTable.get(PARAM_B_NAME)) + paramTable.get(PARAM_B_NAME) * (docLength / avgDocLength));
+			double documentScaling = ((termFreq * (paramTable.get(PARAM_K1_NAME) + 1)) / (K + termFreq));
 			
 			double termScore = idf * documentScaling;
 			
 			// If we're including the query weight term
 			// (i.e. if k2 is non-negative)
-			if (super.paramTable.get(PARAM_K2_NAME) >= 0) {
+			if (paramTable.get(PARAM_K2_NAME) >= 0) {
 				double termFreqQuery = this.gQuery.getFeatureVector().getFeatureWeight(term);
-				double queryScaling = (super.paramTable.get(PARAM_K2_NAME) + 1) * termFreqQuery / (super.paramTable.get(PARAM_K2_NAME) + termFreqQuery);
+				double queryScaling = (paramTable.get(PARAM_K2_NAME) + 1) * termFreqQuery / (paramTable.get(PARAM_K2_NAME) + termFreqQuery);
 				termScore *= queryScaling;
 			}
 			
