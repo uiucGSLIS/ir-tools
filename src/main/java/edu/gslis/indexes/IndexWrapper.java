@@ -32,6 +32,8 @@ public interface IndexWrapper {
 	
 	public double getDocLength(int docID);
 	
+	public double termTypeCount();
+	
 	// really shouldn't use this
 	public Object getActualIndex();
 }

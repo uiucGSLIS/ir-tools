@@ -1,53 +1,38 @@
 package edu.gslis.demo;
 
 import java.io.BufferedWriter;
-
 import java.io.File;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.commons.validator.GenericValidator;
 
+import edu.gslis.docaccumulators.ResultAccumulatorUnconstrained;
 import edu.gslis.docscoring.QueryDocScorer;
 import edu.gslis.docscoring.support.CollectionStats;
-import edu.gslis.eval.Qrels;
 import edu.gslis.filtering.session.FilterSession;
-import edu.gslis.filtering.session.SimpleFilterSessionImpl;
-import edu.gslis.filtering.threshold.SimpleCutoffThresholdClassifier;
-import edu.gslis.filtering.threshold.ThresholdFinder;
-import edu.gslis.filtering.threshold.ThresholdFinderParamSweep;
 import edu.gslis.indexes.IndexWrapper;
 import edu.gslis.indexes.IndexWrapperIndriImpl;
 import edu.gslis.output.FormattedOutputTrecEval;
 import edu.gslis.queries.GQueries;
 import edu.gslis.queries.GQueriesJsonImpl;
 import edu.gslis.queries.GQuery;
+import edu.gslis.searchhits.SearchHit;
 import edu.gslis.searchhits.SearchHits;
+import edu.gslis.searchhits.UnscoredSearchHit;
 import edu.gslis.textrepresentation.FeatureVector;
 import edu.gslis.utils.ParameterBroker;
 import edu.gslis.utils.Stopper;
 
 
-/**
- * runs a basic test/train batch filter session
- * 
- * @author mefron
- *
- */
 
-public class RunFilter {
+/** 
+ * Rescore all documents in a collection
+ */
+public class RunScorer {
 	
-	/**
-	 * runs a basic test/train batch filter session
-	 * 
-	 * @param args[0] /path/to/json/param/file
-	 * @throws ClassNotFoundException 
-	 * @throws IllegalAccessException 
-	 * @throws InstantiationException 
-	 * @throws NoSuchFieldException 
-	 * @throws SecurityException 
-	 */
 	public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, SecurityException, NoSuchFieldException {
 		File paramFile = new File(args[0]);
 		if(!paramFile.exists()) {
@@ -63,26 +48,16 @@ public class RunFilter {
 		queries.setMetadataField(FilterSession.NAME_OF_CONSTRAINT_FIELD);
 		queries.read(params.getParamValue(ParameterBroker.QUERY_PATH_PARAM));
 		
-		IndexWrapper    trainIndex = new IndexWrapperIndriImpl(params.getParamValue("train-index"));
-		IndexWrapper    testIndex = new IndexWrapperIndriImpl(params.getParamValue("test-index"));
-		
-		Qrels trainQrels = null;
-		String pathToQrels = params.getParamValue("train-qrels");
-		if(pathToQrels != null) {
-			trainQrels =  new Qrels(pathToQrels, false, 2);
-		}
-		
-		
+		IndexWrapper index = new IndexWrapperIndriImpl(params.getParamValue("index"));
+				
 		String runId = "gslis";
-		if(params.getParamValue("run-name") != null)
-			runId = params.getParamValue("run-name");
+        if(params.getParamValue("run-name") != null)
+            runId = params.getParamValue("run-name");
 
+		
 		Stopper stopper = null;
 		if(params.getParamValue(ParameterBroker.STOPPER_PARAM) != null)
 			stopper = new Stopper(params.getParamValue(ParameterBroker.STOPPER_PARAM));
-		
-	
-		
 		
 		ClassLoader loader = ClassLoader.getSystemClassLoader();
 		
@@ -126,17 +101,11 @@ public class RunFilter {
 			}
 		}
 		
-		String optimizerType = "edu.gslis.filtering.threshold.ThresholdFinderParamSweep";
-		if(params.getParamValue("optimizer-name") != null)
-			optimizerType = params.getParamValue("optimizer-name");
-		ThresholdFinder optimizer = (ThresholdFinder)loader.loadClass(optimizerType).newInstance();
-		
-		
-		
-		
+
 		Writer outputWriter = new BufferedWriter(new OutputStreamWriter(System.out));
-		FormattedOutputTrecEval output = FormattedOutputTrecEval.getInstance(runId, outputWriter);
-		
+	    FormattedOutputTrecEval output = FormattedOutputTrecEval.getInstance(runId, outputWriter);
+
+	      
 		Iterator<GQuery> queryIterator = queries.iterator();
 		while(queryIterator.hasNext()) {
 			GQuery query = queryIterator.next();
@@ -153,21 +122,23 @@ public class RunFilter {
 			
 			docScorer.setQuery(query);
 
-			
-			
-			FilterSession filterSession = new SimpleFilterSessionImpl(query, 
-					trainIndex,
-					testIndex,
-					trainQrels,
-					docScorer,
-					optimizer);
-			
-			filterSession.train();
-			SearchHits results = filterSession.filter();
-			
-			output.write(results, query.getTitle());
-		}
-		output.close();
-	}
 
+			ResultAccumulatorUnconstrained accumulator = 
+	                new ResultAccumulatorUnconstrained((IndexWrapperIndriImpl)index, query.getText());
+	        accumulator.accumulate();
+	        Map<Integer, UnscoredSearchHit> accumulated = 
+	                accumulator.getAccumulatedDocs();
+	        
+	        SearchHits results = new SearchHits();
+	        for (UnscoredSearchHit unscoredHit: accumulated.values()) {
+	            SearchHit hit = unscoredHit.toSearchHit();
+	            double score = docScorer.score(hit);
+	            hit.setScore(score);  
+	            results.add(hit);
+	        }   
+	            
+            output.write(results, query.getTitle());
+        }
+        output.close();
+	}
 }

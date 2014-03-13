@@ -1,6 +1,7 @@
 package edu.gslis.docscoring;
 
 import java.util.HashMap;
+
 import java.util.Map;
 
 import edu.gslis.docscoring.support.CollectionStats;
@@ -23,4 +24,14 @@ public abstract class QueryDocScorer implements Scorer {
 			paramTable = new HashMap<String,Double>();
 		paramTable.put(paramName, paramValue);
 	}
+	
+	/**
+	 * Optional for string-valued parameters
+	 */
+	public void setParameter(String paramName, String paramValue) {}
+	
+	/**
+	 * To support any optional initialization steps required by the scorer.
+	 */
+	public void init() {}
 }

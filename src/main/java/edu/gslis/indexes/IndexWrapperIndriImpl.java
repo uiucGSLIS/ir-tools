@@ -2,6 +2,8 @@ package edu.gslis.indexes;
 
 import lemurproject.indri.QueryEnvironment;
 import lemurproject.indri.ScoredExtentResult;
+import lemurproject.lemur.Index;
+import lemurproject.lemur.IndexManager;
 import edu.gslis.queries.GQuery;
 import edu.gslis.searchhits.SearchHit;
 import edu.gslis.searchhits.SearchHits;
@@ -16,10 +18,17 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 	private double vocabularySize = -1.0;
 	private double docLengthAvg   = -1.0;
 	private String timeFieldName  = null;
-
+	
 	public IndexWrapperIndriImpl(String pathToIndex) {
 		index = new QueryEnvironment();
 		addIndex(pathToIndex);
+		try
+		{
+		    Index lemurIndex = IndexManager.openIndex(pathToIndex);
+		    vocabularySize = lemurIndex.termCountUnique();
+		} catch (Exception e) {
+		    e.printStackTrace();
+		}		
 	}
 
 	private void addIndex(String pathToIndex) {
