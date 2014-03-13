@@ -22,6 +22,7 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 	public IndexWrapperIndriImpl(String pathToIndex) {
 		index = new QueryEnvironment();
 		addIndex(pathToIndex);
+		/*
 		try
 		{
 		    Index lemurIndex = IndexManager.openIndex(pathToIndex);
@@ -29,11 +30,17 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 		} catch (Exception e) {
 		    e.printStackTrace();
 		}		
+		*/
 	}
 
 	private void addIndex(String pathToIndex) {
 		try {
-			index.addIndex(pathToIndex);
+		    if (pathToIndex.startsWith("server:")) {
+		        String server = pathToIndex.substring(7);
+		        index.addServer(server);
+		    }
+		    else
+		        index.addIndex(pathToIndex);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

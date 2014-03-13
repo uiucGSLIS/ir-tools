@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.validator.GenericValidator;
+
 import lemurproject.indri.QueryEnvironment;
 import lemurproject.indri.ScoredExtentResult;
 import edu.gslis.indexes.IndexWrapperIndriImpl;
@@ -38,12 +40,7 @@ public class ResultAccumulatorUnconstrained {
 				ScoredExtentResult[] featureResults = env.expressionList(featureQuery);
 
 				String[] docnos   = env.documentMetadata(featureResults, "docno");
-				String[] epochs   = new String[0];
-				try {
-				    epochs = env.documentMetadata(featureResults, "epoch");
-				} catch (Exception e) {
-				    // No epoch metadata for this collection.  Ignore.
-				}
+				String[] epochs   = env.documentMetadata(featureResults, "epoch");
 				
 				if(featureResults.length==0)
 					continue;
@@ -60,8 +57,9 @@ public class ResultAccumulatorUnconstrained {
 	                if(hit == null) {
 	                    String docno = docnos[k];
 	                    double length = (double)env.documentLength(docId);
+	                    
 	                    double epoch = 0;
-	                    if (epochs.length > 0)
+	                    if (GenericValidator.isDouble(epochs[k]))
 	                        epoch = Double.parseDouble(epochs[k]);
 	                    hit = new UnscoredSearchHit(docno, docId, length, epoch);
 	                }
