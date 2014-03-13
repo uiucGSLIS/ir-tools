@@ -38,7 +38,12 @@ public class ResultAccumulatorUnconstrained {
 				ScoredExtentResult[] featureResults = env.expressionList(featureQuery);
 
 				String[] docnos   = env.documentMetadata(featureResults, "docno");
-				String[] epochs   = env.documentMetadata(featureResults, "epoch");
+				String[] epochs   = new String[0];
+				try {
+				    epochs = env.documentMetadata(featureResults, "epoch");
+				} catch (Exception e) {
+				    // No epoch metadata for this collection.  Ignore.
+				}
 				
 				if(featureResults.length==0)
 					continue;
@@ -55,7 +60,9 @@ public class ResultAccumulatorUnconstrained {
 	                if(hit == null) {
 	                    String docno = docnos[k];
 	                    double length = (double)env.documentLength(docId);
-	                    double epoch = Double.parseDouble(epochs[k]);
+	                    double epoch = 0;
+	                    if (epochs.length > 0)
+	                        epoch = Double.parseDouble(epochs[k]);
 	                    hit = new UnscoredSearchHit(docno, docId, length, epoch);
 	                }
 					    
