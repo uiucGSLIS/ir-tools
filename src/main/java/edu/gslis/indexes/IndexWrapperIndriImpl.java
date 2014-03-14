@@ -48,13 +48,17 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
      * @param pathToIndex
      */
     private void getVocabularySize(String pathToIndex) {
-        try
+        if (pathToIndex.startsWith(SERVER_PREFIX))
+            System.err.println("Unable to get vocabulary size from remote server. Must use local index.");
+        else
         {
-            Index lemurIndex = IndexManager.openIndex(pathToIndex);
-            vocabularySize = lemurIndex.termCountUnique();
-        } catch (Exception e) {
-            System.err.println("Error getting vocabulary size: perhaps liblemur library is missing?");
-        }         
+            try {
+                Index lemurIndex = IndexManager.openIndex(pathToIndex);
+                vocabularySize = lemurIndex.termCountUnique();
+            } catch (Exception e) {
+                System.err.println("Error getting vocabulary size: perhaps liblemur library is missing?");
+            }         
+        }
     }
 
 	public SearchHits runQuery(GQuery query, int count) {
