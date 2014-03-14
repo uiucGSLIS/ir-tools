@@ -71,7 +71,8 @@ public class IDFWeights {
                 String term = it.next();
                 double weight = fv.getFeatureWeight(term);
                 double docFreq = collectionStats.docCount(term);
-                weight = weight * Math.log(numDocs/docFreq);
+                if(docFreq > 0)
+                    weight = weight * Math.log(numDocs/docFreq);
                 fv.setTerm(term, weight);
             } 
         }
