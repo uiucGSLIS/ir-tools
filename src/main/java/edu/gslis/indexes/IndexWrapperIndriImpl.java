@@ -14,6 +14,9 @@ import edu.gslis.utils.Stopper;
 
 
 public class IndexWrapperIndriImpl implements IndexWrapper{
+
+    private static final String SERVER_PREFIX = "server:";
+    
 	private QueryEnvironment index;
 	private double vocabularySize = -1.0;
 	private double docLengthAvg   = -1.0;
@@ -22,21 +25,15 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 	public IndexWrapperIndriImpl(String pathToIndex) {
 		index = new QueryEnvironment();
 		addIndex(pathToIndex);
-		/*
-		try
-		{
-		    Index lemurIndex = IndexManager.openIndex(pathToIndex);
-		    vocabularySize = lemurIndex.termCountUnique();
-		} catch (Exception e) {
-		    e.printStackTrace();
-		}		
-		*/
+		getVocabularySize(pathToIndex);
 	}
+
 
 	private void addIndex(String pathToIndex) {
 		try {
-		    if (pathToIndex.startsWith("server:")) {
-		        String server = pathToIndex.substring(7);
+		    // If the index path starts with 'server:', treat it as a server
+		    if (pathToIndex.startsWith(SERVER_PREFIX)) {
+		        String server = pathToIndex.substring(SERVER_PREFIX.length());
 		        index.addServer(server);
 		    }
 		    else
@@ -45,6 +42,20 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 			e.printStackTrace();
 		}
 	}
+	
+	   /**
+     * Initialize the vocabulary size using the lemur API
+     * @param pathToIndex
+     */
+    private void getVocabularySize(String pathToIndex) {
+        try
+        {
+            Index lemurIndex = IndexManager.openIndex(pathToIndex);
+            vocabularySize = lemurIndex.termCountUnique();
+        } catch (Exception e) {
+            System.err.println("Error getting vocabulary size: perhaps liblemur library is missing?");
+        }         
+    }
 
 	public SearchHits runQuery(GQuery query, int count) {
 				
