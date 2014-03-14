@@ -81,7 +81,7 @@ import edu.gslis.utils.Stopper;
 
 public class ScorerSMART extends QueryDocScorer 
 {    
-    public static final String PARAM_SMART_SPEC = "scorer-param-smartspec";
+    public static final String PARAM_SMART_SPEC = "smartspec";
     
     /* Weights and normalizers */
     FeatureVector qfv = null;
@@ -92,7 +92,7 @@ public class ScorerSMART extends QueryDocScorer
     Normalizer queryNormalizer = null;
     Normalizer docNormalizer = null;
 
-    String smartSpec = "ltc.lnc";
+    String smartSpec = "lnc.ltc";
     
 
     /**
@@ -124,16 +124,28 @@ public class ScorerSMART extends QueryDocScorer
             queryNormalizer.setAvgDocLen(avgDocLen); 
             queryNormalizer.setAvgUniqueTerms(avgUniqueTerms);
             
-            // Initialize the query vector, apply weights and normalize
-            qfv = gQuery.getFeatureVector();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void setQuery(GQuery gQuery) {
+        this.gQuery = gQuery;
+        
+        // Initialize the query vector, apply weights and normalize
+        qfv = gQuery.getFeatureVector();
+        
+        try
+        {
             queryTF.weight(qfv);
             queryIDF.weight(qfv);
             queryNormalizer.normalize(qfv);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        
     }
-    
 
     /**
      * CosineSimilarity score
