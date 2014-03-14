@@ -2,6 +2,8 @@ package edu.gslis.demo;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Iterator;
@@ -33,7 +35,8 @@ import edu.gslis.utils.Stopper;
  */
 public class RunScorer {
 	
-	public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, SecurityException, NoSuchFieldException {
+    public static int DEFAULT_MAX_RESULTS = 1000;
+	public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, SecurityException, NoSuchFieldException, FileNotFoundException {
 		File paramFile = new File(args[0]);
 		if(!paramFile.exists()) {
 			System.err.println("you must specify a parameter file to run against.");
@@ -54,6 +57,7 @@ public class RunScorer {
         if(params.getParamValue("run-name") != null)
             runId = params.getParamValue("run-name");
 
+        String outputFile = params.getParamValue("output");
 		
 		Stopper stopper = null;
 		if(params.getParamValue(ParameterBroker.STOPPER_PARAM) != null)
@@ -83,7 +87,7 @@ public class RunScorer {
 			scorerType = params.getParamValue("scorer-name");
 		QueryDocScorer docScorer = (QueryDocScorer)loader.loadClass(scorerType).newInstance();
 		docScorer.setCollectionStats(corpusStats);
-		docScorer.init();
+		
 		
 		Iterator<String> parameterIt = params.getAllParams().keySet().iterator();
 		while(parameterIt.hasNext()) {
@@ -100,9 +104,15 @@ public class RunScorer {
 	            docScorer.setParameter(paramName, paramValue);
 			}
 		}
+		// Perform any optional initialization
+		docScorer.init();
 		
 
-		Writer outputWriter = new BufferedWriter(new OutputStreamWriter(System.out));
+		Writer outputWriter;
+		if (outputFile != null)
+		    outputWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile)));
+		else
+		    outputWriter = new BufferedWriter(new OutputStreamWriter(System.out));
 	    FormattedOutputTrecEval output = FormattedOutputTrecEval.getInstance(runId, outputWriter);
 
 	      
@@ -124,20 +134,23 @@ public class RunScorer {
 
 
 			ResultAccumulatorUnconstrained accumulator = 
-	                new ResultAccumulatorUnconstrained((IndexWrapperIndriImpl)index, query.getText());
+	                new ResultAccumulatorUnconstrained((IndexWrapperIndriImpl)index, 
+	                        query.getText());
 	        accumulator.accumulate();
 	        Map<Integer, UnscoredSearchHit> accumulated = 
 	                accumulator.getAccumulatedDocs();
 	        
 	        SearchHits results = new SearchHits();
 	        for (UnscoredSearchHit unscoredHit: accumulated.values()) {
+
 	            SearchHit hit = unscoredHit.toSearchHit();
 	            double score = docScorer.score(hit);
 	            hit.setScore(score);  
 	            results.add(hit);
 	        }   
 	            
-            output.write(results, query.getTitle());
+	        results.rank();
+            output.write(results, query.getTitle(), 1000);
         }
         output.close();
 	}
