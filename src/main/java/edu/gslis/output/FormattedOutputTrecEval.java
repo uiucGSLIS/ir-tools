@@ -33,11 +33,17 @@ public class FormattedOutputTrecEval {
 		return formattedOutputTrecEval;		
 	}
 
-	public void write(SearchHits results, String queryName) {
+    public void write(SearchHits results, String queryName) {
+        write(results, queryName, -1);
+    }
+	public void write(SearchHits results, String queryName, int maxResults) {
 		Iterator<SearchHit> hitIterator = results.iterator();
 		int k=1;
 		try {
 			while(hitIterator.hasNext()) {
+			    if (maxResults > 0 && k == maxResults)
+			        break;
+			    
 				SearchHit hit = hitIterator.next();
 				
 				if(hit.getDocno() == null || hit.getDocno().length()<2)
