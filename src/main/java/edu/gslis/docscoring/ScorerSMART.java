@@ -82,6 +82,7 @@ import edu.gslis.utils.Stopper;
 public class ScorerSMART extends QueryDocScorer 
 {    
     public static final String PARAM_SMART_SPEC = "smartspec";
+    public static final String PARAM_PUN_SLOPE = "slope";
     
     /* Weights and normalizers */
     FeatureVector qfv = null;
@@ -107,20 +108,25 @@ public class ScorerSMART extends QueryDocScorer
             double tokenCount = collectionStats.getTokCount();
             double termTypeCount = collectionStats.getTermTypeCount();
             double avgDocLen = tokenCount/numDocs;
-            double avgUniqueTerms = termTypeCount/numDocs;
+            double avgUniqueTerms = tokenCount/termTypeCount;
+            //double avgUniqueTerms = termTypeCount/numDocs;
                         
-            this.docTF = TFWeights.getTFWeight(smartSpec.charAt(0));
-            this.docIDF = IDFWeights.getIDFWeight(smartSpec.charAt(1));
+            docTF = TFWeights.getTFWeight(smartSpec.charAt(0));
+            docIDF = IDFWeights.getIDFWeight(smartSpec.charAt(1));
             docIDF.setNumDocs(numDocs);
             docIDF.setCollectionStats(collectionStats);
-            this.docNormalizer = Normalizers.getNormalizer(smartSpec.charAt(2));
+            docNormalizer = Normalizers.getNormalizer(smartSpec.charAt(2));
             docNormalizer.setAvgDocLen(avgDocLen);
             docNormalizer.setAvgUniqueTerms(avgUniqueTerms);
-            this.queryTF = TFWeights.getTFWeight(smartSpec.charAt(4));
-            this.queryIDF = IDFWeights.getIDFWeight(smartSpec.charAt(5));
+            if (paramTable.get(PARAM_PUN_SLOPE) != null)
+                docNormalizer.setSlope(paramTable.get(PARAM_PUN_SLOPE));
+            queryTF = TFWeights.getTFWeight(smartSpec.charAt(4));
+            queryIDF = IDFWeights.getIDFWeight(smartSpec.charAt(5));
             queryIDF.setNumDocs(numDocs);
             queryIDF.setCollectionStats(collectionStats);
-            this.queryNormalizer = Normalizers.getNormalizer(smartSpec.charAt(6));
+            queryNormalizer = Normalizers.getNormalizer(smartSpec.charAt(6));
+            if (paramTable.get(PARAM_PUN_SLOPE) != null)
+                queryNormalizer.setSlope(paramTable.get(PARAM_PUN_SLOPE));
             queryNormalizer.setAvgDocLen(avgDocLen); 
             queryNormalizer.setAvgUniqueTerms(avgUniqueTerms);
             
@@ -161,7 +167,7 @@ public class ScorerSMART extends QueryDocScorer
         try 
         {
             FeatureVector dfv = doc.getFeatureVector();
-            
+
             // Note: query vector weights handled during init()
             
             docTF.weight(dfv);

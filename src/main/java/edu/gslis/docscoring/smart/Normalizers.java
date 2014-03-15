@@ -47,19 +47,25 @@ public class Normalizers {
     public class Normalizer {
         double avgDocLen = 0;
         double avgUniqueTerms = 0;
+        double slope = 0;
+        
         public void normalize(FeatureVector fv) throws Exception {}
+        
         public void setAvgDocLen(double avgDocLen) {
             this.avgDocLen = avgDocLen;
         }
         public void setAvgUniqueTerms(double avgUniqueTerms) {
             this.avgUniqueTerms = avgUniqueTerms;
         }
+        public void setSlope(double slope) {
+            this.slope = slope;
+        }
     }
     
   //sum     divide each new_wt by sum of new_wts in vector
     class SumWeightNormalizer extends Normalizer {
         
-        public void weight(FeatureVector fv) {
+        public void normalize(FeatureVector fv) {
             Iterator<String> it = fv.iterator();
             double sum = 0;
             it = fv.iterator();
@@ -168,16 +174,16 @@ public class Normalizers {
      * configuration (e.g., output of dumpindex for index).
      */
     class PivotedUniqueNormalizer extends Normalizer {
-        public void normalize(FeatureVector fv, int docLen) throws Exception 
+        public void normalize(FeatureVector fv) throws Exception 
         {
+//            double slope = 0.2;
             // The pivot is the average number of unique terms per document.
-            double slope = 2.0;
             Iterator<String> it = fv.iterator();
             it = fv.iterator();
             while (it.hasNext()) {
                 String term = it.next();
                 double weight = fv.getFeatureWeight(term);
-                weight = (1.0 - slope)*avgUniqueTerms + (slope*(docLen/fv.getLength()));
+                weight = (1.0 - slope)*avgUniqueTerms + (slope*fv.getLength());
                 fv.setTerm(term,  weight);
             }
         }
