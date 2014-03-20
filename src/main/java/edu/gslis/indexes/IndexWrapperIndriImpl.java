@@ -2,6 +2,8 @@ package edu.gslis.indexes;
 
 import lemurproject.indri.QueryEnvironment;
 import lemurproject.indri.ScoredExtentResult;
+import lemurproject.lemur.Index;
+import lemurproject.lemur.IndexManager;
 import edu.gslis.queries.GQuery;
 import edu.gslis.searchhits.SearchHit;
 import edu.gslis.searchhits.SearchHits;
@@ -12,23 +14,52 @@ import edu.gslis.utils.Stopper;
 
 
 public class IndexWrapperIndriImpl implements IndexWrapper{
+
+    private static final String SERVER_PREFIX = "server:";
+    
 	private QueryEnvironment index;
 	private double vocabularySize = -1.0;
 	private double docLengthAvg   = -1.0;
 	private String timeFieldName  = null;
-
+	
 	public IndexWrapperIndriImpl(String pathToIndex) {
 		index = new QueryEnvironment();
 		addIndex(pathToIndex);
+		getVocabularySize(pathToIndex);
 	}
+
 
 	private void addIndex(String pathToIndex) {
 		try {
-			index.addIndex(pathToIndex);
+		    // If the index path starts with 'server:', treat it as a server
+		    if (pathToIndex.startsWith(SERVER_PREFIX)) {
+		        String server = pathToIndex.substring(SERVER_PREFIX.length());
+		        index.addServer(server);
+		    }
+		    else
+		        index.addIndex(pathToIndex);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+	
+	   /**
+     * Initialize the vocabulary size using the lemur API
+     * @param pathToIndex
+     */
+    private void getVocabularySize(String pathToIndex) {
+        if (pathToIndex.startsWith(SERVER_PREFIX))
+            System.err.println("Unable to get vocabulary size from remote server. Must use local index.");
+        else
+        {
+            try {
+                Index lemurIndex = IndexManager.openIndex(pathToIndex);
+                vocabularySize = lemurIndex.termCountUnique();
+            } catch (Exception e) {
+                System.err.println("Error getting vocabulary size: perhaps liblemur library is missing?");
+            }         
+        }
+    }
 
 	public SearchHits runQuery(GQuery query, int count) {
 				
