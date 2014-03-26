@@ -57,7 +57,7 @@ public class ScorerBM25 extends QueryDocScorer {
 			double termFreq = doc.getFeatureVector().getFeatureWeight(term);
 			
 			double n = collectionStats.docCount(term);
-			double idf = Math.log((N - n + 0.5) / n + 0.5);
+			double idf = Math.log((N - n + 0.5) / (n + 0.5));
 			
 			double K = paramTable.get(PARAM_K1_NAME) * ((1 - paramTable.get(PARAM_B_NAME)) + paramTable.get(PARAM_B_NAME) * (docLength / avgDocLength));
 			double documentScaling = ((termFreq * (paramTable.get(PARAM_K1_NAME) + 1)) / (K + termFreq));
