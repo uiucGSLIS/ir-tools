@@ -16,7 +16,7 @@ import edu.gslis.textrepresentation.FeatureVector;
 
 public class ResultAccumulator {
 
-	private String query;
+	private FeatureVector queryModel;
 	private QueryEnvironment env;
 	private Map<Integer,UnscoredSearchHit> accumulatedFilteredDocs;
 	private String constraint;
@@ -40,11 +40,11 @@ public class ResultAccumulator {
 		}	
 	}
 
-	public ResultAccumulator(IndexWrapperIndriImpl indexWrapper, String query, String constraint) {
+	public ResultAccumulator(IndexWrapperIndriImpl indexWrapper, FeatureVector queryModel, String constraint) {
 		
 		// danger!  assumes we've got an indri index
 		this.env = (QueryEnvironment)indexWrapper.getActualIndex();
-		this.query = query;
+		this.queryModel = queryModel;
 		this.constraint = constraint;
 		accumulatedFilteredDocs = new HashMap<Integer,UnscoredSearchHit>();
 	}
@@ -78,8 +78,7 @@ public class ResultAccumulator {
 			}
 
 			// now iterate over each query term
-			FeatureVector surfaceForm = new FeatureVector(query, null);
-			Iterator<String> featureIterator = surfaceForm.iterator();
+			Iterator<String> featureIterator = queryModel.iterator();
 			while(featureIterator.hasNext()) {
 				String feature = featureIterator.next();
 				

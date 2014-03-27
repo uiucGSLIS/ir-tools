@@ -45,7 +45,7 @@ public class SimpleFilterSessionImpl implements FilterSession {
 
 	public void train() {
 		ResultAccumulator accumulator = new ResultAccumulator((IndexWrapperIndriImpl)trainIndex, 
-				query.getText(), query.getMetadata(NAME_OF_CONSTRAINT_FIELD));
+				query.getFeatureVector(), query.getMetadata(NAME_OF_CONSTRAINT_FIELD));
 		
 		
 		accumulator.accumulate();
@@ -70,7 +70,7 @@ public class SimpleFilterSessionImpl implements FilterSession {
 
 	public SearchHits filter() {
 		ResultAccumulator accumulator = new ResultAccumulator((IndexWrapperIndriImpl)testIndex, 
-				query.getText(), query.getMetadata(NAME_OF_CONSTRAINT_FIELD));
+				query.getFeatureVector(), query.getMetadata(NAME_OF_CONSTRAINT_FIELD));
 		accumulator.accumulate();
 		List<UnscoredSearchHit> testingAccumulated = accumulator.getChronologicallyOrderedDocs();
 		

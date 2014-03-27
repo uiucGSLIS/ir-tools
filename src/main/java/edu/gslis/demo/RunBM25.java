@@ -149,7 +149,8 @@ public class RunBM25 {
 
 			System.err.println(query.getText());
 			
-			ResultAccumulator accumulator = new ResultAccumulator((IndexWrapperIndriImpl)index, query.getText(), "the");
+			ResultAccumulator accumulator = new ResultAccumulator((IndexWrapperIndriImpl)index, 
+					query.getFeatureVector(), "the");
 			accumulator.accumulate();
 			List<UnscoredSearchHit> accumulated = accumulator.getChronologicallyOrderedDocs();
 			
