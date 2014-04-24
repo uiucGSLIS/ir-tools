@@ -51,12 +51,15 @@ public class FeedbackRelevanceModel extends Feedback {
 			while(it.hasNext()) {
 				String term = it.next();
 
+				/*
 				if(!term.matches(".*[a-z].*"))
 					continue;
 				
 				if(adHocGroom && (term.matches(".*[0-9].*") || term.length()<3)) {
 					continue;
 				}
+				*/
+				
 				
 				double fbWeight = 0.0;
 				

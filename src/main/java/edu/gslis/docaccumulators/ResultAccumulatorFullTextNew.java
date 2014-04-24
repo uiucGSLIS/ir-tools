@@ -4,20 +4,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import lemurproject.indri.QueryEnvironment;
 import lemurproject.indri.ScoredExtentResult;
+import edu.gslis.docaccumulators.Postings;
+import edu.gslis.docaccumulators.PostingsAggregator;
 import edu.gslis.indexes.IndexWrapperIndriImpl;
 import edu.gslis.searchhits.UnscoredSearchHit;
 import edu.gslis.textrepresentation.FeatureVector;
 import edu.gslis.textrepresentation.IndriDocument;
 
-public class ResultAccumulatorFullText {
+public class ResultAccumulatorFullTextNew {
 
 	private FeatureVector queryModel;
 	private QueryEnvironment env;
@@ -43,7 +43,7 @@ public class ResultAccumulatorFullText {
 		}	
 	}
 
-	public ResultAccumulatorFullText(IndexWrapperIndriImpl indexWrapper, FeatureVector queryModel, String constraint) {
+	public ResultAccumulatorFullTextNew(IndexWrapperIndriImpl indexWrapper, FeatureVector queryModel, String constraint) {
 		
 		// danger!  assumes we've got an indri index
 		this.env = (QueryEnvironment)indexWrapper.getActualIndex();
@@ -61,8 +61,7 @@ public class ResultAccumulatorFullText {
 
 			// accumulate all possibly relevant docs
 			ScoredExtentResult[] allResults = env.expressionList(constraint);
-
-			Set<Integer> docIDs = new HashSet<Integer>();
+			
 			
 			if(allResults.length==0)
 				return;
@@ -73,27 +72,32 @@ public class ResultAccumulatorFullText {
 			int k=0;
 			for(ScoredExtentResult r: allResults) {
 				int docID = r.document;
-				if(docIDs.contains(docID)) {
-					k++;
-					continue;
-				}
-				docIDs.add(docID);
 				String docno = docnos[k];
 				double length = (double)env.documentLength(docID);
-				IndriDocument doc = new IndriDocument(env);
-				doc.setIndex(env);
 				double epoch = Double.parseDouble(epochs[k]);
 				UnscoredSearchHit hit = new UnscoredSearchHit(docno, docID, length, epoch);
+				accumulatedFilteredDocs.put(docID, hit);
+				k++;
+			}
+
+			Map<Integer,UnscoredSearchHit> fullText = new HashMap<Integer,UnscoredSearchHit>(accumulatedFilteredDocs.size());
+			Iterator<Integer> it = accumulatedFilteredDocs.keySet().iterator();
+			while(it.hasNext()) {
+				int docID = it.next();
+				UnscoredSearchHit hit = accumulatedFilteredDocs.get(docID);
+				IndriDocument doc = new IndriDocument(env);
+				doc.setIndex(env);
 				FeatureVector docVector = doc.getFeatureVector(docID , null);
 				Iterator<String> terms = docVector.iterator();
 				while(terms.hasNext()) {
 					String term = terms.next();
 					hit.addFeature(term, docVector.getFeatureWeight(term));
 				}
-				accumulatedFilteredDocs.put(docID, hit);
-				k++;
+				fullText.put(docID, hit);
 			}
-
+			accumulatedFilteredDocs = fullText;
+			
+			
 
 
 
@@ -101,8 +105,6 @@ public class ResultAccumulatorFullText {
 			e.printStackTrace();
 		}
 	}
-
-
 
 
 	public Map<Integer,UnscoredSearchHit> getAccumulatedDocs() {

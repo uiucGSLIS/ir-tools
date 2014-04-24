@@ -35,7 +35,7 @@ public class ScorerDirichlet extends QueryDocScorer {
 			double collectionProb = (EPSILON + collectionStats.termCount(feature)) / collectionStats.getTokCount();
 			double pr = (docFreq + 
 					paramTable.get(PARAMETER_NAME)*collectionProb) / 
-					(docLength + paramTable.get(PARAMETER_NAME)*collectionProb);
+					(docLength + paramTable.get(PARAMETER_NAME));
 			double queryWeight = gQuery.getFeatureVector().getFeatureWeight(feature);
 			logLikelihood += queryWeight * Math.log(pr);
 		}

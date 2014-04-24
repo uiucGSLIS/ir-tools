@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import edu.gslis.docaccumulators.ResultAccumulator;
+import edu.gslis.docaccumulators.ResultAccumulatorNew;
 import edu.gslis.docscoring.Scorer;
 import edu.gslis.eval.Qrels;
 import edu.gslis.filtering.threshold.SimpleCutoffThresholdClassifier;
@@ -44,7 +45,7 @@ public class SimpleFilterSessionImpl implements FilterSession {
 
 
 	public void train() {
-		ResultAccumulator accumulator = new ResultAccumulator((IndexWrapperIndriImpl)trainIndex, 
+		ResultAccumulatorNew accumulator = new ResultAccumulatorNew((IndexWrapperIndriImpl)trainIndex, 
 				query.getFeatureVector(), query.getMetadata(NAME_OF_CONSTRAINT_FIELD));
 		
 		
@@ -69,7 +70,7 @@ public class SimpleFilterSessionImpl implements FilterSession {
 	}
 
 	public SearchHits filter() {
-		ResultAccumulator accumulator = new ResultAccumulator((IndexWrapperIndriImpl)testIndex, 
+		ResultAccumulatorNew accumulator = new ResultAccumulatorNew((IndexWrapperIndriImpl)testIndex, 
 				query.getFeatureVector(), query.getMetadata(NAME_OF_CONSTRAINT_FIELD));
 		accumulator.accumulate();
 		List<UnscoredSearchHit> testingAccumulated = accumulator.getChronologicallyOrderedDocs();
