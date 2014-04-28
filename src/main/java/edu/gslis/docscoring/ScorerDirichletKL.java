@@ -8,9 +8,6 @@ import edu.gslis.searchhits.SearchHit;
 
 /**
  * Preliminary KL-divergence scorer implementation with Dirichlet smoothing. 
- * If the type parameter is set to 1 (TYPE_LEMUR), will return Lemur-style
- * negative KL-scores.  If type is set to 2 (TYPE_STANDARD), query entropy
- * is not subtracted.
  */
 public class ScorerDirichletKL extends QueryDocScorer 
 {
