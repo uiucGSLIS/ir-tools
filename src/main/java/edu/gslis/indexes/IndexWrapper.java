@@ -1,6 +1,7 @@
 package edu.gslis.indexes;
 
 import edu.gslis.queries.GQuery;
+import edu.gslis.searchhits.SearchHit;
 import edu.gslis.searchhits.SearchHits;
 import edu.gslis.textrepresentation.FeatureVector;
 import edu.gslis.utils.Stopper;
@@ -33,6 +34,8 @@ public interface IndexWrapper {
 	public double getDocLength(int docID);
 	
 	public double termTypeCount();
+	
+	public SearchHit getSearchHit(String docno, Stopper stopper);
 	
 	// really shouldn't use this
 	public Object getActualIndex();
