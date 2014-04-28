@@ -1,5 +1,7 @@
 package edu.gslis.indexes;
 
+import java.util.Iterator;
+
 import lemurproject.indri.QueryEnvironment;
 import lemurproject.indri.ScoredExtentResult;
 import lemurproject.lemur.Index;
@@ -66,7 +68,15 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 		SearchHits hits = new SearchHits();
 		try {
 			// assumes that this gQuery's text member is all formatted and ready to go.
-			ScoredExtentResult[] res = index.runQuery(query.getText(), count);
+			StringBuilder queryString = new StringBuilder("#weight(");
+			Iterator<String> qt = query.getFeatureVector().iterator();
+			while(qt.hasNext()) {
+				String term = qt.next();
+				queryString.append(query.getFeatureVector().getFeatureWeight(term) + " " + term + " ");
+			}
+			queryString.append(")");
+			
+			ScoredExtentResult[] res = index.runQuery(queryString.toString(), count);
 			String[] docnos = index.documentMetadata(res, "docno");
 			String[] timeStrings  = null;
 			double[] times = null;
@@ -188,7 +198,16 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 
 	public FeatureVector getDocVector(String docno, Stopper stopper) {
 		IndriDocument doc = new IndriDocument(index);
-		int docID = doc.getDocID(docno);
+		int docID = 1;
+		try {
+			docID = doc.getDocID(docno);
+			if(docID < 1) {
+				System.err.println("no doc ID found for docno " + docno);
+				return null;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return this.getDocVector(docID, stopper);
 	}
 	
