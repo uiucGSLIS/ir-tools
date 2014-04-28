@@ -47,5 +47,10 @@ public class SearchHits {
 		return hits.size();
 	}
 	
+	public void crop(int size) {
+	    hits = hits.subList(0, size);
+	    iter = hits.iterator();
+	}
+	
 
 }
