@@ -32,6 +32,9 @@ public class SearchHits {
 		hits.add(hit);
 	}
 	
+	public SearchHit remove(int i) {
+	    return hits.remove(i);
+	}
 	public void rank() {
 		ScorableComparator comparator = new ScorableComparator(true);
 		Collections.sort(hits, comparator);
@@ -48,9 +51,49 @@ public class SearchHits {
 	}
 	
 	public void crop(int size) {
-	    hits = hits.subList(0, size);
-	    iter = hits.iterator();
+	    if (hits.size() > size) {
+	        hits = hits.subList(0, size);
+	        iter = hits.iterator();
+	    }
 	}
 	
-
+	public List<SearchHit> hits() {
+	    return hits;
+	}
+	
+	public void setHits(List<SearchHit> hits) {
+	    this.hits = hits;
+	}
+	
+	/** 
+	 * Port of Lemur method.
+	 */
+    public void logToPosterior() 
+    {
+        Iterator<SearchHit> it = hits.iterator();
+        double K = 0;
+        while(it.hasNext()) {
+            SearchHit hit = it.next();
+            if (K == 0 || hit.getScore() > K) {
+                K = hit.getScore();
+            }
+        }
+        K = -K;
+        double sum = 0;
+        it = hits.iterator();
+        while(it.hasNext()) {
+            SearchHit hit = it.next();  
+            double score = hit.getScore();
+            score = Math.exp(K + score);
+            hit.setScore(score);
+            sum += score;
+        }
+        
+        it = hits.iterator();
+        while(it.hasNext()) {
+            SearchHit hit = it.next();  
+            double score = hit.getScore() / sum;
+            hit.setScore(score);
+        }
+    }
 }
