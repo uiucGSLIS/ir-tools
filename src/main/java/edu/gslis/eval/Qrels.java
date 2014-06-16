@@ -197,4 +197,24 @@ public class Qrels {
 		rel.get(queryName).add(docno);
 	}
 
+	public boolean contains(String docno) {
+	    for (String key: rel.keySet()) {
+	        Set<String> val = rel.get(key);
+	        if (val.contains(docno))
+	            return true;
+	    }
+	    for (String key: nonRel.keySet()) {
+	        Set<String> val = nonRel.get(key);
+	        if (val.contains(docno))
+	            return true;
+	    }
+	    return false;
+	}
+	
+    public boolean contains(String docno, String query) {
+        if (rel.get(query).contains(docno) || 
+                nonRel.get(query).contains(docno))
+            return true;
+        return false;
+    }
 }
