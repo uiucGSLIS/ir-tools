@@ -9,7 +9,7 @@ import edu.gslis.utils.Scorable;
 
 
 
-public class SearchHit implements Scorable {
+public class SearchHit implements Scorable, Comparable<SearchHit> {
 	
 	private String queryName;
 	private String docno;
@@ -73,4 +73,11 @@ public class SearchHit implements Scorable {
 		return score;
 	}
 	
+    public int compareTo(SearchHit h) {
+        if (this.score != h.score)
+            return Double.compare(this.score, h.score);
+        else    
+            return docno.compareTo(h.docno);
+    }
+    
 }
