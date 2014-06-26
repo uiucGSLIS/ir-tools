@@ -1,0 +1,43 @@
+indexPath: /Users/cwillis/dev/uiucGSLIS/indexes/lucene/FT.train
+corpus: 
+   path: /Users/cwillis/dev/uiucGSLIS/data/FT.train
+   type: trectext
+analyzer: org.apache.lucene.analysis.standard.StandardAnalyzer
+stopwords: /Users/cwillis/dev/uiucGSLIS/data/stoplist.none
+similarity: org.apache.lucene.search.similarities.DefaultSimilarity
+fields:
+   - name: DOCNO
+     indexed: true
+     stored: true
+     storedTermVectors: false
+     type: string
+   - name: PROFILE
+     indexed: true
+     stored: true
+     storedTermVectors: false
+     type: string
+   - name: EPOCH
+     indexed: true
+     stored: true
+     storedTermVectors: false
+     type: long
+   - name: HEADLINE
+     indexed: true
+     stored: true
+     storedTermVectors: false
+     type: string
+   - name: TEXT
+     indexed: true
+     stored: true
+     storedTermVectors: true
+     type: text
+   - name: PUB
+     indexed: true
+     stored: true
+     storedTermVectors: false
+     type: string
+   - name: PAGE
+     indexed: true
+     stored: true
+     storedTermVectors: false
+     type: string
