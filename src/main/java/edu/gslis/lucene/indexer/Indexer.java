@@ -28,6 +28,9 @@ public abstract class Indexer
     public static final String FIELD_TYPE_INT = "int";
     public static final String FIELD_TYPE_LONG = "long";
     public static final String FIELD_TYPE_DOUBLE = "double";
+    
+    public static final String DEFAULT_SIMILARITY = "org.apache.lucene.search.similarities.DefaultSimilarity";
+    public static final String DEFAULT_ANALYZER = "org.apache.lucene.analysis.standard.StandardAnalyzer";
 
 
     public abstract void buildIndex(IndexWriter writer, Set<FieldConfig> fields, File file)
