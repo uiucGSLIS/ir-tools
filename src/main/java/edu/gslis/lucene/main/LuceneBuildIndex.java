@@ -4,9 +4,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.Reader;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.util.StopwordAnalyzerBase;
 import org.apache.lucene.index.IndexWriter;
@@ -55,7 +59,7 @@ public class LuceneBuildIndex {
         Directory dir = FSDirectory.open(new File(indexPath));
 
         // Initialize the analyzer
-        StopwordAnalyzerBase analyzer;
+        StopwordAnalyzerBase defaultAnalyzer;
         String stopwordsPath = config.getStopwords();
         String analyzerClass = config.getAnalyzer();
         if (!StringUtils.isEmpty(analyzerClass))
@@ -67,14 +71,15 @@ public class LuceneBuildIndex {
             {
                 @SuppressWarnings({ "rawtypes", "unchecked" })
                 java.lang.reflect.Constructor analyzerConst = analyzerCls.getConstructor(Version.class, Reader.class);
-                analyzer = (StopwordAnalyzerBase)analyzerConst.newInstance(Indexer.VERSION, new FileReader(stopwordsPath));            
+                defaultAnalyzer = (StopwordAnalyzerBase)analyzerConst.newInstance(Indexer.VERSION, new FileReader(stopwordsPath));            
             } else {
                 @SuppressWarnings({ "rawtypes", "unchecked" })
                 java.lang.reflect.Constructor analyzerConst = analyzerCls.getConstructor(Version.class);
-                analyzer = (StopwordAnalyzerBase)analyzerConst.newInstance(Indexer.VERSION);            
+                defaultAnalyzer = (StopwordAnalyzerBase)analyzerConst.newInstance(Indexer.VERSION);            
             }
         } else
-            analyzer = new StandardAnalyzer(Indexer.VERSION);
+            defaultAnalyzer = new StandardAnalyzer(Indexer.VERSION);
+        
         
         // Assumes default similarity, but can be changed.
         Similarity similarity = new DefaultSimilarity();
@@ -82,6 +87,19 @@ public class LuceneBuildIndex {
         if (!StringUtils.isEmpty(similarityClass))
             similarity = (Similarity)loader.loadClass(similarityClass).newInstance();
         
+        Map<String, Analyzer> perFieldAnalyzers = new HashMap<String, Analyzer>();
+        Set<FieldConfig> fields = config.getFields();
+        for (FieldConfig field: fields) {
+            String fieldAnalyzerClass = field.getAnalyzer();
+            if (!StringUtils.isEmpty(fieldAnalyzerClass)) {
+                @SuppressWarnings("rawtypes")
+                Class fieldAnalyzerCls = loader.loadClass(fieldAnalyzerClass);
+                Analyzer fieldAnalyzer = (Analyzer)fieldAnalyzerCls.newInstance();
+                perFieldAnalyzers.put(field.getName(), fieldAnalyzer);
+            }
+        }
+        
+        Analyzer analyzer = new PerFieldAnalyzerWrapper(defaultAnalyzer, perFieldAnalyzers);
         IndexWriterConfig iwc = new IndexWriterConfig(Indexer.VERSION, analyzer);
         iwc.setOpenMode(OpenMode.CREATE);
         iwc.setRAMBufferSizeMB(256.0);
@@ -91,7 +109,6 @@ public class LuceneBuildIndex {
         CorpusConfig corpusConfig = config.getCorpus();
         String corpusPath = corpusConfig.getPath();
         String corpusType = corpusConfig.getType();
-        Set<FieldConfig> fields = config.getFields();
 
         try
         {
