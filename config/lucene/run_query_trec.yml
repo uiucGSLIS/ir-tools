@@ -2,7 +2,10 @@ index: /Users/cwillis/dev/uiucGSLIS/indexes/lucene/FT.train
 analyzer: org.apache.lucene.analysis.standard.StandardAnalyzer
 stopwords: /Users/cwillis/dev/uiucGSLIS/data/stoplist.all
 similarity: org.apache.lucene.search.similarities.DefaultSimilarity
-field: text
+field: text,title
+queryfile:
+    path: fedwebtopics
+    format: tab
 queries:
    - number: 351
      text: falkland petroleum exploration
