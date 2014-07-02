@@ -75,7 +75,7 @@ public class WikiIndexWriter  implements DumpWriter {
         //boolean isRedirect = page.isRedirect;        
         //addField("id", pageId);
         System.out.println("Indexing " + pageTitle);
-        addField("title", pageTitle);
+        addField("docno", pageTitle);
     }
     
     public void writeEndPage() throws IOException {
@@ -95,7 +95,7 @@ public class WikiIndexWriter  implements DumpWriter {
 
             String source = field.getSource();
             String element = field.getElement();
-            if (StringUtils.isEmpty(source) || source.equals(FieldConfig.SOURCE_ELEMENT)) {
+            if (StringUtils.isEmpty(source) || !source.equals(FieldConfig.SOURCE_ELEMENT)) {
                 throw new IOException ("Unsupported source " + source);
             }
             
@@ -106,7 +106,7 @@ public class WikiIndexWriter  implements DumpWriter {
             if (element.equals("text")) {
                                     
                 String wikitext = StringEscapeUtils.unescapeHtml(value);
-                String title = currentDoc.getField("title").stringValue();
+                String title = currentDoc.getField("docno").stringValue();
                 String output = "";
                 try
                 {
