@@ -10,13 +10,14 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.util.StopwordAnalyzerBase;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
-import org.apache.lucene.search.similarities.DefaultSimilarity;
+import org.apache.lucene.search.similarities.LMDirichletSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -25,6 +26,7 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 import edu.gslis.lucene.indexer.Indexer;
+import edu.gslis.lucene.indexer.TikaIndexer;
 import edu.gslis.lucene.indexer.TrecTextIndexer;
 import edu.gslis.lucene.indexer.WikiTextIndexer;
 import edu.gslis.lucene.main.config.CorpusConfig;
@@ -81,22 +83,31 @@ public class LuceneBuildIndex {
             defaultAnalyzer = new StandardAnalyzer(Indexer.VERSION);
         
         
-        // Assumes default similarity, but can be changed.
-        Similarity similarity = new DefaultSimilarity();
+        // Assumes LM similarity, but can be changed via config file
+        Similarity similarity = new LMDirichletSimilarity();
         String similarityClass = config.getSimilarity();
         if (!StringUtils.isEmpty(similarityClass))
             similarity = (Similarity)loader.loadClass(similarityClass).newInstance();
         
+        // Setup any per-field analyzers.
         Map<String, Analyzer> perFieldAnalyzers = new HashMap<String, Analyzer>();
         Set<FieldConfig> fields = config.getFields();
         for (FieldConfig field: fields) {
-            String fieldAnalyzerClass = field.getAnalyzer();
+            String fieldAnalyzerClass = field.getAnalyzer();            
+            String fieldType = field.getType();
+
             if (!StringUtils.isEmpty(fieldAnalyzerClass)) {
+                // Use per-field analyzer, if present
                 @SuppressWarnings("rawtypes")
                 Class fieldAnalyzerCls = loader.loadClass(fieldAnalyzerClass);
                 Analyzer fieldAnalyzer = (Analyzer)fieldAnalyzerCls.newInstance();
                 perFieldAnalyzers.put(field.getName(), fieldAnalyzer);
             }
+            else if (!StringUtils.isEmpty(fieldType)&& fieldType.equals(FieldConfig.TYPE_ID)) {
+                // If the field type is ID, default to KeywordAnalyzer.
+                Analyzer fieldAnalyzer = new KeywordAnalyzer();
+                perFieldAnalyzers.put(field.getName(), fieldAnalyzer);
+            }            
         }
         
         Analyzer analyzer = new PerFieldAnalyzerWrapper(defaultAnalyzer, perFieldAnalyzers);
@@ -112,15 +123,19 @@ public class LuceneBuildIndex {
 
         try
         {
+            Indexer indexer;
             if (corpusType.equals(Indexer.FORMAT_WIKI)) {      
-                Indexer indexer = new WikiTextIndexer();
-                indexer.buildIndex(writer,  fields, new File(corpusPath));
+                indexer = new WikiTextIndexer();
             } else if (corpusType.equals(Indexer.FORMAT_TRECTEXT)){ 
-                Indexer indexer = new TrecTextIndexer();
-                indexer.buildIndex(writer,  fields, new File(corpusPath));
+                indexer = new TrecTextIndexer();
+            } else if (corpusType.equals(Indexer.FORMAT_TIKA)) {
+                indexer = new TikaIndexer();                
             } else {
-                throw new Exception("Unsupported corpus type/format.");
+                throw new Exception("Unsupported corpus type/format.");                
             }
+            
+            indexer.buildIndex(writer,  fields, new File(corpusPath));
+
         } finally {
             writer.close();
         }   
