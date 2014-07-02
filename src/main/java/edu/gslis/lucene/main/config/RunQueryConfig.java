@@ -11,6 +11,7 @@ public class RunQueryConfig {
     String similarity = "";
     String field = "";
     String docno = "";
+    QueryFile queryFile;
 
     
     public String getIndex() {
@@ -55,8 +56,10 @@ public class RunQueryConfig {
     public void setDocno(String docno) {
         this.docno = docno;
     }
-    
-    
-    
-
+    public QueryFile getQueryFile() {
+        return queryFile;
+    }
+    public void setQueryFile(QueryFile queryFile) {
+        this.queryFile = queryFile;
+    }
 }

@@ -6,15 +6,30 @@ package edu.gslis.lucene.main.config;
  *
  */
 public class FieldConfig {
+
+    public static final String TYPE_ID = "id";
+    public static final String TYPE_TEXT = "text";
+    public static final String TYPE_STRING = "string";
+    public static final String TYPE_INT = "int";
+    public static final String TYPE_LONG = "long";
+    public static final String TYPE_DOUBLE = "double";
+    
+    public static final String SOURCE_ELEMENT = "element";
+    public static final String SOURCE_FILE = "file";
+    public static final String SOURCE_FILENAME = "filename";
+        
+    String element = "";
     String name = "";
-    boolean indexed = false;
-    boolean stored = false;
-    boolean storedTermVectors = false;
-    boolean storedTermVectorPositions = false;
-    boolean storedTermVectorOffsets= false;
-    boolean storedTermVectorPayloads = false;
-    String analyzer = "";
     String type = "";
+    String source = "";
+    boolean indexed = true;
+    boolean stored = true;
+    boolean storedTermVectors = true;
+    boolean storedTermVectorPositions = true;
+    boolean storedTermVectorOffsets = true;
+    boolean storedTermVectorPayloads = true;
+    boolean analyzed = true;
+    String analyzer = "";
     
     public String getName() {
         return name;
@@ -70,5 +85,22 @@ public class FieldConfig {
     public void setAnalyzer(String analyzer) {
         this.analyzer = analyzer;
     }
-    
+    public String getSource() {
+        return source;
+    }
+    public void setSource(String source) {
+        this.source = source;
+    }
+    public boolean isAnalyzed() {
+        return analyzed;
+    }
+    public void setAnalyzed(boolean analyzed) {
+        this.analyzed = analyzed;
+    }
+    public String getElement() {
+        return element;
+    }
+    public void setElement(String element) {
+        this.element = element;
+    }        
 }
