@@ -3,13 +3,17 @@ package edu.gslis.indexes;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.DocsAndPositionsEnum;
 import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexableField;
@@ -21,12 +25,10 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.similarities.DefaultSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.SmallFloat;
 
 import edu.gslis.docscoring.ScorerDirichlet;
 import edu.gslis.docscoring.support.CollectionStats;
@@ -92,12 +94,16 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
         return runQuery(queryString.toString(), count);
     }
     
+    public SearchHits runQuery(String q, int count) {
+        return runQuery(q, Indexer.FIELD_TEXT, count);
+    }
+
     /**
      * Execute a query given a query string
      * @param q   Query string
      * @param count Number of hits
      */
-	public SearchHits runQuery(String q, int count) {
+	public SearchHits runQuery(String q, String field, int count) {
 				
 	    SearchHits hits = new SearchHits();
 	    
@@ -106,7 +112,7 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
             IndexSearcher searcher = new IndexSearcher(index);
             Similarity similarity = new DefaultSimilarity();
             Analyzer analyzer = new SimpleAnalyzer(Indexer.VERSION);
-            QueryParser parser = new QueryParser(Indexer.VERSION, Indexer.FIELD_TEXT, analyzer);
+            QueryParser parser = new QueryParser(Indexer.VERSION, field, analyzer);
             Query query = parser.parse(q);
             searcher.setSimilarity(similarity);
             TopDocs topDocs = searcher.search(query,  null, count);
@@ -236,12 +242,16 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	 * @param docid    Lucene internal identifier
 	 * @param stopper  Stopper
 	 */
-	public FeatureVector getDocVector(int docID, Stopper stopper) {
+    public FeatureVector getDocVector(int docID,  Stopper stopper) {
+        return getDocVector(docID, Indexer.FIELD_TEXT, stopper);
+    }
+    
+	public FeatureVector getDocVector(int docID,  String field, Stopper stopper) {
 	   
 	    FeatureVector fv = new FeatureVector(stopper);
 	    try
 	    {
-    	    Terms terms = index.getTermVector(docID, Indexer.FIELD_TEXT);
+    	    Terms terms = index.getTermVector(docID, field);
     	    //Map<Integer, String> dv = new TreeMap<Integer, String>();
     	    if (terms != null) { 
     	        TermsEnum termsEnum = terms.iterator(null); 
@@ -271,25 +281,68 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	    }
 	    return fv;
 	}
-
+	
+	   public String getDocText(int docID,  String field) {
+	       
+	       StringBuffer text = new StringBuffer();
+           FeatureVector fv = new FeatureVector(null);
+	       try
+	       {
+	            Terms terms = index.getTermVector(docID, field);
+	            Map<Integer, String> dv = new TreeMap<Integer, String>();
+	            if (terms != null) { 
+	                TermsEnum termsEnum = terms.iterator(null); 
+	                DocsAndPositionsEnum dp = null; 
+	                while (termsEnum.next() != null) { 
+	                    String term = termsEnum.term().utf8ToString();
+	                   
+	                    dp = termsEnum.docsAndPositions(null, dp);
+	                    dp.nextDoc();
+	                    int freq = dp.freq();
+	                    for (int i=0; i<freq; i++) {
+	                        int pos = dp.nextPosition();
+	                        dv.put(pos, term);
+	                    }
+	                    long f = termsEnum.totalTermFreq();
+	                    fv.addTerm(term, f);
+	                }
+	                for (int pos: dv.keySet()) 
+	                    text.append(dv.get(pos) + " ");
+	            }
+	        } catch (Exception e) {
+	            logger.log(Level.SEVERE, e.getMessage(), e);
+	        }
+	        return text.toString();
+	    }
+	
 	/**
 	 * Returns the internal document identifier given a docno
 	 */
 	public int getDocId(String docno) {
-	    int docid = -1;
-        IndexSearcher searcher = new IndexSearcher(index);
-        TermQuery q = new TermQuery(new Term(Indexer.FIELD_DOCNO, docno));
-	                
-	    try
-	    {
-	        TopDocs docs = searcher.search(q,  1);
-	        if (docs.totalHits > 0)
-	            docid = docs.scoreDocs[0].doc;
+	    return getDocId(Indexer.FIELD_DOCNO, docno);
+	}
+	
+	public int getDocId(String field, String docno) {
+        int docid = -1;
+        
+        try
+        {
+            IndexSearcher searcher = new IndexSearcher(index);
+            Analyzer analyzer = new KeywordAnalyzer();
+            QueryParser parser = new QueryParser(Indexer.VERSION, field, analyzer);
+            Query q = parser.parse("\"" + docno + "\"");
+    
+    //        TermQuery q = new TermQuery(new Term(field, docno));
+                            
+
+            TopDocs docs = searcher.search(q,  1);
+            if (docs.totalHits > 0)
+                docid = docs.scoreDocs[0].doc;
         } catch (Exception e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
-	        
-	    return docid;
+            
+        return docid;
 	}
 	
 	/**
@@ -298,8 +351,15 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	public FeatureVector getDocVector(String docno, Stopper stopper) {
 	    int docid = getDocId(docno);
 	    	    
-    	return getDocVector(docid, stopper);
+    	return getDocVector(docid, Indexer.FIELD_TEXT, stopper);
 	}
+	
+	   public FeatureVector getDocVector(String docno, String field, Stopper stopper) {
+	        int docid = getDocId(docno);
+	        	                
+	        return getDocVector(docid, field, stopper);
+	    }
+	    
 	
 
 	/**
