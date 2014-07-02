@@ -12,6 +12,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiFields;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
+import org.apache.lucene.util.BytesRef;
 
 import edu.gslis.indexes.IndexWrapperLuceneImpl;
 import edu.gslis.lucene.indexer.Indexer;
@@ -20,7 +21,8 @@ import edu.gslis.textrepresentation.FeatureVector;
 
 
 
-public class LuceneDumpIndex {
+public class LuceneDumpIndex 
+{
  
     public static void main(String[] args) throws Exception {
 
@@ -77,22 +79,15 @@ public class LuceneDumpIndex {
             Fields fields = MultiFields.getFields(lucene);  
             Terms terms = fields.terms(Indexer.FIELD_TEXT);
             TermsEnum termsEnum = terms.iterator(null);
-
+            BytesRef byteRef = null;
+            while((byteRef = termsEnum.next()) != null) {
+                System.out.println(byteRef.utf8ToString() + "\t" + termsEnum.docFreq());
+            }
         }
         else if (cmd.equals("xcount") || cmd.equals("x")) {
             // 3
             // dxcount
         }
-
-        /*
-        if (cmd.equals("term") || cmd.equals("t")) {    }
-        else if (cmd.equals("termpositions") || cmd.equals("tp")) {}
-        else if (cmd.equals("fieldposutions") || cmd.equals("fp")) {}
-        else if (cmd.equals("expressionlist") || cmd.equals("e")) {}
-        else if (cmd.equals("documentname") || cmd.equals("dn")) {}
-        else if (cmd.equals("documentdata") || cmd.equals("dd")) {}
-        else if (cmd.equals("invlist") || cmd.equals("il")) {}
-         */
     }
     
     public static Options createOptions()
