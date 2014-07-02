@@ -1,22 +1,14 @@
 package edu.gslis.lucene.indexer;
 
 import java.io.IOException;
-
-import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.DoubleField;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.Field.Store;
-import org.apache.lucene.document.FieldType;
-import org.apache.lucene.document.IntField;
-import org.apache.lucene.document.LongField;
 import org.apache.lucene.index.IndexWriter;
 import org.mediawiki.importer.DumpWriter;
 import org.mediawiki.importer.Page;
@@ -29,7 +21,6 @@ import org.sweble.wikitext.engine.utils.SimpleWikiConfiguration;
 
 import edu.gslis.lucene.main.TextConverter;
 import edu.gslis.lucene.main.config.FieldConfig;
-
 
 
 /**
@@ -46,9 +37,12 @@ public class WikiIndexWriter  implements DumpWriter {
     org.sweble.wikitext.engine.Compiler compiler = null;
     Analyzer analyzer = null;
     SimpleWikiConfiguration wikicfg = null;
+    WikiTextIndexer parent = null;
     
-    public WikiIndexWriter(IndexWriter index, Set<FieldConfig> fieldSet) throws IOException {
+    public WikiIndexWriter(IndexWriter index, Set<FieldConfig> fieldSet, WikiTextIndexer parent) 
+            throws IOException {
         this.index = index;
+        this.parent = parent;
         for (FieldConfig field: fieldSet) {
             fields.put(field.getName(), field);
         }
@@ -98,23 +92,18 @@ public class WikiIndexWriter  implements DumpWriter {
         {
             
             FieldConfig field = fields.get(name);
-            String type = field.getType();
-            String fieldName = field.getName();
+
+            String source = field.getSource();
+            String element = field.getElement();
+            if (StringUtils.isEmpty(source) || source.equals(FieldConfig.SOURCE_ELEMENT)) {
+                throw new IOException ("Unsupported source " + source);
+            }
             
-            Field.Store stored = field.isStored() ? Field.Store.YES : Field.Store.NO;
+            if (StringUtils.isEmpty(element)) {
+                throw new IOException ("Element name must be specified");
+            }
             
-            Field luceneField; 
-            if (type.equals(Indexer.FIELD_TYPE_STRING)) {
-                FieldType fieldType = new FieldType();
-                fieldType.setIndexed(field.isIndexed());
-                fieldType.setStored(field.isStored());
-                fieldType.setStoreTermVectors(field.isStoredTermVectors());
-                fieldType.setStoreTermVectorPositions(field.isStoredTermVectorPositions());
-                fieldType.setStoreTermVectorOffsets(field.isStoredTermVectorOffsets());
-                fieldType.setStoreTermVectorPayloads(field.isStoredTermVectorPayloads());
-                luceneField = new Field(fieldName, value, fieldType);
-                                
-            } else if (type.equals(Indexer.FIELD_TYPE_TEXT)) {
+            if (element.equals("text")) {
                                     
                 String wikitext = StringEscapeUtils.unescapeHtml(value);
                 String title = currentDoc.getField("title").stringValue();
@@ -127,44 +116,17 @@ public class WikiIndexWriter  implements DumpWriter {
                     
                     TextConverter p = new TextConverter(wikicfg, 80);
                     output = (String) p.go(cp.getPage());
-                    output = title + "\n" + output;
+                    output = title + "\n" + output;                    
                 } catch (Exception e) {
                     System.out.println("Failed to parse page" + title);
                     e.printStackTrace();
                 }
             
-                
-                FieldType fieldType = new FieldType();
-                fieldType.setIndexed(field.isIndexed());
-                fieldType.setStored(field.isStored());
-                fieldType.setStoreTermVectors(field.isStoredTermVectors());
-                fieldType.setStoreTermVectorPositions(field.isStoredTermVectorPositions());
-                fieldType.setStoreTermVectorOffsets(field.isStoredTermVectorOffsets());
-                fieldType.setStoreTermVectorPayloads(field.isStoredTermVectorPayloads());
-                luceneField = new Field(fieldName, output, fieldType);
-                
-                
-                // Store the document length
-                TokenStream stream = analyzer.tokenStream(fieldName, new StringReader(output));
-                stream.reset();                            
-                long docLength = 0;                            
-                while (stream.incrementToken())
-                    docLength++;
-                stream.end();
-                stream.close();
-                currentDoc.add(new LongField(Indexer.FIELD_DOC_LEN, docLength, Store.YES));
+                parent.addField(currentDoc, field, output, index.getAnalyzer());
+            }
+            else
+                parent.addField(currentDoc, field, value, index.getAnalyzer());
 
-            } else if (type.equals(Indexer.FIELD_TYPE_INT)) {
-                luceneField = new IntField(fieldName, Integer.valueOf(value), stored);
-            } else if (type.equals(Indexer.FIELD_TYPE_LONG)) {
-                luceneField = new LongField(fieldName, Long.valueOf(value), stored);
-            } else if (type.equals(Indexer.FIELD_TYPE_DOUBLE)) {
-                luceneField = new DoubleField(fieldName, Double.valueOf(value), stored);
-            }
-            else {
-                throw new IOException("Unsupported field type: " + type);
-            }
-            currentDoc.add(luceneField);
         } catch (Exception e) { 
             throw new IOException(e);
         }

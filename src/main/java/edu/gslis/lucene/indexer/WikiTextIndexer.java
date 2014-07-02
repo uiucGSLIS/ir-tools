@@ -34,7 +34,7 @@ public class WikiTextIndexer extends Indexer {
                 buildIndex(writer, fields, file);
             }
         } else {
-            WikiIndexWriter dumpWriter = new WikiIndexWriter(writer, fields);
+            WikiIndexWriter dumpWriter = new WikiIndexWriter(writer, fields, this);
             System.out.println("Indexing " + corpus.getAbsolutePath());
             XmlDumpReader wikiReader = null;
                         
@@ -64,5 +64,7 @@ public class WikiTextIndexer extends Indexer {
             reader.close();
         }        
     }
+    
+    
 }
         
