@@ -5,12 +5,14 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.Reader;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Options;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.analysis.util.StopwordAnalyzerBase;
@@ -138,14 +140,36 @@ public class LuceneRunQuery {
                 similarity = Indexer.DEFAULT_SIMILARITY;
 
             String query = cmd.getOptionValue("query");
+            String queryfile = cmd.getOptionValue("queryfile");
+            String format = cmd.getOptionValue("format");
             String index = cmd.getOptionValue("index");
             String stopwords = cmd.getOptionValue("stopwords");
-         
-            QueryConfig querycfg = new QueryConfig();
-            querycfg.setNumber(querynum);
-            querycfg.setText(query);
-            Set<QueryConfig> queries = new HashSet<QueryConfig>();
-            queries.add(querycfg);
+            
+            Set<QueryConfig> queries = new HashSet<QueryConfig>();                    
+            if (!StringUtils.isEmpty(query)) {
+                QueryConfig querycfg = new QueryConfig();
+                querycfg.setNumber(querynum);
+                querycfg.setText(query.replaceAll("'", "\""));
+                queries.add(querycfg);
+            } else if (!StringUtils.isEmpty(queryfile)) {
+                List<String> rows = FileUtils.readLines(new File(queryfile));
+                for (String row: rows) {
+                    if (format.equals("fedweb14")) {
+                        String[] fields = row.split("\t");
+                        QueryConfig q = new QueryConfig();
+                        q.setNumber(fields[0]);
+                        q.setText(fields[1]);
+                        queries.add(q);
+                    }
+                    else if (format.equals("fedweb13")) {
+                        String[] fields = row.split(":");
+                        QueryConfig q = new QueryConfig();
+                        q.setNumber(fields[0]);
+                        q.setText(fields[1]);
+                        queries.add(q);
+                    }
+                }
+            }
             
             config.setAnalyzer(analyzer);
             config.setField(field);
@@ -168,6 +192,8 @@ public class LuceneRunQuery {
         options.addOption("docno", true, "Docno field");
         options.addOption("querynum", true, "Query identifier");
         options.addOption("query", true, "Query string");
+        options.addOption("queryfile", true, "Query file");
+        options.addOption("format", true, "Query file format");
         options.addOption("similarity", true, "Similarity class");
         options.addOption("stopwords", true, "Stopwords list");
         return options;
