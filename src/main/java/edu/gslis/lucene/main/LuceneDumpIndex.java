@@ -6,13 +6,13 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Options;
+import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiFields;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
 
-import edu.gslis.indexes.IndexWrapper;
 import edu.gslis.indexes.IndexWrapperLuceneImpl;
 import edu.gslis.lucene.indexer.Indexer;
 import edu.gslis.textrepresentation.FeatureVector;
@@ -28,15 +28,24 @@ public class LuceneDumpIndex {
         CommandLineParser parser = new GnuParser();
         CommandLine cl = parser.parse( options, args);
         
-        String path = cl.getOptionValue("index");
+        // Path to the index
+        String path = cl.getOptionValue("index"); 
+        // Field that we're searching
         String field = cl.getOptionValue("field");
+        if (StringUtils.isEmpty(field)) 
+            field = "text";
+        // Field containing the document identifier
         String docno = cl.getOptionValue("docno");
+        if (StringUtils.isEmpty(docno))
+            docno = "docno";
+        // Command
         String cmd = cl.getOptionValue("cmd");
         String arg = cl.getOptionValue("arg");
 
         IndexWrapperLuceneImpl index = new IndexWrapperLuceneImpl(path);
         IndexReader lucene = (IndexReader)index.getActualIndex();
         if (cmd.equals("documentid") || cmd.equals("di")) {
+            // Return the document ID given the specified field/value
             System.out.println(index.getDocId(field, arg));
         }
         else if (cmd.equals("stats") || cmd.equals("s")) {
@@ -48,9 +57,9 @@ public class LuceneDumpIndex {
             System.out.println("Fields: \t" + fields.size());
         }
         else if (cmd.equals("documenttext") || cmd.equals("dt")) {
-            // Would be nice
+            int docId = index.getDocId(docno, arg);
+            System.out.println(index.getDocText(docId, field));
         }
-
         else if (cmd.equals("documentvector") || cmd.equals("dv")) {
             int docId = index.getDocId(docno, arg);
             FeatureVector fv = index.getDocVector(docId, field, null);
