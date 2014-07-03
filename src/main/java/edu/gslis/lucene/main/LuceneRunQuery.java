@@ -8,6 +8,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -29,11 +32,14 @@ import org.apache.lucene.search.similarities.DefaultSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 import edu.gslis.lucene.indexer.Indexer;
 import edu.gslis.lucene.main.config.QueryConfig;
+import edu.gslis.lucene.main.config.QueryFile;
 import edu.gslis.lucene.main.config.RunQueryConfig;
 
 
@@ -80,8 +86,21 @@ public class LuceneRunQuery {
         if (StringUtils.isEmpty(field))
             field = "text";
         String[] fields = field.split(",");
-        
+
         Set<QueryConfig> queries = config.getQueries();        
+        if (queries == null)
+            queries = new HashSet<QueryConfig>(); 
+        QueryFile queryFile = config.getQueryFile();
+        if (queryFile != null) {
+            String path = queryFile.getPath();
+            String format = queryFile.getFormat();
+            if (format.startsWith("fedweb"))
+                queries = readDelimitedFile(new File(path), format);
+            else if (format.equals("indri")) {
+                queries = readIndriQueries(new File(path));
+            }
+        }
+        
         for (QueryConfig query: queries) {
             QueryParser parser = new MultiFieldQueryParser(Indexer.VERSION, fields, analyzer);
             Query q = parser.parse(query.getText());
@@ -122,22 +141,12 @@ public class LuceneRunQuery {
             CommandLineParser parser = new GnuParser();
             CommandLine cmd = parser.parse( options, args);
             
-            String analyzer = cmd.getOptionValue("analyzer");
-            if (StringUtils.isEmpty(analyzer)) 
-                analyzer = Indexer.DEFAULT_ANALYZER;
-            String docno = cmd.getOptionValue("docno");
-            if (StringUtils.isEmpty(docno)) 
-                docno = Indexer.FIELD_DOCNO;            
-            String field = cmd.getOptionValue("field");
-            if (StringUtils.isEmpty(field)) 
-                field = Indexer.FIELD_TEXT;            
-            String querynum = cmd.getOptionValue("querynum");
-            if (StringUtils.isEmpty(querynum)) 
-                querynum = "1";
+            String analyzer = cmd.getOptionValue("analyzer", Indexer.DEFAULT_ANALYZER);
+            String docno = cmd.getOptionValue("docno", Indexer.FIELD_DOCNO);
+            String field = cmd.getOptionValue("field", Indexer.FIELD_TEXT);
+            String querynum = cmd.getOptionValue("querynum", "1");
             
-            String similarity = cmd.getOptionValue("similarity");
-            if (StringUtils.isEmpty(similarity)) 
-                similarity = Indexer.DEFAULT_SIMILARITY;
+            String similarity = cmd.getOptionValue("similarity", Indexer.DEFAULT_SIMILARITY);
 
             String query = cmd.getOptionValue("query");
             String queryfile = cmd.getOptionValue("queryfile");
@@ -152,22 +161,10 @@ public class LuceneRunQuery {
                 querycfg.setText(query.replaceAll("'", "\""));
                 queries.add(querycfg);
             } else if (!StringUtils.isEmpty(queryfile)) {
-                List<String> rows = FileUtils.readLines(new File(queryfile));
-                for (String row: rows) {
-                    if (format.equals("fedweb14")) {
-                        String[] fields = row.split("\t");
-                        QueryConfig q = new QueryConfig();
-                        q.setNumber(fields[0]);
-                        q.setText(fields[1]);
-                        queries.add(q);
-                    }
-                    else if (format.equals("fedweb13")) {
-                        String[] fields = row.split(":");
-                        QueryConfig q = new QueryConfig();
-                        q.setNumber(fields[0]);
-                        q.setText(fields[1]);
-                        queries.add(q);
-                    }
+                if (format.startsWith("fedweb"))
+                    queries = readDelimitedFile(new File(queryfile), format);
+                else if (format.equals("indri")) {
+                    queries = readIndriQueries(new File(queryfile));
                 }
             }
             
@@ -181,6 +178,51 @@ public class LuceneRunQuery {
         }            
         LuceneRunQuery runner = new LuceneRunQuery(config);
         runner.run();
+    }
+    
+    public static Set<QueryConfig> readDelimitedFile(File file, String format) throws Exception 
+    {
+        Set<QueryConfig> queries = new HashSet<QueryConfig>();
+
+        List<String> rows = FileUtils.readLines(file);
+        for (String row: rows) {
+            if (format.equals("fedweb14")) {
+                String[] fields = row.split("\t");
+                QueryConfig q = new QueryConfig();
+                q.setNumber(fields[0]);
+                q.setText(fields[1]);
+                queries.add(q);
+            }
+            else if (format.equals("fedweb13")) {
+                String[] fields = row.split(":");
+                QueryConfig q = new QueryConfig();
+                q.setNumber(fields[0]);
+                q.setText(fields[1]);
+                queries.add(q);
+            }
+        }
+        return queries;
+    }
+    
+    public static Set<QueryConfig> readIndriQueries(File file) throws Exception 
+    {
+        Set<QueryConfig> queries = new HashSet<QueryConfig>();
+        DocumentBuilderFactory factory =  DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        org.w3c.dom.Document xml = builder.parse(new FileInputStream(file));
+        NodeList queryNodes = xml.getElementsByTagName("query");
+        for (int i=0; i<queryNodes.getLength(); i++) {
+            Element queryElem = (Element) queryNodes.item(i);
+            QueryConfig query = new QueryConfig();
+            
+            String number = queryElem.getElementsByTagName("number").item(0).getFirstChild().getNodeValue();
+            String text   = queryElem.getElementsByTagName("text").item(0).getFirstChild().getNodeValue();
+            text = text.replaceAll("\\\n", "");
+            query.setNumber(number);
+            query.setText(text);
+            queries.add(query);
+        }
+        return queries;
     }
     
     public static Options createOptions()
