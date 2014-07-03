@@ -1,6 +1,7 @@
 package edu.gslis.lucene.main;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.Reader;
@@ -8,11 +9,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.analysis.util.StopwordAnalyzerBase;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -79,9 +82,9 @@ public class LuceneBuildIndex {
                 java.lang.reflect.Constructor analyzerConst = analyzerCls.getConstructor(Version.class);
                 defaultAnalyzer = (StopwordAnalyzerBase)analyzerConst.newInstance(Indexer.VERSION);            
             }
-        } else
-            defaultAnalyzer = new StandardAnalyzer(Indexer.VERSION);
-        
+        } else {
+            defaultAnalyzer = new StandardAnalyzer(Indexer.VERSION, new CharArraySet(Indexer.VERSION, 0, true));
+        }
         
         // Assumes LM similarity, but can be changed via config file
         Similarity similarity = new LMDirichletSimilarity();
@@ -134,7 +137,17 @@ public class LuceneBuildIndex {
                 throw new Exception("Unsupported corpus type/format.");                
             }
             
-            indexer.buildIndex(writer,  fields, new File(corpusPath));
+            String filter = corpusConfig.getFilter();
+            File corpusFile = new File(corpusPath);
+            if (!StringUtils.isEmpty(filter)) {
+                FileFilter fileFilter = new WildcardFileFilter(filter);
+                File[] files = corpusFile.listFiles(fileFilter);
+                for (File file: files) {
+                    indexer.buildIndex(writer,  fields, file);
+                }                    
+            } else {
+                indexer.buildIndex(writer,  fields, new File(corpusPath));
+            }
 
         } finally {
             writer.close();
