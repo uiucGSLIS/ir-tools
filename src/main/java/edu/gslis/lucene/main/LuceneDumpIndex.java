@@ -5,6 +5,7 @@ import java.util.Iterator;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.IndexReader;
@@ -29,6 +30,12 @@ public class LuceneDumpIndex
         CommandLineParser parser = new GnuParser();
         CommandLine cl = parser.parse( options, args);
         
+        if (args.length == 0 || cl.hasOption("help")) {
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp( "dumpindex", options );
+            return;
+        }
+        
         // Path to the index
         String path = cl.getOptionValue("index"); 
         // Field that we're searching
@@ -49,10 +56,18 @@ public class LuceneDumpIndex
         else if (cmd.equals("stats") || cmd.equals("s")) {
             
             Fields fields = MultiFields.getFields(lucene); 
-            System.out.println("Documents: \t" + index.docCount());
-            System.out.println("Unique terms: \t" + index.termTypeCount());
-            System.out.println("Total terms: \t" + index.termCount());
-            System.out.println("Fields: \t" + fields.size());
+            System.out.println("Documents: \t" + (long)index.docCount());
+            System.out.println("Unique terms: \t" + (long)index.termTypeCount());
+            System.out.println("Total terms: \t" + (long)index.termCount());
+            
+            String fieldNames = "";
+            Iterator<String> it = fields.iterator();
+            while (it.hasNext()) {
+                String fieldName = it.next();
+                fieldNames +=  fieldName + " ";
+            }
+
+            System.out.println("Fields: \t" + fieldNames);
         }
         else if (cmd.equals("documenttext") || cmd.equals("dt")) {
             int docId = index.getDocId(docno, arg);
@@ -90,10 +105,11 @@ public class LuceneDumpIndex
     {
         Options options = new Options();
         options.addOption("index", true, "Path to index");
-        options.addOption("field", true, "Field to search");
-        options.addOption("docno", true, "Docno field");
-        options.addOption("cmd", true, "Command");
-        options.addOption("arg", true, "Argument");
+        options.addOption("field", true, "Target field (default: all)");
+        options.addOption("docno", true, "Field containing document ID (default: docno)");
+        options.addOption("cmd", true, "Command (e.g., dv)");
+        options.addOption("arg", true, "Command argument (e.g., docno)");
+        options.addOption("help", false, "Print this help message");
 
         return options;
     }
