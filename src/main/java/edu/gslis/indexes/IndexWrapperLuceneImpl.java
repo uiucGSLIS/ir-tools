@@ -2,8 +2,12 @@ package edu.gslis.indexes;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,6 +25,7 @@ import org.apache.lucene.index.MultiFields;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -50,9 +55,7 @@ import edu.gslis.utils.Stopper;
  *      set during both indexing and retrieval. Fortunately, we rescore
  *      everything. For now, the DefaultSimilarity is used for both.
  *      
- *   2. Fields: To mimic Indri, the LuceneBuildIndex assumes a unique
- *      identifier called "docno" (Indexer.FIELD_DOCNO) and content field 
- *      called "text" (Indexer.FIELD_TEXT).
+ *   2. Fields: 
  * 
  *   3. Document length: Lucene doesn't store the document length in a useful
  *      way for use. LuceneBuildIndex calculates the document length and
@@ -94,16 +97,47 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
         return runQuery(queryString.toString(), count);
     }
     
+    /**
+     * Execute a query given a query string against all fields
+     * @param q Query string
+     * @param count Number of hits
+     */
     public SearchHits runQuery(String q, int count) {
-        return runQuery(q, Indexer.FIELD_TEXT, count);
+
+        SearchHits hits = new SearchHits();
+        try {
+            List<String> fieldNames = new ArrayList<String>();
+            Fields fields = MultiFields.getFields(index);
+            Iterator<String> it = fields.iterator();
+            while (it.hasNext()) {
+                String fieldName = it.next();
+                fieldNames.add(fieldName);
+            }
+            hits = runQuery(q, fieldNames.toArray(new String[0]), count);
+            
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        }    
+        return hits;
+    }
+    
+    /**
+     * Execute a query given a query string against the specified field
+     * @param q   Query string
+     * @param field  Field to be queried
+     * @param count Number of hits
+     */    
+    public SearchHits runQuery(String q, String field, int count) {
+        return runQuery(q, new String[] { field } , count);
     }
 
     /**
-     * Execute a query given a query string
+     * Execute a query given a query string against the specified fields
      * @param q   Query string
+     * @param field  Field to be queried
      * @param count Number of hits
      */
-	public SearchHits runQuery(String q, String field, int count) {
+	public SearchHits runQuery(String q, String[] field, int count) {
 				
 	    SearchHits hits = new SearchHits();
 	    
@@ -112,7 +146,7 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
             IndexSearcher searcher = new IndexSearcher(index);
             Similarity similarity = new DefaultSimilarity();
             Analyzer analyzer = new SimpleAnalyzer(Indexer.VERSION);
-            QueryParser parser = new QueryParser(Indexer.VERSION, field, analyzer);
+            QueryParser parser = new MultiFieldQueryParser(Indexer.VERSION, field, analyzer);
             Query query = parser.parse(q);
             searcher.setSimilarity(similarity);
             TopDocs topDocs = searcher.search(query,  null, count);
@@ -187,30 +221,89 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	}
 	
 	/**
-	 * Returns the total vocabulary size in text field only.
-	 * 
+	 * Returns the total vocabulary size in all fields
 	 */
 	public double termTypeCount() {
 	    if (vocabularySize == -1) {
 	        try {
                 Fields fields = MultiFields.getFields(index);  
-                Terms terms = fields.terms(Indexer.FIELD_TEXT);
-                vocabularySize = terms.size();
+                Iterator<String> it = fields.iterator();
+                while (it.hasNext()) {
+                    String field = it.next();
+                    Terms terms = fields.terms(field);
+                    vocabularySize += terms.size();
+
+                }
             } catch (Exception e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
             }
 	    }
 	    return vocabularySize;
 	}
+	
+	/** 
+	 * Returns the total vocabulary size for the specified field
+	 * @param field
+	 * @return
+	 */
+    public double termTypeCount(String field) {
+        if (vocabularySize == -1) {
+            try {
+                Fields fields = MultiFields.getFields(index);  
+                Terms terms = fields.terms(field);
+                vocabularySize = terms.size();
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, e.getMessage(), e);
+            }
+        }
+        return vocabularySize;
+    }
 
 	/**
-	 * Returns the number of documents containing the specified term.
-	 * Assumes content in text field.
+	 * Returns the number of documents containing the specified term, across
+	 * all indexed fields.
 	 * @param term  Term
 	 */
 	public double docFreq(String term) {
+	    double df = 0;
+	    
 		try {
-			return (double)index.docFreq(new Term(Indexer.FIELD_TEXT, term));
+            Fields fields = MultiFields.getFields(index);  
+            Iterator<String> it = fields.iterator();
+            while (it.hasNext()) {
+                String field = it.next();
+                df += index.docFreq(new Term(field, term));
+            }
+		} catch (Exception e) {
+		    logger.log(Level.SEVERE, e.getMessage(), e);
+		}
+		return df;
+	}
+
+	/**
+	 * Returns the number of documents containing the specified term
+	 * in the specified field.
+	 * @param term  Term
+	 * @param field Field
+	 * @return
+	 */
+    public double docFreq(String term, String field) {
+        try {
+            return (double)index.docFreq(new Term(field, term));
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return -1.0;
+    }
+
+	/**
+	 * Returns total term frequency in the specified field
+	 * @param term Term
+	 * @param tield Field name
+	 */
+	public double termFreq(String term, String field) {
+		try {
+			return (double)index.totalTermFreq(new Term(field, term));
 		} catch (Exception e) {
 		    logger.log(Level.SEVERE, e.getMessage(), e);
 		}
@@ -218,17 +311,25 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	}
 
 	/**
-	 * Returns total term frequency in text field.
+	 * Returns total term frequency across all fields
+	 * @param term Term
 	 */
-	public double termFreq(String term) {
-		try {
-			return (double)index.totalTermFreq(new Term(Indexer.FIELD_TEXT, term));
-		} catch (Exception e) {
-		    logger.log(Level.SEVERE, e.getMessage(), e);
-		}
-		return -1.0;
-	}
-
+    public double termFreq(String term) {
+        double tf = -1;
+        
+        try {
+            Fields fields = MultiFields.getFields(index);  
+            Iterator<String> it = fields.iterator();
+            while (it.hasNext()) {
+                String field = it.next();
+                tf += index.totalTermFreq(new Term(field, term));
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return tf;
+    }
+	
 	/**
 	 * Returns average document length
 	 */
@@ -243,7 +344,7 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	 * @param stopper  Stopper
 	 */
     public FeatureVector getDocVector(int docID,  Stopper stopper) {
-        return getDocVector(docID, Indexer.FIELD_TEXT, stopper);
+        return getDocVector(docID, null, stopper);
     }
     
 	public FeatureVector getDocVector(int docID,  String field, Stopper stopper) {
@@ -251,31 +352,33 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	    FeatureVector fv = new FeatureVector(stopper);
 	    try
 	    {
-    	    Terms terms = index.getTermVector(docID, field);
-    	    //Map<Integer, String> dv = new TreeMap<Integer, String>();
-    	    if (terms != null) { 
-    	        TermsEnum termsEnum = terms.iterator(null); 
-    	        //DocsAndPositionsEnum dp = null; 
-    	        while (termsEnum.next() != null) { 
-    	            String term = termsEnum.term().utf8ToString();
-    	           
-    	            /*
-    	            dp = termsEnum.docsAndPositions(null, dp);
-    	            dp.nextDoc();
-    	            int freq = dp.freq();
-    	            for (int i=0; i<freq; i++) {
-    	                int pos = dp.nextPosition();
-    	                dv.put(pos, term);
-    	            }
-    	            */
-    	            long f = termsEnum.totalTermFreq();
-    	            fv.addTerm(term, f);
-    	        }
-    	        /*
-    	        for (int pos: dv.keySet()) 
-    	            System.out.println(pos + " " + dv.get(pos));
-    	        */
-    	    }
+            Set<Terms> termsSet = new HashSet<Terms>();
+
+	        if (field == null) {	            
+	            Fields fields = index.getTermVectors(docID);
+	            Iterator<String> it = fields.iterator();
+	            while (it.hasNext()) {
+	                String fieldName = it.next();
+	                Terms terms = fields.terms(fieldName);
+	                if (terms != null)
+	                    termsSet.add(terms);
+	            }
+	        }
+	        else {
+	            Terms terms = index.getTermVector(docID, field);
+	            termsSet.add(terms);
+	        }
+	        
+	        for (Terms terms: termsSet) {
+        	    if (terms != null) { 
+        	        TermsEnum termsEnum = terms.iterator(null); 
+        	        while (termsEnum.next() != null) { 
+        	            String term = termsEnum.term().utf8ToString();
+        	            long f = termsEnum.totalTermFreq();
+        	            fv.addTerm(term, f);
+        	        }
+        	    }
+	        }
 	    } catch (Exception e) {
 	        logger.log(Level.SEVERE, e.getMessage(), e);
 	    }
@@ -346,22 +449,27 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	}
 	
 	/**
-	 * Returns a document vector given the docno
+	 * Returns a document vector given the docno (assumes all fields)
 	 */
 	public FeatureVector getDocVector(String docno, Stopper stopper) {
 	    int docid = getDocId(docno);
 	    	    
-    	return getDocVector(docid, Indexer.FIELD_TEXT, stopper);
+    	return getDocVector(docid, stopper);
 	}
 	
-	   public FeatureVector getDocVector(String docno, String field, Stopper stopper) {
-	        int docid = getDocId(docno);
-	        	                
-	        return getDocVector(docid, field, stopper);
-	    }
-	    
-	
-
+	/**
+	 * Returns a term vector given the specified field
+	 * @param docno    Document number
+	 * @param field    Field
+	 * @param stopper  Stopper
+	 * @return
+	 */
+    public FeatureVector getDocVector(String docno, String field, Stopper stopper) {
+        int docid = getDocId(docno);
+        	                
+        return getDocVector(docid, field, stopper);
+    }
+    
 	/**
 	 * Returns the underlying Lucene IndexReader
 	 */
@@ -440,7 +548,7 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
        //double dlavg = index.docLengthAvg();
        int docid = index.getDocId("FT911-1");
        FeatureVector fv1 = index.getDocVector(docid, null);       
-       assert(fv1.getFeatureWeight("the") == 11);
+       assert(fv1.getFeatureWeight("the") == 12);
        
        double tc = index.termCount();
        assert(tc == 22058714);
@@ -461,8 +569,8 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 //       String epoch = index.getMetadataValue("test-docno1", "epoch");
        // -6.68693  FT911-382   0   1510
        // -6.80837    FT911-1 0   217
-       SearchHits hits = index.runQuery(query, 10);
-       assert(hits.size() == 10);
+       SearchHits hits = index.runQuery(query, 88);
+       assert(hits.size() == 88);
        ScorerDirichlet scorer = new ScorerDirichlet();
        scorer.setParameter("mu", 2000);
        scorer.setQuery(query);
@@ -475,7 +583,16 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
        for (int i=0; i<hits.size(); i++) {
            SearchHit hit = hits.getHit(i);
            double score = scorer.score(hit);
-           System.out.println(hit.getDocno() + "\t" + hit.getScore() + "\t" + score);
+           hit.setScore(score);
+//           System.out.println(hit.getDocno() + "\t" + hit.getScore() + "\t" + score);
        }
+       hits.rank();
+       for (int i=0; i<hits.size(); i++) {
+           SearchHit hit = hits.getHit(i);
+           double score = scorer.score(hit);
+           hit.setScore(score);
+           System.out.println(hit.getDocno() + "\t" + hit.getScore());
+       }
+
    }
 }
