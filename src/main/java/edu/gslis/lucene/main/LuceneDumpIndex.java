@@ -6,7 +6,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Options;
-import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiFields;
@@ -33,13 +32,10 @@ public class LuceneDumpIndex
         // Path to the index
         String path = cl.getOptionValue("index"); 
         // Field that we're searching
-        String field = cl.getOptionValue("field");
-        if (StringUtils.isEmpty(field)) 
-            field = "text";
+        String field = cl.getOptionValue("field", null);
         // Field containing the document identifier
-        String docno = cl.getOptionValue("docno");
-        if (StringUtils.isEmpty(docno))
-            docno = "docno";
+        String docno = cl.getOptionValue("docno", "docno")
+                ;
         // Command
         String cmd = cl.getOptionValue("cmd");
         String arg = cl.getOptionValue("arg");
@@ -76,7 +72,7 @@ public class LuceneDumpIndex
         }
         else if (cmd.equals("vocabulary") || cmd.equals("v")) {
             // 1
-            Fields fields = MultiFields.getFields(lucene);  
+            Fields fields = MultiFields.getFields(lucene); 
             Terms terms = fields.terms(Indexer.FIELD_TEXT);
             TermsEnum termsEnum = terms.iterator(null);
             BytesRef byteRef = null;
