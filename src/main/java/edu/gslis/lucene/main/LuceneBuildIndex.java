@@ -156,9 +156,15 @@ public class LuceneBuildIndex {
     
 
     public static void main(String[] args) throws Exception {
+        
+        if (args.length == 0) {
+            System.err.println("You must specify a configuration file.");
+            System.exit(-1);            
+        }
+        
         File yamlFile = new File(args[0]);
         if(!yamlFile.exists()) {
-            System.err.println("you must specify a configuration file.");
+            System.err.println("File not found");
             System.exit(-1);
         }
         
