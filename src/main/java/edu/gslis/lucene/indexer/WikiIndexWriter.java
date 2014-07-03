@@ -76,6 +76,7 @@ public class WikiIndexWriter  implements DumpWriter {
         //addField("id", pageId);
         System.out.println("Indexing " + pageTitle);
         addField("docno", pageTitle);
+        addField("title", pageTitle);
     }
     
     public void writeEndPage() throws IOException {
