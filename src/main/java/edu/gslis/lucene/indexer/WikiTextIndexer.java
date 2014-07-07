@@ -48,7 +48,7 @@ public class WikiTextIndexer extends Indexer {
             } catch (Exception e2) {
                 System.out.println("Assuming UTF-8 encoded text");
                 // Treat as uncompressed raw XML
-                reader = new InputStreamReader(input, "UTF-8");                    
+                reader = new InputStreamReader(input);                    
             }
         }            
         wikiReader = new XmlDumpReader(new InputSource(reader), dumpWriter);
