@@ -34,7 +34,13 @@ public class TikaIndexer extends Indexer {
             for (File f: files) {
                 String name = f.getName();
                 InputStream is = new FileInputStream(f);
-                buildIndex(writer, fields, name, is);
+                try
+                {
+                    buildIndex(writer, fields, name, is);
+                } catch (Exception  e) {
+                    System.err.println("Error processing " +  f.getAbsolutePath());
+                    e.printStackTrace();
+                }
             }
         }
         else if (file.getName().endsWith("tgz")) {
@@ -47,19 +53,26 @@ public class TikaIndexer extends Indexer {
             while (null != (entry = tis.getNextTarEntry())) 
             {
                 if (entry.isFile()) {
-                    int size = 0;
-                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                    int c;
-                    while (size < entry.getSize()) {
-                        c = tis.read();
-                        size++;
-                        bos.write(c);
+                    try
+                    {
+                        int size = 0;
+                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                        int c;
+                        while (size < entry.getSize()) {
+                            c = tis.read();
+                            size++;
+                            bos.write(c);
+                        }
+                        
+                        String name = entry.getName();
+                        name = name.substring(0, name.lastIndexOf("."));
+                        name = name.replaceAll("/", "_");
+                        InputStream is = new ByteArrayInputStream(bos.toByteArray());
+                        buildIndex(writer, fields, name, is);
+                    } catch (Exception e) {
+                        System.err.println("Error processing entry " + entry.getName());
+                        e.printStackTrace();
                     }
-                    
-                    String name = entry.getName();
-                    name = name.substring(name.lastIndexOf("/")+1, name.lastIndexOf("."));
-                    InputStream is = new ByteArrayInputStream(bos.toByteArray());
-                    buildIndex(writer, fields, name, is);
                 }
             }
             tis.close();
