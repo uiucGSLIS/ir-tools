@@ -7,6 +7,9 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
+import org.apache.commons.collections.Bag;
+import org.apache.commons.collections.bag.TreeBag;
+import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiFields;
@@ -41,8 +44,7 @@ public class LuceneDumpIndex
         // Field that we're searching
         String field = cl.getOptionValue("field", null);
         // Field containing the document identifier
-        String docno = cl.getOptionValue("docno", "docno")
-                ;
+        String docno = cl.getOptionValue("docno", "docno");
         // Command
         String cmd = cl.getOptionValue("cmd");
         String arg = cl.getOptionValue("arg");
@@ -71,11 +73,19 @@ public class LuceneDumpIndex
         }
         else if (cmd.equals("documenttext") || cmd.equals("dt")) {
             int docId = index.getDocId(docno, arg);
-            System.out.println(index.getDocText(docId, field));
-        }
+            if (!StringUtils.isEmpty(field))
+                System.out.println(index.getDocText(docId, field));
+            else
+                System.out.println(index.getDocText(docId));
+                
+       }
         else if (cmd.equals("documentvector") || cmd.equals("dv")) {
             int docId = index.getDocId(docno, arg);
-            FeatureVector fv = index.getDocVector(docId, field, null);
+            FeatureVector fv;
+            if (!StringUtils.isEmpty(field)) 
+                fv = index.getDocVector(docId, field, null);
+            else
+                fv = index.getDocVector(docId, null);
             Iterator<String> it = fv.iterator();
             System.out.println("Feature count: " + fv.getFeatureCount());
             System.out.println("Length " + fv.getLength());
@@ -86,14 +96,38 @@ public class LuceneDumpIndex
             }
         }
         else if (cmd.equals("vocabulary") || cmd.equals("v")) {
-            // 1
             Fields fields = MultiFields.getFields(lucene); 
-            Terms terms = fields.terms(Indexer.FIELD_TEXT);
-            TermsEnum termsEnum = terms.iterator(null);
-            BytesRef byteRef = null;
-            while((byteRef = termsEnum.next()) != null) {
-                System.out.println(byteRef.utf8ToString() + "\t" + termsEnum.docFreq());
+            Bag vocab = new TreeBag();
+
+            if (StringUtils.isEmpty(field)) {
+                Iterator<String> it = fields.iterator();
+                while (it.hasNext()) {
+                    String fieldName = it.next();
+                    Terms terms = fields.terms(fieldName);
+                    TermsEnum termsEnum = terms.iterator(null);
+                    BytesRef byteRef = null;
+                    while((byteRef = termsEnum.next()) != null) {
+                        vocab.add(byteRef.utf8ToString(), termsEnum.docFreq());
+                    }
+                }
             }
+            else {
+                Terms terms = fields.terms(Indexer.FIELD_TEXT);
+                TermsEnum termsEnum = terms.iterator(null);
+                BytesRef byteRef = null;
+                while((byteRef = termsEnum.next()) != null) {
+                    vocab.add(byteRef.utf8ToString(), termsEnum.docFreq());
+                }
+            }
+            
+            @SuppressWarnings("unchecked")
+            Iterator<String> it = (Iterator<String>)vocab.iterator();
+            while (it.hasNext()) {
+                String term = (String)it.next();
+                System.out.println(term + "\t" + vocab.getCount(term));
+            }
+            
+            
         }
         else if (cmd.equals("xcount") || cmd.equals("x")) {
             // 3
