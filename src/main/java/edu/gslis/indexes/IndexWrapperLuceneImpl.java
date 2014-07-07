@@ -385,6 +385,22 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	    return fv;
 	}
 	
+	public String getDocText(int docID) {
+	    StringBuffer text = new StringBuffer();
+	    try
+	    {
+            Fields fields = index.getTermVectors(docID);
+            Iterator<String> it = fields.iterator();
+            while (it.hasNext()) {
+                String fieldName = it.next();
+                text.append(getDocText(docID, fieldName));
+                text.append(" ");
+            }
+	    } catch (Exception e) {
+	        logger.log(Level.SEVERE, e.getMessage(), e);	        
+	    }
+	    return text.toString();
+	}
 	   public String getDocText(int docID,  String field) {
 	       
 	       StringBuffer text = new StringBuffer();
