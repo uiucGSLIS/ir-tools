@@ -53,13 +53,21 @@ public class LuceneDumpIndex
         IndexReader lucene = (IndexReader)index.getActualIndex();
         if (cmd.equals("documentid") || cmd.equals("di")) {
             // Return the document ID given the specified field/value
-            System.out.println(index.getDocId(field, arg));
+            // Default to docno, if not specified
+            if (field == null)
+                System.out.println(index.getDocId(arg));
+            else
+                System.out.println(index.getDocId(field, arg));
         }
         else if (cmd.equals("stats") || cmd.equals("s")) {
             
             Fields fields = MultiFields.getFields(lucene); 
             System.out.println("Documents: \t" + (long)index.docCount());
-            System.out.println("Unique terms: \t" + (long)index.termTypeCount());
+            long vocabSize = (long)index.termTypeCount();
+            if (vocabSize > 0)
+                System.out.println("Unique terms: \t" + vocabSize);
+            else
+                System.out.println("Unique terms: \t Not supported by codec.");
             System.out.println("Total terms: \t" + (long)index.termCount());
             
             String fieldNames = "";
