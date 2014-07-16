@@ -19,8 +19,8 @@ import org.sweble.wikitext.engine.PageId;
 import org.sweble.wikitext.engine.PageTitle;
 import org.sweble.wikitext.engine.utils.SimpleWikiConfiguration;
 
-import edu.gslis.lucene.main.TextConverter;
 import edu.gslis.lucene.main.config.FieldConfig;
+import edu.gslis.wiki.TextConverter;
 
 
 /**
@@ -93,6 +93,8 @@ public class WikiIndexWriter  implements DumpWriter {
         {
             
             FieldConfig field = fields.get(name);
+            if (field == null)
+                return;
 
             String source = field.getSource();
             String element = field.getElement();
