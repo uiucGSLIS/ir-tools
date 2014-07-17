@@ -231,7 +231,9 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
                 while (it.hasNext()) {
                     String field = it.next();
                     Terms terms = fields.terms(field);
-                    vocabularySize += terms.size();
+                    long fieldSize = terms.size();
+                    if (fieldSize > 0) 
+                        vocabularySize += fieldSize;
 
                 }
             } catch (Exception e) {
@@ -360,8 +362,9 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	            while (it.hasNext()) {
 	                String fieldName = it.next();
 	                Terms terms = fields.terms(fieldName);
-	                if (terms != null)
+	                if (terms != null) {	                    
 	                    termsSet.add(terms);
+	                }
 	            }
 	        }
 	        else {
@@ -374,6 +377,11 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
         	        TermsEnum termsEnum = terms.iterator(null); 
         	        while (termsEnum.next() != null) { 
         	            String term = termsEnum.term().utf8ToString();
+        	            
+        	            
+        	            if (stopper != null && stopper.isStopWord(term))
+        	                continue;
+        	            
         	            long f = termsEnum.totalTermFreq();
         	            fv.addTerm(term, f);
         	        }
@@ -401,6 +409,56 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	    }
 	    return text.toString();
 	}
+	
+	
+	/**
+	 * Returns a map of positions (key) and terms for the specified document.
+	 * @param docID
+	 * @return
+	 */
+    public Map<Integer, String> getTermPositions(int docID) 
+    {
+       
+        Map<Integer, String> termPos = new TreeMap<Integer, String>();
+        try
+        {
+            Fields fields = index.getTermVectors(docID);
+            Iterator<String> it = fields.iterator();
+            int fieldPos = 0;
+            while (it.hasNext()) {
+                String field = it.next();
+   
+                Terms terms = index.getTermVector(docID, field);
+                if (terms != null) { 
+                    TermsEnum termsEnum = terms.iterator(null); 
+                    DocsAndPositionsEnum dp = null; 
+                    while (termsEnum.next() != null) { 
+                        String term = termsEnum.term().utf8ToString();
+                       
+                        dp = termsEnum.docsAndPositions(null, dp);
+                        dp.nextDoc();
+                        int freq = dp.freq();
+                        for (int i=0; i<freq; i++) {
+                            int pos = fieldPos + dp.nextPosition();
+                            termPos.put(pos, term);
+                        }
+                    }
+                    fieldPos = termPos.size();
+                }
+                
+            }
+         } catch (Exception e) {
+             logger.log(Level.SEVERE, e.getMessage(), e);
+         }
+         return termPos;
+     }	
+    
+    /**
+     * Recomposes the document text from term position information.
+     * @param docID
+     * @param field
+     * @return
+     */
 	   public String getDocText(int docID,  String field) {
 	       
 	       StringBuffer text = new StringBuffer();

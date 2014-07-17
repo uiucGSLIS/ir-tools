@@ -1,6 +1,7 @@
 package edu.gslis.indexes;
 
 import java.util.Iterator;
+import java.util.Map;
 
 import lemurproject.indri.QueryEnvironment;
 import lemurproject.indri.ScoredExtentResult;
@@ -276,5 +277,18 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
            hit.setMetadataValue(timeFieldName, time);
        }
        return hit;
+   }
+   
+   public String getDocText(int docid) {
+       IndriDocument doc = new IndriDocument(index);
+       return doc.getDocString(docid);       
+   }
+   
+   /**
+    * Returns a map of positions (key) to terms in the specified document.
+    */
+   public Map<Integer, String> getTermPositions(int docid) {
+       IndriDocument doc = new IndriDocument(index);
+       return doc.getTermPos(docid);
    }
 }

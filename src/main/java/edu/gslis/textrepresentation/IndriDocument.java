@@ -1,5 +1,8 @@
 package edu.gslis.textrepresentation;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import lemurproject.indri.DocumentVector;
 import lemurproject.indri.ParsedDocument;
 import lemurproject.indri.QueryEnvironment;
@@ -145,5 +148,36 @@ public class IndriDocument {
 	public void setIndex(QueryEnvironment e) {
 		env = e;
 	}
+	
+	/**
+	 * Returns a map of positions (key) to terms for the specified document.
+	 * @param docID
+	 * @return
+	 */
+    public Map<Integer, String> getTermPos(int docID) {
+        Map<Integer, String> termPos = new HashMap<Integer, String>();
+        int[] inds = new int[1];
+        inds[0] = docID;
+        String[] stems = null;
+        int[] positions = null;
+        inds[0] = docID;
+        try{
+            DocumentVector[] dv = env.documentVectors(inds);
+            stems = dv[0].stems;
+            positions = dv[0].positions;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        int j = 0;
+        for(int i=0; i<positions.length; i++) {
+            if(stems[positions[i]].equals("[OOV]"))
+                continue;
+
+            termPos.put(j, stems[positions[i]]);
+            j++;
+        }
+        return termPos;
+    }
 
 }
