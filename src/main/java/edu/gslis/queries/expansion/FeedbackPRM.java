@@ -2,6 +2,7 @@ package edu.gslis.queries.expansion;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -80,7 +81,7 @@ public class FeedbackPRM extends Feedback {
 			// For each query result
 			while (hitIterator.hasNext()) {
 	            SearchHit hit = hitIterator.next();
-	            Map<Integer, String> termPosMap = index.getTermPositions(hit.getDocID());
+	            List<String> docTerms = index.getDocTerms(hit.getDocID());
 			    
 	            // First pass: record the position of each query term
                 Map<Integer, String> posQTermMap = new HashMap<Integer, String>();
@@ -88,8 +89,8 @@ public class FeedbackPRM extends Feedback {
                 // double docLength = termPosMap.size();
                 double stoppedDocLength = 0;
                 
-	            for (int pos: termPosMap.keySet()) {
-	                String term = termPosMap.get(pos);
+	            for (int pos = 0; pos < docTerms.size(); pos++) {
+	                String term = docTerms.get(pos);
 	                
                     if (!isValidWord(term))
 	                    continue;
@@ -103,13 +104,13 @@ public class FeedbackPRM extends Feedback {
     			    }
 	            }
 			    
-	            double[] posScores = new double[termPosMap.size()];
+	            double[] posScores = new double[docTerms.size()];
 	            double posScoreSum = 0;
 	            
 			    // Second pass: estimate PLMs
 			    double lenNorm = Math.sqrt(2 * Math.PI) * sigma;
-			    for (int i: termPosMap.keySet()) {
-			        String term = termPosMap.get(i);
+			    for (int i=0; i< docTerms.size(); i++) {
+			        String term = docTerms.get(i);
 			        
                     if (!isValidWord(term))
 			            continue;
@@ -144,9 +145,9 @@ public class FeedbackPRM extends Feedback {
 			    }
 			    
 	             // Third pass: aggregate feedback counts
-			    for (int i: termPosMap.keySet()) {
+			    for (int i=0; i<docTerms.size(); i++) {
                     double posScore = posScores[i];
-                    String term = termPosMap.get(i);
+                    String term = docTerms.get(i);
                     
                     if (!isValidWord(term))
                         continue;
@@ -211,7 +212,7 @@ public class FeedbackPRM extends Feedback {
 	}
 	
 	public boolean isValidWord(String term) {
-	    if (term.equals("[OOV]") || StringUtils.isNumeric(term))
+	    if (term.equals("[OOV]") || !StringUtils.isAlphanumeric(term) || term.length() <= 2)
 	        return false;
 	    else 
 	        return true;
