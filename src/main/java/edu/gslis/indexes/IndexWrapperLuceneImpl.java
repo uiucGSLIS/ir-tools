@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -412,13 +413,12 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	
 	
 	/**
-	 * Returns a map of positions (key) and terms for the specified document.
+	 * Returns an ordered list of terms for the specified document
 	 * @param docID
 	 * @return
 	 */
-    public Map<Integer, String> getTermPositions(int docID) 
-    {
-       
+    public List<String> getDocTerms(int docID) 
+    {       
         Map<Integer, String> termPos = new TreeMap<Integer, String>();
         try
         {
@@ -450,7 +450,9 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
          } catch (Exception e) {
              logger.log(Level.SEVERE, e.getMessage(), e);
          }
-         return termPos;
+        List<String> termList = new LinkedList<String>();
+        termList.addAll(termPos.values());
+        return termList;
      }	
     
     /**
@@ -512,7 +514,7 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
     //        TermQuery q = new TermQuery(new Term(field, docno));
                             
 
-            TopDocs docs = searcher.search(q,  1);
+            TopDocs docs = searcher.search(q,  100);
             if (docs.totalHits > 0)
                 docid = docs.scoreDocs[0].doc;
         } catch (Exception e) {

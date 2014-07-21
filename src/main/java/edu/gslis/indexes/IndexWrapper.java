@@ -1,6 +1,6 @@
 package edu.gslis.indexes;
 
-import java.util.Map;
+import java.util.List;
 
 import edu.gslis.queries.GQuery;
 import edu.gslis.searchhits.SearchHit;
@@ -45,12 +45,12 @@ public interface IndexWrapper {
 	public String getDocText(int docid);
 	
 	/**
-	 * Returns a map containing the term position (key) and term 
-	 * for a document. Used by proximity-based models.
+	 * Returns an ordered list of terms in the document. 
+	 * Used by proximity-based models
 	 * 
 	 * @param docid
 	 * @return
 	 */
-    public Map<Integer, String> getTermPositions(int docid) ;
+	public List<String> getDocTerms (int docid);
 
 }
