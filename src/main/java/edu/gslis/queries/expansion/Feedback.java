@@ -18,6 +18,7 @@ import edu.gslis.utils.Stopper;
 public abstract class Feedback {
 	protected IndexWrapper index;
 	protected SearchHits relDocs;
+	protected SearchHits nrelDocs;
 	protected GQuery originalQuery;
 	protected int fbDocCount  = 20;
 	protected int fbTermCount = 20;
@@ -114,6 +115,9 @@ public abstract class Feedback {
 	}
 	public void setRes(SearchHits relDocs) {
 		this.relDocs = relDocs;
+	}
+	public void setNRelDocs(SearchHits nrelDocs) {
+	    this.nrelDocs = nrelDocs;
 	}
 	public void setOriginalQuery(GQuery originalQuery) {
 		this.originalQuery = originalQuery;

@@ -17,7 +17,6 @@ public class FormattedOutputTrecEval {
 	private static FormattedOutputTrecEval formattedOutputTrecEval;
 
 
-
 	private void setWriter(Writer writer) {
 		FormattedOutputTrecEval.writer = writer;
 	}
@@ -68,6 +67,7 @@ public class FormattedOutputTrecEval {
 		try {
 			writer.flush();
 			writer.close();
+			formattedOutputTrecEval = null;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

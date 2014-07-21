@@ -1,0 +1,4644 @@
+{
+  "queries": [
+    {
+      "title": "351",
+      "text": "falkland petroleum exploration",
+      "constraint": "#syn(falkland petroleum exploration)",
+      "model": [
+        {
+          "weight": "85.0748229818925",
+          "feature": "falkland"
+        },
+        {
+          "weight": "64.17004944115196",
+          "feature": "falklands"
+        },
+        {
+          "weight": "60.295959171809",
+          "feature": "aires"
+        },
+        {
+          "weight": "60.21333397979633",
+          "feature": "buenos"
+        },
+        {
+          "weight": "58.07392224645351",
+          "feature": "seismic"
+        },
+        {
+          "weight": "57.168822601263365",
+          "feature": "islands"
+        },
+        {
+          "weight": "50.6595217826984",
+          "feature": "argentina"
+        },
+        {
+          "weight": "46.29718924062246",
+          "feature": "exploration"
+        },
+        {
+          "weight": "37.17782314860299",
+          "feature": "argentine"
+        },
+        {
+          "weight": "31.85376830081775",
+          "feature": "sovereignty"
+        },
+        {
+          "weight": "31.31412526165232",
+          "feature": "oil"
+        },
+        {
+          "weight": "26.882098176286593",
+          "feature": "islanders"
+        },
+        {
+          "weight": "25.021807765353245",
+          "feature": "waters"
+        },
+        {
+          "weight": "22.789409951860343",
+          "feature": "seabed"
+        },
+        {
+          "weight": "22.146928442705057",
+          "feature": "atlantic"
+        },
+        {
+          "weight": "19.19632162117457",
+          "feature": "invasion"
+        },
+        {
+          "weight": "19.01429790800994",
+          "feature": "disputed"
+        },
+        {
+          "weight": "18.658595949351465",
+          "feature": "menem"
+        },
+        {
+          "weight": "18.425243836646736",
+          "feature": "geological"
+        },
+        {
+          "weight": "18.32610424289569",
+          "feature": "licences"
+        },
+        {
+          "weight": "17.488919990271395",
+          "feature": "tella"
+        },
+        {
+          "weight": "16.81593802452747",
+          "feature": "territorially"
+        },
+        {
+          "weight": "14.61845097999927",
+          "feature": "sampson"
+        },
+        {
+          "weight": "14.115709626952944",
+          "feature": "condor"
+        }
+      ]
+    },
+    {
+      "title": "352",
+      "text": "british chunnel impact",
+      "constraint": "#syn(british chunnel impact)",
+      "model": [
+        {
+          "weight": "355.65176539569177",
+          "feature": "tunnel"
+        },
+        {
+          "weight": "308.9167382687927",
+          "feature": "channel"
+        },
+        {
+          "weight": "184.82038613472307",
+          "feature": "rail"
+        },
+        {
+          "weight": "138.02132616752584",
+          "feature": "british"
+        },
+        {
+          "weight": "81.58111760516304",
+          "feature": "trains"
+        },
+        {
+          "weight": "71.84136192701234",
+          "feature": "freight"
+        },
+        {
+          "weight": "69.74960494374706",
+          "feature": "railway"
+        },
+        {
+          "weight": "64.9257564835689",
+          "feature": "br"
+        },
+        {
+          "weight": "64.57924965198697",
+          "feature": "terminal"
+        },
+        {
+          "weight": "61.606604504463995",
+          "feature": "services"
+        },
+        {
+          "weight": "58.718136426917",
+          "feature": "brs"
+        },
+        {
+          "weight": "57.551888487582545",
+          "feature": "railways"
+        },
+        {
+          "weight": "56.42132838629836",
+          "feature": "link"
+        },
+        {
+          "weight": "51.44675040798848",
+          "feature": "transport"
+        },
+        {
+          "weight": "41.18714822078748",
+          "feature": "passenger"
+        },
+        {
+          "weight": "40.18933386726837",
+          "feature": "service"
+        },
+        {
+          "weight": "39.75201014899012",
+          "feature": "east"
+        },
+        {
+          "weight": "38.89258364225567",
+          "feature": "plans"
+        },
+        {
+          "weight": "35.08604586263085",
+          "feature": "eurotunnel"
+        },
+        {
+          "weight": "34.31145955321288",
+          "feature": "continental"
+        },
+        {
+          "weight": "33.58256388874597",
+          "feature": "line"
+        },
+        {
+          "weight": "33.06356176004022",
+          "feature": "network"
+        },
+        {
+          "weight": "32.739550785071806",
+          "feature": "kent"
+        },
+        {
+          "weight": "30.377574559858846",
+          "feature": "railfreight"
+        },
+        {
+          "weight": "29.92189931938508",
+          "feature": "route"
+        },
+        {
+          "weight": "29.230791675264154",
+          "feature": "construction"
+        },
+        {
+          "weight": "28.91426096047478",
+          "feature": "ferry"
+        },
+        {
+          "weight": "27.419949918184937",
+          "feature": "cross"
+        },
+        {
+          "weight": "27.412481617834654",
+          "feature": "environmental"
+        },
+        {
+          "weight": "27.35498062308505",
+          "feature": "operators"
+        },
+        {
+          "weight": "26.214303895282953",
+          "feature": "distribution"
+        },
+        {
+          "weight": "24.3362778295409",
+          "feature": "roads"
+        },
+        {
+          "weight": "23.891091701452453",
+          "feature": "road"
+        },
+        {
+          "weight": "22.775695177012643",
+          "feature": "port"
+        },
+        {
+          "weight": "22.763685960890417",
+          "feature": "sleeper"
+        },
+        {
+          "weight": "22.71587342693148",
+          "feature": "opening"
+        },
+        {
+          "weight": "22.43961360586876",
+          "feature": "reid"
+        },
+        {
+          "weight": "21.938350829841188",
+          "feature": "lorries"
+        },
+        {
+          "weight": "21.540656190987054",
+          "feature": "traffic"
+        },
+        {
+          "weight": "21.445168662837702",
+          "feature": "folkestone"
+        },
+        {
+          "weight": "21.339497543160828",
+          "feature": "rails"
+        },
+        {
+          "weight": "21.30714889052262",
+          "feature": "calais"
+        },
+        {
+          "weight": "21.044609620292018",
+          "feature": "waterloo"
+        },
+        {
+          "weight": "20.121087986914194",
+          "feature": "regions"
+        },
+        {
+          "weight": "20.114216240006666",
+          "feature": "rolling"
+        },
+        {
+          "weight": "18.5911109595405",
+          "feature": "sites"
+        },
+        {
+          "weight": "18.49855199744408",
+          "feature": "cologne"
+        },
+        {
+          "weight": "17.87639905660296",
+          "feature": "wagons"
+        },
+        {
+          "weight": "17.70713443770305",
+          "feature": "expresses"
+        },
+        {
+          "weight": "17.652263930201467",
+          "feature": "ferries"
+        },
+        {
+          "weight": "17.652263930201467",
+          "feature": "dover"
+        },
+        {
+          "weight": "17.497416899734397",
+          "feature": "boulogne"
+        },
+        {
+          "weight": "17.046438380393052",
+          "feature": "stratford"
+        },
+        {
+          "weight": "16.89523595464511",
+          "feature": "sncf"
+        },
+        {
+          "weight": "16.479300651876777",
+          "feature": "tunnels"
+        },
+        {
+          "weight": "16.15148086705788",
+          "feature": "journey"
+        },
+        {
+          "weight": "16.10087683966982",
+          "feature": "ashford"
+        },
+        {
+          "weight": "15.338116601526746",
+          "feature": "rainham"
+        },
+        {
+          "weight": "15.32101818839056",
+          "feature": "corridor"
+        },
+        {
+          "weight": "15.151414476432993",
+          "feature": "stena"
+        },
+        {
+          "weight": "14.769723735319428",
+          "feature": "eurotunnels"
+        },
+        {
+          "weight": "14.769723735319428",
+          "feature": "sealink"
+        },
+        {
+          "weight": "14.316427838988762",
+          "feature": "carpark"
+        }
+      ]
+    },
+    {
+      "title": "353",
+      "text": "antarctica exploration",
+      "constraint": "#syn(antarctica exploration)",
+      "model": [
+        {
+          "weight": "106.32588417130066",
+          "feature": "antarctica"
+        },
+        {
+          "weight": "62.08486829452881",
+          "feature": "antarctic"
+        },
+        {
+          "weight": "39.69856310317297",
+          "feature": "madrid"
+        },
+        {
+          "weight": "30.210840432691597",
+          "feature": "moratorium"
+        },
+        {
+          "weight": "29.580178000694545",
+          "feature": "antarcticas"
+        },
+        {
+          "weight": "22.21528726986962",
+          "feature": "environmentalists"
+        },
+        {
+          "weight": "22.12923573694005",
+          "feature": "conference"
+        },
+        {
+          "weight": "20.759906424126854",
+          "feature": "mining"
+        },
+        {
+          "weight": "20.32915257201717",
+          "feature": "mineral"
+        },
+        {
+          "weight": "18.1368576248551",
+          "feature": "continent"
+        },
+        {
+          "weight": "18.013554950826236",
+          "feature": "treaty"
+        },
+        {
+          "weight": "17.780480426142105",
+          "feature": "extraction"
+        },
+        {
+          "weight": "17.411356201057195",
+          "feature": "greenpeace"
+        },
+        {
+          "weight": "16.701617204133374",
+          "feature": "ban"
+        },
+        {
+          "weight": "15.647963243767082",
+          "feature": "exploitation"
+        },
+        {
+          "weight": "15.541871724619936",
+          "feature": "nitrous"
+        },
+        {
+          "weight": "15.266753198154841",
+          "feature": "minerals"
+        }
+      ]
+    },
+    {
+      "title": "354",
+      "text": "journalist risks",
+      "constraint": "#syn(journalist risks)",
+      "model": [
+        {
+          "weight": "66.25596264382862",
+          "feature": "journalist"
+        }
+      ]
+    },
+    {
+      "title": "355",
+      "text": "ocean remote sensing",
+      "constraint": "#syn(ocean remote sensing)",
+      "model": [
+        {
+          "weight": "0.3333333333333333",
+          "feature": "ocean"
+        },
+        {
+          "weight": "0.3333333333333333",
+          "feature": "sensing"
+        },
+        {
+          "weight": "0.3333333333333333",
+          "feature": "remote"
+        }
+      ]
+    },
+    {
+      "title": "356",
+      "text": "postmenopausal estrogen britain",
+      "constraint": "#syn(postmenopausal estrogen britain)",
+      "model": [
+        {
+          "weight": "0.3333333333333333",
+          "feature": "postmenopausal"
+        },
+        {
+          "weight": "0.3333333333333333",
+          "feature": "estrogen"
+        },
+        {
+          "weight": "0.3333333333333333",
+          "feature": "britain"
+        }
+      ]
+    },
+    {
+      "title": "357",
+      "text": "territorial waters dispute",
+      "constraint": "#syn(territorial waters dispute)",
+      "model": [
+        {
+          "weight": "104.82486912041621",
+          "feature": "territorial"
+        },
+        {
+          "weight": "89.87025830670306",
+          "feature": "islands"
+        },
+        {
+          "weight": "63.87980605952742",
+          "feature": "brunei"
+        },
+        {
+          "weight": "63.58331917394491",
+          "feature": "waters"
+        },
+        {
+          "weight": "61.04671583007537",
+          "feature": "spratly"
+        },
+        {
+          "weight": "60.662487708192565",
+          "feature": "oil"
+        },
+        {
+          "weight": "57.65901435106095",
+          "feature": "spratlys"
+        },
+        {
+          "weight": "54.441701653785664",
+          "feature": "foreign"
+        },
+        {
+          "weight": "54.20747342247961",
+          "feature": "area"
+        },
+        {
+          "weight": "54.05562632453548",
+          "feature": "dispute"
+        },
+        {
+          "weight": "53.264024885295186",
+          "feature": "south"
+        },
+        {
+          "weight": "50.49372529323546",
+          "feature": "disputed"
+        },
+        {
+          "weight": "48.607569323096335",
+          "feature": "sovereignty"
+        },
+        {
+          "weight": "48.44749261704765",
+          "feature": "malaysia"
+        },
+        {
+          "weight": "47.096283973599505",
+          "feature": "philippines"
+        },
+        {
+          "weight": "47.0128036461238",
+          "feature": "vietnam"
+        },
+        {
+          "weight": "44.758706413211875",
+          "feature": "exploration"
+        },
+        {
+          "weight": "39.478220315156015",
+          "feature": "sea"
+        },
+        {
+          "weight": "36.67456666903191",
+          "feature": "asean"
+        },
+        {
+          "weight": "36.5155360072433",
+          "feature": "indonesia"
+        },
+        {
+          "weight": "34.439622858062485",
+          "feature": "atolls"
+        },
+        {
+          "weight": "34.338184328596796",
+          "feature": "qian"
+        },
+        {
+          "weight": "34.338184328596796",
+          "feature": "qichen"
+        },
+        {
+          "weight": "33.09365891110888",
+          "feature": "islets"
+        },
+        {
+          "weight": "32.586990271448606",
+          "feature": "zone"
+        },
+        {
+          "weight": "31.83727911021112",
+          "feature": "seismic"
+        },
+        {
+          "weight": "31.528230809338815",
+          "feature": "thailand"
+        },
+        {
+          "weight": "30.60583765122272",
+          "feature": "china"
+        },
+        {
+          "weight": "27.699563622231523",
+          "feature": "ministers"
+        },
+        {
+          "weight": "27.444015215936574",
+          "feature": "disputes"
+        },
+        {
+          "weight": "26.783340891288955",
+          "feature": "taiwan"
+        },
+        {
+          "weight": "26.510589243992385",
+          "feature": "east"
+        },
+        {
+          "weight": "26.437580684084697",
+          "feature": "manila"
+        },
+        {
+          "weight": "26.412096065024702",
+          "feature": "atlantic"
+        },
+        {
+          "weight": "26.0974237875277",
+          "feature": "operation"
+        },
+        {
+          "weight": "25.8998872289645",
+          "feature": "countries"
+        },
+        {
+          "weight": "25.88895828911597",
+          "feature": "singapore"
+        },
+        {
+          "weight": "25.803898762458992",
+          "feature": "nations"
+        },
+        {
+          "weight": "25.47520879572291",
+          "feature": "archipelago"
+        },
+        {
+          "weight": "25.47520879572291",
+          "feature": "marker"
+        },
+        {
+          "weight": "25.194288545861436",
+          "feature": "claim"
+        },
+        {
+          "weight": "25.065553825562294",
+          "feature": "asian"
+        },
+        {
+          "weight": "25.031871030054063",
+          "feature": "regional"
+        },
+        {
+          "weight": "24.30266001749074",
+          "feature": "falkland"
+        },
+        {
+          "weight": "23.778632960658225",
+          "feature": "shelf"
+        },
+        {
+          "weight": "22.543523469928004",
+          "feature": "aseans"
+        },
+        {
+          "weight": "22.161571880782937",
+          "feature": "peaceful"
+        },
+        {
+          "weight": "21.61946289432087",
+          "feature": "navy"
+        },
+        {
+          "weight": "21.37185743687457",
+          "feature": "vietnamese"
+        },
+        {
+          "weight": "20.581555296395013",
+          "feature": "island"
+        },
+        {
+          "weight": "19.86430539662847",
+          "feature": "chinas"
+        },
+        {
+          "weight": "19.8367815378511",
+          "feature": "chinese"
+        },
+        {
+          "weight": "19.634815478743548",
+          "feature": "reef"
+        },
+        {
+          "weight": "18.9864165593655",
+          "feature": "relations"
+        },
+        {
+          "weight": "18.67160901739396",
+          "feature": "drilling"
+        },
+        {
+          "weight": "18.44384189493242",
+          "feature": "conflict"
+        },
+        {
+          "weight": "18.234815271383336",
+          "feature": "neighbours"
+        },
+        {
+          "weight": "18.185753758485035",
+          "feature": "prospecting"
+        },
+        {
+          "weight": "17.82993187254919",
+          "feature": "presence"
+        },
+        {
+          "weight": "17.576769325604143",
+          "feature": "offshore"
+        },
+        {
+          "weight": "17.121555932847684",
+          "feature": "raul"
+        },
+        {
+          "weight": "16.551892323362857",
+          "feature": "wooing"
+        },
+        {
+          "weight": "16.486636663979024",
+          "feature": "ocean"
+        },
+        {
+          "weight": "16.073215057185056",
+          "feature": "drill"
+        },
+        {
+          "weight": "16.008382153093397",
+          "feature": "bases"
+        },
+        {
+          "weight": "15.865956842065485",
+          "feature": "concession"
+        },
+        {
+          "weight": "15.249059941331303",
+          "feature": "claimants"
+        },
+        {
+          "weight": "15.154828956469737",
+          "feature": "territorially"
+        },
+        {
+          "weight": "15.154451311686334",
+          "feature": "falklands"
+        },
+        {
+          "weight": "14.681429482165022",
+          "feature": "reefs"
+        },
+        {
+          "weight": "14.2507837064054",
+          "feature": "badawi"
+        },
+        {
+          "weight": "13.6303988444067",
+          "feature": "hainan"
+        }
+      ]
+    },
+    {
+      "title": "358",
+      "text": "blood alcohol fatalities",
+      "constraint": "#syn(blood alcohol fatalities)",
+      "model": [
+        {
+          "weight": "0.3333333333333333",
+          "feature": "fatalities"
+        },
+        {
+          "weight": "0.3333333333333333",
+          "feature": "alcohol"
+        },
+        {
+          "weight": "0.3333333333333333",
+          "feature": "blood"
+        }
+      ]
+    },
+    {
+      "title": "359",
+      "text": "mutual fund predictors",
+      "constraint": "#syn(mutual fund predictors)",
+      "model": [
+        {
+          "weight": "16.917721482901026",
+          "feature": "thumb"
+        }
+      ]
+    },
+    {
+      "title": "360",
+      "text": "drug legalization benefits",
+      "constraint": "#syn(drug legalization benefits)",
+      "model": [
+        {
+          "weight": "18.673439842482015",
+          "feature": "addicts"
+        },
+        {
+          "weight": "18.510008776468887",
+          "feature": "heroin"
+        }
+      ]
+    },
+    {
+      "title": "361",
+      "text": "clothing sweatshops",
+      "constraint": "#syn(clothing sweatshops)",
+      "model": [
+        {
+          "weight": "0.5",
+          "feature": "clothing"
+        },
+        {
+          "weight": "0.5",
+          "feature": "sweatshops"
+        }
+      ]
+    },
+    {
+      "title": "362",
+      "text": "human smuggling",
+      "constraint": "#syn(human smuggling)",
+      "model": [
+        {
+          "weight": "0.5",
+          "feature": "smuggling"
+        },
+        {
+          "weight": "0.5",
+          "feature": "human"
+        }
+      ]
+    },
+    {
+      "title": "363",
+      "text": "transportation tunnel disasters",
+      "constraint": "#syn(transportation tunnel disasters)",
+      "model": []
+    },
+    {
+      "title": "364",
+      "text": "rabies",
+      "constraint": "#syn(rabies)",
+      "model": []
+    },
+    {
+      "title": "365",
+      "text": "el nino",
+      "constraint": "#syn(el nino)",
+      "model": [
+        {
+          "weight": "78.05081789112147",
+          "feature": "nino"
+        },
+        {
+          "weight": "56.53633234336153",
+          "feature": "el"
+        },
+        {
+          "weight": "50.22647293025962",
+          "feature": "weather"
+        },
+        {
+          "weight": "31.842535450028837",
+          "feature": "phenomenon"
+        },
+        {
+          "weight": "30.805467426551814",
+          "feature": "drought"
+        },
+        {
+          "weight": "29.31958744746175",
+          "feature": "commodities"
+        },
+        {
+          "weight": "22.872108684055924",
+          "feature": "pacific"
+        },
+        {
+          "weight": "21.745114379899",
+          "feature": "monsoon"
+        },
+        {
+          "weight": "21.034430138577996",
+          "feature": "global"
+        },
+        {
+          "weight": "20.802487607017312",
+          "feature": "crop"
+        },
+        {
+          "weight": "20.609379524621758",
+          "feature": "agriculture"
+        },
+        {
+          "weight": "19.44972619038076",
+          "feature": "eastern"
+        },
+        {
+          "weight": "19.12913934806017",
+          "feature": "rains"
+        },
+        {
+          "weight": "17.192213360055586",
+          "feature": "agricultural"
+        },
+        {
+          "weight": "16.077690803375653",
+          "feature": "crops"
+        },
+        {
+          "weight": "15.54017119944443",
+          "feature": "wheat"
+        },
+        {
+          "weight": "14.889592148838707",
+          "feature": "grain"
+        },
+        {
+          "weight": "14.710082592038257",
+          "feature": "equatorial"
+        }
+      ]
+    },
+    {
+      "title": "366",
+      "text": "commercial cyanide uses",
+      "constraint": "#syn(commercial cyanide uses)",
+      "model": [
+        {
+          "weight": "21.97999828883007",
+          "feature": "cyanide"
+        }
+      ]
+    },
+    {
+      "title": "367",
+      "text": "piracy",
+      "constraint": "#syn(piracy)",
+      "model": [
+        {
+          "weight": "38.525327749738345",
+          "feature": "piracy"
+        },
+        {
+          "weight": "28.85236144042424",
+          "feature": "indonesia"
+        },
+        {
+          "weight": "26.972558291874776",
+          "feature": "malacca"
+        },
+        {
+          "weight": "18.982201567756192",
+          "feature": "philippines"
+        },
+        {
+          "weight": "17.29493414632859",
+          "feature": "malaysia"
+        },
+        {
+          "weight": "15.933135896448642",
+          "feature": "sumatra"
+        },
+        {
+          "weight": "15.13996783017628",
+          "feature": "pirates"
+        },
+        {
+          "weight": "14.365248260243083",
+          "feature": "brunei"
+        },
+        {
+          "weight": "14.316427838988762",
+          "feature": "strait"
+        },
+        {
+          "weight": "14.176723765877355",
+          "feature": "boarded"
+        }
+      ]
+    },
+    {
+      "title": "368",
+      "text": "in vitro fertilization",
+      "constraint": "#syn(vitro fertilization)",
+      "model": [
+        {
+          "weight": "0.5",
+          "feature": "vitro"
+        },
+        {
+          "weight": "0.5",
+          "feature": "fertilization"
+        }
+      ]
+    },
+    {
+      "title": "369",
+      "text": "anorexia nervosa bulimia",
+      "constraint": "#syn(anorexia nervosa bulimia)",
+      "model": [
+        {
+          "weight": "0.3333333333333333",
+          "feature": "bulimia"
+        },
+        {
+          "weight": "0.3333333333333333",
+          "feature": "anorexia"
+        },
+        {
+          "weight": "0.3333333333333333",
+          "feature": "nervosa"
+        }
+      ]
+    },
+    {
+      "title": "370",
+      "text": "food drug laws",
+      "constraint": "#syn(food drug laws)",
+      "model": [
+        {
+          "weight": "108.55600181092011",
+          "feature": "food"
+        },
+        {
+          "weight": "75.60635179950008",
+          "feature": "fda"
+        },
+        {
+          "weight": "63.52354450856646",
+          "feature": "products"
+        },
+        {
+          "weight": "51.95740215632743",
+          "feature": "drug"
+        },
+        {
+          "weight": "38.46597497896761",
+          "feature": "labelling"
+        },
+        {
+          "weight": "35.825747294529656",
+          "feature": "administration"
+        },
+        {
+          "weight": "34.29286506031461",
+          "feature": "label"
+        },
+        {
+          "weight": "29.03946596635843",
+          "feature": "kerridge"
+        },
+        {
+          "weight": "29.03946596635843",
+          "feature": "imferon"
+        },
+        {
+          "weight": "27.750960133817618",
+          "feature": "health"
+        },
+        {
+          "weight": "26.615843809379783",
+          "feature": "product"
+        },
+        {
+          "weight": "26.346787873653113",
+          "feature": "opticrom"
+        },
+        {
+          "weight": "26.263929885535376",
+          "feature": "regulations"
+        },
+        {
+          "weight": "25.686280987651852",
+          "feature": "labels"
+        },
+        {
+          "weight": "21.084554206538932",
+          "feature": "manufacturers"
+        },
+        {
+          "weight": "19.04959829172623",
+          "feature": "fisons"
+        },
+        {
+          "weight": "18.445063255891046",
+          "feature": "egan"
+        },
+        {
+          "weight": "18.314164198171348",
+          "feature": "drugs"
+        },
+        {
+          "weight": "17.852647302527462",
+          "feature": "genetically"
+        },
+        {
+          "weight": "17.836217084680438",
+          "feature": "foods"
+        },
+        {
+          "weight": "17.308798551393128",
+          "feature": "tastier"
+        },
+        {
+          "weight": "16.07783362445369",
+          "feature": "asthma"
+        },
+        {
+          "weight": "15.493175422740649",
+          "feature": "genetic"
+        },
+        {
+          "weight": "15.111461481790723",
+          "feature": "nutritious"
+        },
+        {
+          "weight": "13.839333948819407",
+          "feature": "melons"
+        }
+      ]
+    },
+    {
+      "title": "371",
+      "text": "health insurance holistic",
+      "constraint": "#syn(health insurance holistic)",
+      "model": []
+    },
+    {
+      "title": "372",
+      "text": "native american casino",
+      "constraint": "#syn(native american casino)",
+      "model": []
+    },
+    {
+      "title": "373",
+      "text": "encryption equipment export",
+      "constraint": "#syn(encryption equipment export)",
+      "model": []
+    },
+    {
+      "title": "374",
+      "text": "nobel prize winners",
+      "constraint": "#syn(nobel prize winners)",
+      "model": [
+        {
+          "weight": "86.14886086385728",
+          "feature": "nobel"
+        },
+        {
+          "weight": "72.62046458398513",
+          "feature": "prize"
+        },
+        {
+          "weight": "26.28417242159616",
+          "feature": "kyi"
+        },
+        {
+          "weight": "26.28417242159616",
+          "feature": "aung"
+        },
+        {
+          "weight": "26.28417242159616",
+          "feature": "suu"
+        },
+        {
+          "weight": "26.28417242159616",
+          "feature": "arakan"
+        },
+        {
+          "weight": "23.468969805029403",
+          "feature": "burmas"
+        },
+        {
+          "weight": "20.64182751033578",
+          "feature": "burmese"
+        },
+        {
+          "weight": "19.765533575392716",
+          "feature": "biology"
+        },
+        {
+          "weight": "19.472028716818254",
+          "feature": "winner"
+        },
+        {
+          "weight": "19.430726393823907",
+          "feature": "peace"
+        },
+        {
+          "weight": "18.760972506605924",
+          "feature": "rohingya"
+        },
+        {
+          "weight": "17.739283767978076",
+          "feature": "slorc"
+        },
+        {
+          "weight": "17.06630180293698",
+          "feature": "rohingyas"
+        },
+        {
+          "weight": "16.56363545387367",
+          "feature": "manerplaw"
+        },
+        {
+          "weight": "14.520032993492633",
+          "feature": "rangoon"
+        }
+      ]
+    },
+    {
+      "title": "375",
+      "text": "hydrogen energy",
+      "constraint": "#syn(hydrogen energy)",
+      "model": [
+        {
+          "weight": "27.790084962744526",
+          "feature": "generating"
+        },
+        {
+          "weight": "26.60836322754125",
+          "feature": "hydrogen"
+        },
+        {
+          "weight": "21.67158090783715",
+          "feature": "century"
+        },
+        {
+          "weight": "21.641228239961585",
+          "feature": "energy"
+        },
+        {
+          "weight": "21.434502579520384",
+          "feature": "water"
+        },
+        {
+          "weight": "21.185520686849113",
+          "feature": "21st"
+        },
+        {
+          "weight": "20.95838452888033",
+          "feature": "fleischmann"
+        },
+        {
+          "weight": "20.95838452888033",
+          "feature": "pons"
+        },
+        {
+          "weight": "16.717445054424175",
+          "feature": "physicists"
+        },
+        {
+          "weight": "16.145494605309434",
+          "feature": "produces"
+        },
+        {
+          "weight": "14.68615863565322",
+          "feature": "fusion"
+        },
+        {
+          "weight": "14.57337774027871",
+          "feature": "mankind"
+        },
+        {
+          "weight": "14.415288378956246",
+          "feature": "solar"
+        }
+      ]
+    },
+    {
+      "title": "376",
+      "text": "world court",
+      "constraint": "#syn(world court)",
+      "model": [
+        {
+          "weight": "71.80622155221263",
+          "feature": "court"
+        },
+        {
+          "weight": "70.9545733768091",
+          "feature": "hague"
+        },
+        {
+          "weight": "67.8990467731957",
+          "feature": "lockerbie"
+        },
+        {
+          "weight": "61.44159937036396",
+          "feature": "libyas"
+        },
+        {
+          "weight": "52.80317168663672",
+          "feature": "libyans"
+        },
+        {
+          "weight": "51.075911062709004",
+          "feature": "libya"
+        },
+        {
+          "weight": "50.383009491694644",
+          "feature": "international"
+        },
+        {
+          "weight": "49.110936045495706",
+          "feature": "bombing"
+        },
+        {
+          "weight": "43.2854370276823",
+          "feature": "pan"
+        },
+        {
+          "weight": "41.449059121589805",
+          "feature": "sanctions"
+        },
+        {
+          "weight": "41.42310281317721",
+          "feature": "tripoli"
+        },
+        {
+          "weight": "40.0907262212825",
+          "feature": "britain"
+        },
+        {
+          "weight": "36.585286208615294",
+          "feature": "justice"
+        },
+        {
+          "weight": "36.07465872553557",
+          "feature": "united"
+        },
+        {
+          "weight": "33.936781396083305",
+          "feature": "resolution"
+        },
+        {
+          "weight": "33.638584104078404",
+          "feature": "un"
+        },
+        {
+          "weight": "28.9441079206194",
+          "feature": "libyan"
+        },
+        {
+          "weight": "28.5540159291084",
+          "feature": "diplomatic"
+        },
+        {
+          "weight": "28.399068284592165",
+          "feature": "accused"
+        },
+        {
+          "weight": "27.052985316603834",
+          "feature": "security"
+        },
+        {
+          "weight": "25.464293509172467",
+          "feature": "muammer"
+        },
+        {
+          "weight": "25.223996308432326",
+          "feature": "gadaffi"
+        },
+        {
+          "weight": "24.60919922851825",
+          "feature": "imposing"
+        },
+        {
+          "weight": "24.15646638782819",
+          "feature": "nations"
+        },
+        {
+          "weight": "24.063842751038898",
+          "feature": "arms"
+        },
+        {
+          "weight": "23.149136957927812",
+          "feature": "air"
+        },
+        {
+          "weight": "22.506333780766024",
+          "feature": "col"
+        },
+        {
+          "weight": "21.986563183507183",
+          "feature": "links"
+        },
+        {
+          "weight": "21.666893810844705",
+          "feature": "scotland"
+        },
+        {
+          "weight": "21.623721137416037",
+          "feature": "cairo"
+        },
+        {
+          "weight": "21.587879399665972",
+          "feature": "arab"
+        },
+        {
+          "weight": "21.10426323438582",
+          "feature": "ruling"
+        },
+        {
+          "weight": "20.745679872239513",
+          "feature": "gadaffis"
+        },
+        {
+          "weight": "20.566482189969275",
+          "feature": "council"
+        },
+        {
+          "weight": "20.426440694663036",
+          "feature": "surrender"
+        },
+        {
+          "weight": "20.242425639192337",
+          "feature": "suspects"
+        },
+        {
+          "weight": "19.542453270593512",
+          "feature": "embargo"
+        },
+        {
+          "weight": "19.503189843525504",
+          "feature": "niger"
+        },
+        {
+          "weight": "18.478605050074535",
+          "feature": "bombers"
+        },
+        {
+          "weight": "18.407116821982985",
+          "feature": "malta"
+        },
+        {
+          "weight": "18.16514283249804",
+          "feature": "alleged"
+        },
+        {
+          "weight": "18.07315849076092",
+          "feature": "uta"
+        },
+        {
+          "weight": "17.576589219588023",
+          "feature": "ambassador"
+        },
+        {
+          "weight": "17.499429849477103",
+          "feature": "tunisia"
+        },
+        {
+          "weight": "15.687419812070912",
+          "feature": "flight"
+        },
+        {
+          "weight": "15.675948294008066",
+          "feature": "raids"
+        },
+        {
+          "weight": "15.403706018551162",
+          "feature": "punitive"
+        },
+        {
+          "weight": "14.99081140379701",
+          "feature": "reluctantly"
+        },
+        {
+          "weight": "13.55006100884164",
+          "feature": "jana"
+        }
+      ]
+    },
+    {
+      "title": "377",
+      "text": "cigar smoking",
+      "constraint": "#syn(cigar smoking)",
+      "model": [
+        {
+          "weight": "19.936395867809768",
+          "feature": "tabacalera"
+        },
+        {
+          "weight": "18.510008776468887",
+          "feature": "cigars"
+        },
+        {
+          "weight": "18.28744499499728",
+          "feature": "cigar"
+        },
+        {
+          "weight": "15.88757665033327",
+          "feature": "cuba"
+        }
+      ]
+    },
+    {
+      "title": "378",
+      "text": "euro opposition",
+      "constraint": "#syn(euro opposition)",
+      "model": [
+        {
+          "weight": "192.54499518692506",
+          "feature": "maastricht"
+        },
+        {
+          "weight": "192.0021408269456",
+          "feature": "treaty"
+        },
+        {
+          "weight": "110.44431335269095",
+          "feature": "monetary"
+        },
+        {
+          "weight": "109.07944991138405",
+          "feature": "currency"
+        },
+        {
+          "weight": "106.14981822396814",
+          "feature": "referendum"
+        },
+        {
+          "weight": "101.27803594627983",
+          "feature": "opposition"
+        },
+        {
+          "weight": "93.98876907723901",
+          "feature": "union"
+        },
+        {
+          "weight": "93.1827481947422",
+          "feature": "ec"
+        },
+        {
+          "weight": "91.35927344662142",
+          "feature": "european"
+        },
+        {
+          "weight": "90.8897040001039",
+          "feature": "vote"
+        },
+        {
+          "weight": "84.58646942866075",
+          "feature": "single"
+        },
+        {
+          "weight": "78.35379672541072",
+          "feature": "ratification"
+        },
+        {
+          "weight": "70.0787807215342",
+          "feature": "europe"
+        },
+        {
+          "weight": "70.0310271370906",
+          "feature": "political"
+        },
+        {
+          "weight": "68.56633890078201",
+          "feature": "euro"
+        },
+        {
+          "weight": "64.33284447130724",
+          "feature": "community"
+        },
+        {
+          "weight": "63.37815937311503",
+          "feature": "policy"
+        },
+        {
+          "weight": "59.925540078011885",
+          "feature": "yes"
+        },
+        {
+          "weight": "59.12569320174514",
+          "feature": "majority"
+        },
+        {
+          "weight": "58.025036942930775",
+          "feature": "integration"
+        },
+        {
+          "weight": "54.52798464972617",
+          "feature": "economic"
+        },
+        {
+          "weight": "53.187619754625956",
+          "feature": "mark"
+        },
+        {
+          "weight": "51.642783572560354",
+          "feature": "germany"
+        },
+        {
+          "weight": "51.29940400228227",
+          "feature": "french"
+        },
+        {
+          "weight": "51.21417390022717",
+          "feature": "sovereignty"
+        },
+        {
+          "weight": "50.777930935314416",
+          "feature": "francois"
+        },
+        {
+          "weight": "50.16295054805595",
+          "feature": "german"
+        },
+        {
+          "weight": "50.06804648781063",
+          "feature": "chancellor"
+        },
+        {
+          "weight": "49.665794671367614",
+          "feature": "kohl"
+        },
+        {
+          "weight": "47.55000058073315",
+          "feature": "debate"
+        },
+        {
+          "weight": "46.092828721795186",
+          "feature": "jacques"
+        },
+        {
+          "weight": "44.33204637664083",
+          "feature": "opinion"
+        },
+        {
+          "weight": "43.1043547109316",
+          "feature": "britain"
+        },
+        {
+          "weight": "42.847525535671735",
+          "feature": "rejection"
+        },
+        {
+          "weight": "41.81359556515921",
+          "feature": "emu"
+        },
+        {
+          "weight": "41.62986812466246",
+          "feature": "states"
+        },
+        {
+          "weight": "41.51763411294387",
+          "feature": "fears"
+        },
+        {
+          "weight": "40.40184180952095",
+          "feature": "helmut"
+        },
+        {
+          "weight": "40.351646588167156",
+          "feature": "parliament"
+        },
+        {
+          "weight": "39.95553395692998",
+          "feature": "mitterrand"
+        },
+        {
+          "weight": "38.8276593973357",
+          "feature": "convergence"
+        },
+        {
+          "weight": "38.44248433444503",
+          "feature": "countries"
+        },
+        {
+          "weight": "38.01829823524778",
+          "feature": "france"
+        },
+        {
+          "weight": "37.64871775543105",
+          "feature": "mitterrands"
+        },
+        {
+          "weight": "37.16459420267952",
+          "feature": "party"
+        },
+        {
+          "weight": "36.25928469688951",
+          "feature": "member"
+        },
+        {
+          "weight": "35.023767832315336",
+          "feature": "common"
+        },
+        {
+          "weight": "34.695647761460954",
+          "feature": "delors"
+        },
+        {
+          "weight": "34.434475114909766",
+          "feature": "give"
+        },
+        {
+          "weight": "33.831051329525145",
+          "feature": "right"
+        },
+        {
+          "weight": "33.194636622503765",
+          "feature": "danish"
+        },
+        {
+          "weight": "33.16041330773133",
+          "feature": "former"
+        },
+        {
+          "weight": "32.872288969027416",
+          "feature": "treatys"
+        },
+        {
+          "weight": "32.15987777299236",
+          "feature": "central"
+        },
+        {
+          "weight": "31.829722730142123",
+          "feature": "sceptics"
+        },
+        {
+          "weight": "31.624703034131013",
+          "feature": "presidency"
+        },
+        {
+          "weight": "30.923297981666167",
+          "feature": "process"
+        },
+        {
+          "weight": "30.518290924365644",
+          "feature": "voting"
+        },
+        {
+          "weight": "30.351949202600586",
+          "feature": "maastrichts"
+        },
+        {
+          "weight": "29.88178662686778",
+          "feature": "germans"
+        },
+        {
+          "weight": "29.6883646119586",
+          "feature": "denmark"
+        },
+        {
+          "weight": "29.19096693545423",
+          "feature": "bundesbank"
+        },
+        {
+          "weight": "29.186773283191418",
+          "feature": "decision"
+        },
+        {
+          "weight": "29.039165922289317",
+          "feature": "chevenement"
+        },
+        {
+          "weight": "28.85333454099481",
+          "feature": "rpr"
+        },
+        {
+          "weight": "28.734360189641446",
+          "feature": "governments"
+        },
+        {
+          "weight": "28.296737199058178",
+          "feature": "bundesrat"
+        },
+        {
+          "weight": "28.273689526995096",
+          "feature": "voters"
+        },
+        {
+          "weight": "27.659856494367098",
+          "feature": "pierre"
+        },
+        {
+          "weight": "27.437767299978262",
+          "feature": "mechanism"
+        },
+        {
+          "weight": "26.99885890600864",
+          "feature": "members"
+        },
+        {
+          "weight": "26.663292454789033",
+          "feature": "poll"
+        },
+        {
+          "weight": "26.313794178685306",
+          "feature": "approval"
+        },
+        {
+          "weight": "26.29325900634847",
+          "feature": "danes"
+        },
+        {
+          "weight": "26.083093671743523",
+          "feature": "criteria"
+        },
+        {
+          "weight": "26.012206734300474",
+          "feature": "brussels"
+        },
+        {
+          "weight": "25.59417915357109",
+          "feature": "gaullist"
+        },
+        {
+          "weight": "25.38595261036282",
+          "feature": "popular"
+        },
+        {
+          "weight": "24.90626017520818",
+          "feature": "spd"
+        },
+        {
+          "weight": "24.373004064710734",
+          "feature": "polls"
+        },
+        {
+          "weight": "24.23074337980736",
+          "feature": "erm"
+        },
+        {
+          "weight": "24.228167978869067",
+          "feature": "poorer"
+        },
+        {
+          "weight": "24.135865698649845",
+          "feature": "commitment"
+        },
+        {
+          "weight": "24.081116137244553",
+          "feature": "campaign"
+        },
+        {
+          "weight": "24.024253578639417",
+          "feature": "undecided"
+        },
+        {
+          "weight": "23.658473431412038",
+          "feature": "constitution"
+        },
+        {
+          "weight": "23.29844278838342",
+          "feature": "favour"
+        },
+        {
+          "weight": "23.050645413894305",
+          "feature": "destaing"
+        },
+        {
+          "weight": "22.707352969254217",
+          "feature": "giscard"
+        },
+        {
+          "weight": "22.6559600407116",
+          "feature": "richer"
+        },
+        {
+          "weight": "22.546858495079885",
+          "feature": "question"
+        },
+        {
+          "weight": "22.537273672494074",
+          "feature": "greater"
+        },
+        {
+          "weight": "22.40609288798646",
+          "feature": "frances"
+        },
+        {
+          "weight": "22.303103140929807",
+          "feature": "wing"
+        },
+        {
+          "weight": "22.181894449025243",
+          "feature": "politicians"
+        },
+        {
+          "weight": "21.591007194633413",
+          "feature": "britains"
+        },
+        {
+          "weight": "21.361246211868142",
+          "feature": "communitys"
+        },
+        {
+          "weight": "21.255682400891388",
+          "feature": "fear"
+        },
+        {
+          "weight": "21.133212637669452",
+          "feature": "heads"
+        },
+        {
+          "weight": "20.940020925524593",
+          "feature": "opposed"
+        },
+        {
+          "weight": "20.887885762150518",
+          "feature": "unanimity"
+        },
+        {
+          "weight": "20.837638503694954",
+          "feature": "ratified"
+        },
+        {
+          "weight": "20.818843451472656",
+          "feature": "udf"
+        },
+        {
+          "weight": "20.581918332844253",
+          "feature": "denmarks"
+        },
+        {
+          "weight": "20.27895968980706",
+          "feature": "summit"
+        },
+        {
+          "weight": "20.217368243407133",
+          "feature": "inevitably"
+        },
+        {
+          "weight": "19.97759929860678",
+          "feature": "anti"
+        },
+        {
+          "weight": "19.850552416121367",
+          "feature": "bundestag"
+        },
+        {
+          "weight": "19.728914429696868",
+          "feature": "parliaments"
+        },
+        {
+          "weight": "19.67181297490415",
+          "feature": "scepticism"
+        },
+        {
+          "weight": "19.44587073650349",
+          "feature": "arguments"
+        },
+        {
+          "weight": "19.418048060836536",
+          "feature": "goal"
+        },
+        {
+          "weight": "19.413556416820555",
+          "feature": "amendment"
+        },
+        {
+          "weight": "19.33633460886894",
+          "feature": "parliamentary"
+        },
+        {
+          "weight": "18.916845085939578",
+          "feature": "ludlow"
+        },
+        {
+          "weight": "18.76382133498293",
+          "feature": "tory"
+        },
+        {
+          "weight": "18.691240195076357",
+          "feature": "lander"
+        },
+        {
+          "weight": "18.41876479220899",
+          "feature": "renegotiation"
+        },
+        {
+          "weight": "18.397119921228263",
+          "feature": "discussion"
+        },
+        {
+          "weight": "18.199080900652024",
+          "feature": "cohesion"
+        },
+        {
+          "weight": "18.05902803657645",
+          "feature": "campaigners"
+        },
+        {
+          "weight": "17.79276887991431",
+          "feature": "subsidiarity"
+        },
+        {
+          "weight": "17.77831145982538",
+          "feature": "establishment"
+        },
+        {
+          "weight": "17.651896063407275",
+          "feature": "calling"
+        },
+        {
+          "weight": "17.573438050949637",
+          "feature": "enlargement"
+        },
+        {
+          "weight": "17.135276821930837",
+          "feature": "franc"
+        },
+        {
+          "weight": "17.010635049539662",
+          "feature": "greece"
+        },
+        {
+          "weight": "16.88879092031943",
+          "feature": "versailles"
+        },
+        {
+          "weight": "16.785276109039618",
+          "feature": "seguin"
+        },
+        {
+          "weight": "16.626851750011323",
+          "feature": "protocol"
+        },
+        {
+          "weight": "16.325153940090388",
+          "feature": "ratify"
+        },
+        {
+          "weight": "15.689202895318225",
+          "feature": "gaullists"
+        },
+        {
+          "weight": "15.419132987577523",
+          "feature": "chirac"
+        },
+        {
+          "weight": "15.419132987577523",
+          "feature": "gaulle"
+        },
+        {
+          "weight": "15.37110611778096",
+          "feature": "wieczoreck"
+        },
+        {
+          "weight": "15.231403007225223",
+          "feature": "monde"
+        },
+        {
+          "weight": "15.05471258823746",
+          "feature": "plebiscite"
+        },
+        {
+          "weight": "14.942437374125726",
+          "feature": "reprieve"
+        },
+        {
+          "weight": "14.781515700950955",
+          "feature": "valery"
+        },
+        {
+          "weight": "14.628771504964508",
+          "feature": "mistrust"
+        },
+        {
+          "weight": "14.19545777977269",
+          "feature": "zeul"
+        },
+        {
+          "weight": "13.794078883691428",
+          "feature": "allensbach"
+        },
+        {
+          "weight": "13.794078883691428",
+          "feature": "esperanto"
+        }
+      ]
+    },
+    {
+      "title": "379",
+      "text": "mainstreaming",
+      "constraint": "#syn(mainstreaming)",
+      "model": [
+        {
+          "weight": "1",
+          "feature": "mainstreaming"
+        }
+      ]
+    },
+    {
+      "title": "380",
+      "text": "obesity medical treatment",
+      "constraint": "#syn(obesity medical treatment)",
+      "model": [
+        {
+          "weight": "0.3333333333333333",
+          "feature": "obesity"
+        },
+        {
+          "weight": "0.3333333333333333",
+          "feature": "treatment"
+        },
+        {
+          "weight": "0.3333333333333333",
+          "feature": "medical"
+        }
+      ]
+    },
+    {
+      "title": "381",
+      "text": "alternative medicine",
+      "constraint": "#syn(alternative medicine)",
+      "model": []
+    },
+    {
+      "title": "382",
+      "text": "hydrogen fuel automobiles",
+      "constraint": "#syn(hydrogen fuel automobiles)",
+      "model": []
+    },
+    {
+      "title": "383",
+      "text": "mental illness drugs",
+      "constraint": "#syn(mental illness drugs)",
+      "model": [
+        {
+          "weight": "83.92627938692308",
+          "feature": "drugs"
+        },
+        {
+          "weight": "49.36961454247469",
+          "feature": "drug"
+        },
+        {
+          "weight": "47.89891389816041",
+          "feature": "depressant"
+        },
+        {
+          "weight": "39.27485605424263",
+          "feature": "antibiotic"
+        },
+        {
+          "weight": "37.82956422696429",
+          "feature": "prozac"
+        },
+        {
+          "weight": "29.411677639401248",
+          "feature": "eli"
+        },
+        {
+          "weight": "28.7752735665687",
+          "feature": "lillys"
+        },
+        {
+          "weight": "28.707541391026595",
+          "feature": "clinical"
+        },
+        {
+          "weight": "27.875395299092528",
+          "feature": "pharmaceuticals"
+        },
+        {
+          "weight": "27.242740456518483",
+          "feature": "seroxat"
+        },
+        {
+          "weight": "26.498416728469074",
+          "feature": "anti"
+        },
+        {
+          "weight": "24.58393202062694",
+          "feature": "patients"
+        },
+        {
+          "weight": "23.293423175693317",
+          "feature": "newer"
+        },
+        {
+          "weight": "22.573470947054098",
+          "feature": "effects"
+        },
+        {
+          "weight": "19.96828574925278",
+          "feature": "smithkline"
+        },
+        {
+          "weight": "19.734056960635048",
+          "feature": "beecham"
+        },
+        {
+          "weight": "19.455232411206335",
+          "feature": "genetically"
+        },
+        {
+          "weight": "18.800526966705384",
+          "feature": "trials"
+        },
+        {
+          "weight": "18.288119967582926",
+          "feature": "ceclor"
+        },
+        {
+          "weight": "16.593449261102663",
+          "feature": "degenerative"
+        },
+        {
+          "weight": "16.2544052489709",
+          "feature": "pharmaceutical"
+        },
+        {
+          "weight": "16.090782910633607",
+          "feature": "augmentin"
+        },
+        {
+          "weight": "15.925394838750158",
+          "feature": "harmful"
+        },
+        {
+          "weight": "15.789955077414582",
+          "feature": "engineered"
+        },
+        {
+          "weight": "15.689404025099154",
+          "feature": "tranquilliser"
+        },
+        {
+          "weight": "15.355258360459736",
+          "feature": "emetic"
+        },
+        {
+          "weight": "14.81865539453529",
+          "feature": "schizophrenia"
+        },
+        {
+          "weight": "14.047180439004752",
+          "feature": "alzheimers"
+        },
+        {
+          "weight": "14.047180439004752",
+          "feature": "dementia"
+        },
+        {
+          "weight": "13.893220856498118",
+          "feature": "enzyme"
+        },
+        {
+          "weight": "13.893220856498118",
+          "feature": "insulin"
+        },
+        {
+          "weight": "13.893220856498118",
+          "feature": "ucb"
+        },
+        {
+          "weight": "13.616845176958261",
+          "feature": "payback"
+        }
+      ]
+    },
+    {
+      "title": "384",
+      "text": "space station moon",
+      "constraint": "#syn(space station moon)",
+      "model": []
+    },
+    {
+      "title": "385",
+      "text": "hybrid fuel cars",
+      "constraint": "#syn(hybrid fuel cars)",
+      "model": [
+        {
+          "weight": "44.3870741903301",
+          "feature": "petrol"
+        },
+        {
+          "weight": "39.76420609202759",
+          "feature": "vehicles"
+        },
+        {
+          "weight": "36.261882055053334",
+          "feature": "cars"
+        },
+        {
+          "weight": "35.93667135494887",
+          "feature": "battery"
+        },
+        {
+          "weight": "32.855872174196165",
+          "feature": "car"
+        },
+        {
+          "weight": "27.750378220988754",
+          "feature": "least"
+        },
+        {
+          "weight": "26.544831172250593",
+          "feature": "electric"
+        },
+        {
+          "weight": "25.071384419467307",
+          "feature": "electricity"
+        },
+        {
+          "weight": "24.855803853985083",
+          "feature": "diesel"
+        },
+        {
+          "weight": "24.419152019601942",
+          "feature": "powered"
+        },
+        {
+          "weight": "23.448575978493317",
+          "feature": "cinquecento"
+        },
+        {
+          "weight": "19.801017253931875",
+          "feature": "california"
+        },
+        {
+          "weight": "19.13280118957905",
+          "feature": "batteries"
+        },
+        {
+          "weight": "18.50559387038929",
+          "feature": "prototype"
+        },
+        {
+          "weight": "18.47875162848791",
+          "feature": "vans"
+        },
+        {
+          "weight": "18.222714648560995",
+          "feature": "motorists"
+        },
+        {
+          "weight": "17.767894311883637",
+          "feature": "boot"
+        },
+        {
+          "weight": "16.849874633656515",
+          "feature": "recharging"
+        },
+        {
+          "weight": "16.522918872636396",
+          "feature": "pack"
+        },
+        {
+          "weight": "16.508973498979692",
+          "feature": "peugeot"
+        },
+        {
+          "weight": "15.708597447184951",
+          "feature": "sodium"
+        },
+        {
+          "weight": "15.643591971316646",
+          "feature": "emissions"
+        },
+        {
+          "weight": "15.387837154299506",
+          "feature": "refuelling"
+        }
+      ]
+    },
+    {
+      "title": "386",
+      "text": "teaching disabled children",
+      "constraint": "#syn(teaching disabled children)",
+      "model": [
+        {
+          "weight": "0.3333333333333333",
+          "feature": "teaching"
+        },
+        {
+          "weight": "0.3333333333333333",
+          "feature": "children"
+        },
+        {
+          "weight": "0.3333333333333333",
+          "feature": "disabled"
+        }
+      ]
+    },
+    {
+      "title": "387",
+      "text": "radioactive waste",
+      "constraint": "#syn(radioactive waste)",
+      "model": [
+        {
+          "weight": "15.88757665033327",
+          "feature": "reactor"
+        }
+      ]
+    },
+    {
+      "title": "388",
+      "text": "organic soil enhancement",
+      "constraint": "#syn(organic soil enhancement)",
+      "model": [
+        {
+          "weight": "22.700711173382583",
+          "feature": "organic"
+        },
+        {
+          "weight": "18.288119967582926",
+          "feature": "attachments"
+        },
+        {
+          "weight": "17.0660018432435",
+          "feature": "tub"
+        },
+        {
+          "weight": "16.563185489025273",
+          "feature": "manure"
+        },
+        {
+          "weight": "16.235776630679574",
+          "feature": "compost"
+        },
+        {
+          "weight": "15.889903475699162",
+          "feature": "weeds"
+        }
+      ]
+    },
+    {
+      "title": "389",
+      "text": "illegal technology transfer",
+      "constraint": "#syn(illegal technology transfer)",
+      "model": [
+        {
+          "weight": "73.24640866814211",
+          "feature": "illegal"
+        },
+        {
+          "weight": "57.876120709276904",
+          "feature": "military"
+        },
+        {
+          "weight": "54.044172197864185",
+          "feature": "charges"
+        },
+        {
+          "weight": "48.46556245565239",
+          "feature": "laundering"
+        },
+        {
+          "weight": "48.180322938258016",
+          "feature": "iraq"
+        },
+        {
+          "weight": "37.32883666873955",
+          "feature": "guerins"
+        },
+        {
+          "weight": "37.19020791208584",
+          "feature": "arms"
+        },
+        {
+          "weight": "32.934012560935976",
+          "feature": "guerin"
+        },
+        {
+          "weight": "28.795472396716857",
+          "feature": "defence"
+        },
+        {
+          "weight": "28.28003512976319",
+          "feature": "intelligence"
+        },
+        {
+          "weight": "27.55999149373101",
+          "feature": "illegally"
+        },
+        {
+          "weight": "27.052985316603834",
+          "feature": "security"
+        },
+        {
+          "weight": "25.38258297011086",
+          "feature": "ferranti"
+        },
+        {
+          "weight": "25.146995803959097",
+          "feature": "950m"
+        },
+        {
+          "weight": "25.145534833898825",
+          "feature": "inman"
+        },
+        {
+          "weight": "25.145534833898825",
+          "feature": "ferrantis"
+        },
+        {
+          "weight": "24.91999028452878",
+          "feature": "saddam"
+        },
+        {
+          "weight": "24.543466504542742",
+          "feature": "clemency"
+        },
+        {
+          "weight": "23.691991162983882",
+          "feature": "indictment"
+        },
+        {
+          "weight": "22.708772556383582",
+          "feature": "cia"
+        },
+        {
+          "weight": "22.428132267967094",
+          "feature": "prosecutors"
+        },
+        {
+          "weight": "21.784349733451943",
+          "feature": "technology"
+        },
+        {
+          "weight": "21.37096288844919",
+          "feature": "bush"
+        },
+        {
+          "weight": "21.174363915344394",
+          "feature": "sentenced"
+        },
+        {
+          "weight": "20.595592351725088",
+          "feature": "defrauding"
+        },
+        {
+          "weight": "20.595592351725088",
+          "feature": "isc"
+        },
+        {
+          "weight": "20.149108972572172",
+          "feature": "scandal"
+        },
+        {
+          "weight": "20.127021750033983",
+          "feature": "allegations"
+        },
+        {
+          "weight": "19.946046011372047",
+          "feature": "comment"
+        },
+        {
+          "weight": "19.555649567125414",
+          "feature": "james"
+        },
+        {
+          "weight": "19.381220360958235",
+          "feature": "deputy"
+        },
+        {
+          "weight": "19.1126211803877",
+          "feature": "procurement"
+        },
+        {
+          "weight": "19.04288992493166",
+          "feature": "export"
+        },
+        {
+          "weight": "18.947424912230904",
+          "feature": "bobby"
+        },
+        {
+          "weight": "18.86551213172527",
+          "feature": "plea"
+        },
+        {
+          "weight": "18.587654200356866",
+          "feature": "missile"
+        },
+        {
+          "weight": "18.478605050074535",
+          "feature": "indicted"
+        },
+        {
+          "weight": "18.16012117623809",
+          "feature": "investigation"
+        },
+        {
+          "weight": "18.13704697339311",
+          "feature": "matrix"
+        },
+        {
+          "weight": "18.08791555796746",
+          "feature": "inmans"
+        },
+        {
+          "weight": "17.500966230969542",
+          "feature": "denied"
+        },
+        {
+          "weight": "17.42828250526529",
+          "feature": "tools"
+        },
+        {
+          "weight": "17.33964195488733",
+          "feature": "prison"
+        },
+        {
+          "weight": "17.066226817231122",
+          "feature": "nightline"
+        },
+        {
+          "weight": "16.96311021965068",
+          "feature": "lawyer"
+        },
+        {
+          "weight": "16.815975123781197",
+          "feature": "technologies"
+        },
+        {
+          "weight": "16.71136428982153",
+          "feature": "iran"
+        },
+        {
+          "weight": "16.536780019471262",
+          "feature": "customs"
+        },
+        {
+          "weight": "16.492055552525613",
+          "feature": "disclosure"
+        },
+        {
+          "weight": "16.451624166628314",
+          "feature": "prosecutor"
+        },
+        {
+          "weight": "16.378780682185553",
+          "feature": "philadelphia"
+        },
+        {
+          "weight": "16.317916163832447",
+          "feature": "iraqi"
+        },
+        {
+          "weight": "15.882305926268431",
+          "feature": "pennsylvania"
+        },
+        {
+          "weight": "15.821889702726093",
+          "feature": "admiral"
+        },
+        {
+          "weight": "15.377787429164691",
+          "feature": "proxy"
+        },
+        {
+          "weight": "15.35208988611572",
+          "feature": "churchill"
+        },
+        {
+          "weight": "15.251436642682911",
+          "feature": "unauthorised"
+        },
+        {
+          "weight": "14.8359708662164",
+          "feature": "classified"
+        },
+        {
+          "weight": "14.451829380901241",
+          "feature": "shipped"
+        },
+        {
+          "weight": "14.195757795711598",
+          "feature": "ccc"
+        },
+        {
+          "weight": "13.693016438446628",
+          "feature": "condor"
+        }
+      ]
+    },
+    {
+      "title": "390",
+      "text": "orphan drugs",
+      "constraint": "#syn(orphan drugs)",
+      "model": [
+        {
+          "weight": "22.482664632974124",
+          "feature": "recombinant"
+        },
+        {
+          "weight": "21.244473751306913",
+          "feature": "transgenic"
+        },
+        {
+          "weight": "20.958234574335233",
+          "feature": "nih"
+        },
+        {
+          "weight": "18.358918664655096",
+          "feature": "dna"
+        },
+        {
+          "weight": "17.9051094799796",
+          "feature": "genetically"
+        },
+        {
+          "weight": "16.814137557409747",
+          "feature": "protein"
+        },
+        {
+          "weight": "16.747940778238796",
+          "feature": "gene"
+        },
+        {
+          "weight": "16.36392895320642",
+          "feature": "genetic"
+        },
+        {
+          "weight": "15.502875506679532",
+          "feature": "engineered"
+        },
+        {
+          "weight": "15.502875506679532",
+          "feature": "diseases"
+        },
+        {
+          "weight": "15.383933652107944",
+          "feature": "biotechnology"
+        }
+      ]
+    },
+    {
+      "title": "391",
+      "text": "r d drug prices",
+      "constraint": "#syn(r d drug prices)",
+      "model": [
+        {
+          "weight": "295.0256872726782",
+          "feature": "drug"
+        },
+        {
+          "weight": "263.17098436435515",
+          "feature": "research"
+        },
+        {
+          "weight": "240.15215149063815",
+          "feature": "drugs"
+        },
+        {
+          "weight": "207.32300642080688",
+          "feature": "development"
+        },
+        {
+          "weight": "194.3524237960273",
+          "feature": "pharmaceuticals"
+        },
+        {
+          "weight": "169.64655679515488",
+          "feature": "pharmaceutical"
+        },
+        {
+          "weight": "115.1477724468292",
+          "feature": "sales"
+        },
+        {
+          "weight": "101.5755303233885",
+          "feature": "clinical"
+        },
+        {
+          "weight": "85.76041209698236",
+          "feature": "glaxo"
+        },
+        {
+          "weight": "77.34870116617607",
+          "feature": "products"
+        },
+        {
+          "weight": "69.08594438056222",
+          "feature": "trials"
+        },
+        {
+          "weight": "69.05043589275174",
+          "feature": "medicines"
+        },
+        {
+          "weight": "68.69633759978689",
+          "feature": "company"
+        },
+        {
+          "weight": "67.83933727522569",
+          "feature": "marketing"
+        },
+        {
+          "weight": "65.41490435145363",
+          "feature": "r"
+        },
+        {
+          "weight": "61.14624929699036",
+          "feature": "patients"
+        },
+        {
+          "weight": "61.00614062108751",
+          "feature": "cancer"
+        },
+        {
+          "weight": "60.10086510243812",
+          "feature": "groups"
+        },
+        {
+          "weight": "60.09304846820624",
+          "feature": "generic"
+        },
+        {
+          "weight": "59.980855071171085",
+          "feature": "market"
+        },
+        {
+          "weight": "57.51036950324211",
+          "feature": "medicine"
+        },
+        {
+          "weight": "57.231424464492136",
+          "feature": "anti"
+        },
+        {
+          "weight": "57.11184695823861",
+          "feature": "treatment"
+        },
+        {
+          "weight": "55.3080701493041",
+          "feature": "innovative"
+        },
+        {
+          "weight": "53.42618742788546",
+          "feature": "glaxos"
+        },
+        {
+          "weight": "53.42578459207257",
+          "feature": "product"
+        },
+        {
+          "weight": "53.15747353531786",
+          "feature": "medical"
+        },
+        {
+          "weight": "51.66887602471514",
+          "feature": "growth"
+        },
+        {
+          "weight": "50.40347972720646",
+          "feature": "industry"
+        },
+        {
+          "weight": "50.13528854697757",
+          "feature": "wellcome"
+        },
+        {
+          "weight": "49.00438868143326",
+          "feature": "merck"
+        },
+        {
+          "weight": "46.90589054449932",
+          "feature": "companies"
+        },
+        {
+          "weight": "46.451493574802896",
+          "feature": "dollars"
+        },
+        {
+          "weight": "45.41110250392398",
+          "feature": "ulcer"
+        },
+        {
+          "weight": "43.80043877534",
+          "feature": "price"
+        },
+        {
+          "weight": "43.58760658014668",
+          "feature": "pricing"
+        },
+        {
+          "weight": "43.37357866533777",
+          "feature": "aids"
+        },
+        {
+          "weight": "41.97798954540774",
+          "feature": "imigran"
+        },
+        {
+          "weight": "39.93009141293207",
+          "feature": "migraine"
+        },
+        {
+          "weight": "39.182190015037",
+          "feature": "compounds"
+        },
+        {
+          "weight": "39.182190015037",
+          "feature": "viral"
+        },
+        {
+          "weight": "38.847599767908676",
+          "feature": "health"
+        },
+        {
+          "weight": "37.63224797087488",
+          "feature": "expenditure"
+        },
+        {
+          "weight": "37.402000437522624",
+          "feature": "biotechnology"
+        },
+        {
+          "weight": "37.08999743169933",
+          "feature": "healthcare"
+        },
+        {
+          "weight": "36.857703980329035",
+          "feature": "researchers"
+        },
+        {
+          "weight": "35.94685190560603",
+          "feature": "therapeutic"
+        },
+        {
+          "weight": "34.73610041991248",
+          "feature": "wellcomes"
+        },
+        {
+          "weight": "34.320813996057005",
+          "feature": "respiratory"
+        },
+        {
+          "weight": "33.86513270726059",
+          "feature": "patent"
+        },
+        {
+          "weight": "33.550902633825864",
+          "feature": "margins"
+        },
+        {
+          "weight": "33.4498563646435",
+          "feature": "spending"
+        },
+        {
+          "weight": "33.04275938701448",
+          "feature": "treat"
+        },
+        {
+          "weight": "32.778142137802774",
+          "feature": "prescription"
+        },
+        {
+          "weight": "32.70405378862158",
+          "feature": "increasingly"
+        },
+        {
+          "weight": "32.63717079142224",
+          "feature": "roche"
+        },
+        {
+          "weight": "32.510028303399274",
+          "feature": "smithkline"
+        },
+        {
+          "weight": "32.34760043182695",
+          "feature": "pressure"
+        },
+        {
+          "weight": "32.03561900664113",
+          "feature": "diseases"
+        },
+        {
+          "weight": "32.033044148692944",
+          "feature": "beecham"
+        },
+        {
+          "weight": "31.74133195498747",
+          "feature": "analysts"
+        },
+        {
+          "weight": "31.33563290783116",
+          "feature": "pfizer"
+        },
+        {
+          "weight": "31.33563290783116",
+          "feature": "retrovir"
+        },
+        {
+          "weight": "31.334064505927333",
+          "feature": "chemical"
+        },
+        {
+          "weight": "30.313292114565147",
+          "feature": "asthma"
+        },
+        {
+          "weight": "30.249268591121186",
+          "feature": "antibiotic"
+        },
+        {
+          "weight": "30.249268591121186",
+          "feature": "antibiotics"
+        },
+        {
+          "weight": "29.265744779380814",
+          "feature": "chemicals"
+        },
+        {
+          "weight": "29.241152241860178",
+          "feature": "industrys"
+        },
+        {
+          "weight": "29.088860726227686",
+          "feature": "treatments"
+        },
+        {
+          "weight": "28.774707959023328",
+          "feature": "vaccines"
+        },
+        {
+          "weight": "28.14439476953537",
+          "feature": "hoechst"
+        },
+        {
+          "weight": "28.038376922309638",
+          "feature": "potential"
+        },
+        {
+          "weight": "27.25914719880077",
+          "feature": "generics"
+        },
+        {
+          "weight": "26.853881239794223",
+          "feature": "zantac"
+        },
+        {
+          "weight": "26.73593842535997",
+          "feature": "blood"
+        },
+        {
+          "weight": "26.57192886054378",
+          "feature": "robb"
+        },
+        {
+          "weight": "26.436691647714472",
+          "feature": "sandoz"
+        },
+        {
+          "weight": "25.93979686892991",
+          "feature": "existing"
+        },
+        {
+          "weight": "25.753377887003477",
+          "feature": "develop"
+        },
+        {
+          "weight": "25.73339494032955",
+          "feature": "effective"
+        },
+        {
+          "weight": "25.428618802037956",
+          "feature": "technology"
+        },
+        {
+          "weight": "25.390371262668943",
+          "feature": "ici"
+        },
+        {
+          "weight": "25.360290012341032",
+          "feature": "squibb"
+        },
+        {
+          "weight": "25.19042287047529",
+          "feature": "analyst"
+        },
+        {
+          "weight": "25.05306064006512",
+          "feature": "500m"
+        },
+        {
+          "weight": "24.73602056471673",
+          "feature": "scientists"
+        },
+        {
+          "weight": "24.59703906137791",
+          "feature": "worldwide"
+        },
+        {
+          "weight": "24.160096634092586",
+          "feature": "increasing"
+        },
+        {
+          "weight": "23.99731110385365",
+          "feature": "dr"
+        },
+        {
+          "weight": "23.639257113340364",
+          "feature": "laboratories"
+        },
+        {
+          "weight": "23.573869843113613",
+          "feature": "1990s"
+        },
+        {
+          "weight": "23.41900940717645",
+          "feature": "discovered"
+        },
+        {
+          "weight": "23.137177611853403",
+          "feature": "geigy"
+        },
+        {
+          "weight": "23.000926963764734",
+          "feature": "poulenc"
+        },
+        {
+          "weight": "22.955071655833358",
+          "feature": "cure"
+        },
+        {
+          "weight": "22.934165391539196",
+          "feature": "ciba"
+        },
+        {
+          "weight": "22.863722434367396",
+          "feature": "tagamet"
+        },
+        {
+          "weight": "22.62645763938335",
+          "feature": "scientific"
+        },
+        {
+          "weight": "22.473018441179967",
+          "feature": "herpes"
+        },
+        {
+          "weight": "22.187584045812066",
+          "feature": "rapidly"
+        },
+        {
+          "weight": "22.117078376548385",
+          "feature": "pharma"
+        },
+        {
+          "weight": "22.03397753709716",
+          "feature": "developing"
+        },
+        {
+          "weight": "21.936886856158633",
+          "feature": "patient"
+        },
+        {
+          "weight": "21.86333066779978",
+          "feature": "rhone"
+        },
+        {
+          "weight": "21.601598561592766",
+          "feature": "manufacturers"
+        },
+        {
+          "weight": "21.47452921029844",
+          "feature": "innovatory"
+        },
+        {
+          "weight": "21.47452921029844",
+          "feature": "gastro"
+        },
+        {
+          "weight": "21.345088385985626",
+          "feature": "zofran"
+        },
+        {
+          "weight": "21.345088385985626",
+          "feature": "reimbursement"
+        },
+        {
+          "weight": "21.306168929648667",
+          "feature": "biological"
+        },
+        {
+          "weight": "20.944529339213297",
+          "feature": "zovirax"
+        },
+        {
+          "weight": "20.819444091530844",
+          "feature": "genetically"
+        },
+        {
+          "weight": "20.60974919720246",
+          "feature": "disease"
+        },
+        {
+          "weight": "20.506310497871745",
+          "feature": "effects"
+        },
+        {
+          "weight": "20.370773977540175",
+          "feature": "spend"
+        },
+        {
+          "weight": "20.246665327501304",
+          "feature": "efficacy"
+        },
+        {
+          "weight": "20.118461286662036",
+          "feature": "zoladex"
+        },
+        {
+          "weight": "20.012789244960825",
+          "feature": "fastest"
+        },
+        {
+          "weight": "19.681946537409463",
+          "feature": "branded"
+        },
+        {
+          "weight": "19.281595244317305",
+          "feature": "doctors"
+        },
+        {
+          "weight": "19.24999410598477",
+          "feature": "treating"
+        },
+        {
+          "weight": "18.67872948673287",
+          "feature": "commercially"
+        },
+        {
+          "weight": "18.478605050074535",
+          "feature": "hypertension"
+        },
+        {
+          "weight": "18.466345021877505",
+          "feature": "otc"
+        },
+        {
+          "weight": "18.34871453930502",
+          "feature": "immune"
+        },
+        {
+          "weight": "18.277038796593473",
+          "feature": "pipeline"
+        },
+        {
+          "weight": "18.2203126008647",
+          "feature": "exploit"
+        },
+        {
+          "weight": "18.178298392393195",
+          "feature": "aspirin"
+        },
+        {
+          "weight": "18.178298392393195",
+          "feature": "intestinal"
+        },
+        {
+          "weight": "17.95304331485581",
+          "feature": "prescribed"
+        },
+        {
+          "weight": "17.905326774709707",
+          "feature": "molecule"
+        },
+        {
+          "weight": "17.905326774709707",
+          "feature": "serevent"
+        },
+        {
+          "weight": "17.719099765708833",
+          "feature": "prescriptions"
+        },
+        {
+          "weight": "17.655125663770306",
+          "feature": "therapies"
+        },
+        {
+          "weight": "16.981595584403095",
+          "feature": "ageing"
+        },
+        {
+          "weight": "16.822005306926194",
+          "feature": "hormone"
+        },
+        {
+          "weight": "16.58797654356955",
+          "feature": "therapy"
+        },
+        {
+          "weight": "16.58797654356955",
+          "feature": "myers"
+        },
+        {
+          "weight": "16.535120400160423",
+          "feature": "ups"
+        },
+        {
+          "weight": "16.17058662726511",
+          "feature": "curing"
+        },
+        {
+          "weight": "16.14224715304866",
+          "feature": "cells"
+        },
+        {
+          "weight": "16.107823027358283",
+          "feature": "charity"
+        },
+        {
+          "weight": "16.090779550992075",
+          "feature": "80m"
+        },
+        {
+          "weight": "15.846581099204466",
+          "feature": "engineered"
+        },
+        {
+          "weight": "15.846581099204466",
+          "feature": "virus"
+        },
+        {
+          "weight": "15.775944316452",
+          "feature": "recoup"
+        },
+        {
+          "weight": "15.635616752197677",
+          "feature": "scientifically"
+        },
+        {
+          "weight": "15.408193397630688",
+          "feature": "icis"
+        },
+        {
+          "weight": "15.400089309110335",
+          "feature": "molecular"
+        },
+        {
+          "weight": "15.400089309110335",
+          "feature": "hoffman"
+        },
+        {
+          "weight": "15.290457789133304",
+          "feature": "agonist"
+        },
+        {
+          "weight": "15.290457789133304",
+          "feature": "914p"
+        },
+        {
+          "weight": "15.290457789133304",
+          "feature": "sumatriptan"
+        },
+        {
+          "weight": "15.290457789133304",
+          "feature": "y227bn"
+        },
+        {
+          "weight": "15.290457789133304",
+          "feature": "quorn"
+        },
+        {
+          "weight": "15.078183814981092",
+          "feature": "prescribe"
+        },
+        {
+          "weight": "15.078183814981092",
+          "feature": "infections"
+        },
+        {
+          "weight": "14.978118251042229",
+          "feature": "vaccine"
+        },
+        {
+          "weight": "14.881279360194778",
+          "feature": "bacteria"
+        },
+        {
+          "weight": "14.696493069640642",
+          "feature": "inflammatory"
+        },
+        {
+          "weight": "14.357881351410782",
+          "feature": "monsanto"
+        },
+        {
+          "weight": "14.278873114867858",
+          "feature": "biotech"
+        },
+        {
+          "weight": "14.26876902589162",
+          "feature": "fk"
+        },
+        {
+          "weight": "14.26876902589162",
+          "feature": "abpi"
+        },
+        {
+          "weight": "14.26876902589162",
+          "feature": "banyu"
+        }
+      ]
+    },
+    {
+      "title": "392",
+      "text": "robotics",
+      "constraint": "#syn(robotics)",
+      "model": [
+        {
+          "weight": "132.9912252666523",
+          "feature": "robotics"
+        },
+        {
+          "weight": "73.40933409222389",
+          "feature": "welding"
+        },
+        {
+          "weight": "65.36068648138554",
+          "feature": "robot"
+        },
+        {
+          "weight": "61.264894764343246",
+          "feature": "robotic"
+        },
+        {
+          "weight": "53.24184528382561",
+          "feature": "technology"
+        },
+        {
+          "weight": "52.80317168663672",
+          "feature": "robots"
+        },
+        {
+          "weight": "50.844436879846064",
+          "feature": "gmfanuc"
+        },
+        {
+          "weight": "44.04164629886318",
+          "feature": "manufacturing"
+        },
+        {
+          "weight": "36.055838087691036",
+          "feature": "engineering"
+        },
+        {
+          "weight": "36.04080720475546",
+          "feature": "systems"
+        },
+        {
+          "weight": "34.74484003245882",
+          "feature": "automation"
+        },
+        {
+          "weight": "33.38231262834816",
+          "feature": "flexibility"
+        },
+        {
+          "weight": "31.731712346920997",
+          "feature": "assembly"
+        },
+        {
+          "weight": "29.965802328288603",
+          "feature": "suppliers"
+        },
+        {
+          "weight": "27.46875438986209",
+          "feature": "techniques"
+        },
+        {
+          "weight": "26.16868905490273",
+          "feature": "japanese"
+        },
+        {
+          "weight": "25.20479829983696",
+          "feature": "handling"
+        },
+        {
+          "weight": "25.15090143018552",
+          "feature": "supplier"
+        },
+        {
+          "weight": "24.86373694252687",
+          "feature": "mechanical"
+        },
+        {
+          "weight": "24.202837351521417",
+          "feature": "plant"
+        },
+        {
+          "weight": "23.738802055380514",
+          "feature": "approach"
+        },
+        {
+          "weight": "22.799908534431783",
+          "feature": "important"
+        },
+        {
+          "weight": "22.134237634627297",
+          "feature": "automotive"
+        },
+        {
+          "weight": "21.634758598797045",
+          "feature": "fanuc"
+        },
+        {
+          "weight": "20.445247865982587",
+          "feature": "spot"
+        },
+        {
+          "weight": "20.088461101677833",
+          "feature": "manufacturers"
+        },
+        {
+          "weight": "19.806630373292585",
+          "feature": "applications"
+        },
+        {
+          "weight": "19.338512078572837",
+          "feature": "machines"
+        },
+        {
+          "weight": "18.788247870587576",
+          "feature": "computer"
+        },
+        {
+          "weight": "18.740716046907515",
+          "feature": "established"
+        },
+        {
+          "weight": "18.660286946566185",
+          "feature": "machine"
+        },
+        {
+          "weight": "18.4555771877141",
+          "feature": "painting"
+        },
+        {
+          "weight": "18.20232321953659",
+          "feature": "sensors"
+        },
+        {
+          "weight": "18.13704697339311",
+          "feature": "arc"
+        },
+        {
+          "weight": "18.08791555796746",
+          "feature": "yaskawa"
+        },
+        {
+          "weight": "17.949317037409756",
+          "feature": "controllers"
+        },
+        {
+          "weight": "17.830377041150854",
+          "feature": "programmed"
+        },
+        {
+          "weight": "17.42828250526529",
+          "feature": "tools"
+        },
+        {
+          "weight": "17.066226817231122",
+          "feature": "workpiece"
+        },
+        {
+          "weight": "17.066226817231122",
+          "feature": "igm"
+        },
+        {
+          "weight": "16.844904062891835",
+          "feature": "baxter"
+        },
+        {
+          "weight": "16.393244850081455",
+          "feature": "auburn"
+        },
+        {
+          "weight": "16.393244850081455",
+          "feature": "hoglund"
+        },
+        {
+          "weight": "16.038872957349746",
+          "feature": "abb"
+        },
+        {
+          "weight": "15.959155502326245",
+          "feature": "handle"
+        },
+        {
+          "weight": "15.675948294008066",
+          "feature": "simultaneous"
+        },
+        {
+          "weight": "15.489199612672103",
+          "feature": "welds"
+        },
+        {
+          "weight": "15.35208988611572",
+          "feature": "penetration"
+        },
+        {
+          "weight": "15.130170662888636",
+          "feature": "accuracy"
+        },
+        {
+          "weight": "14.61845097999927",
+          "feature": "reinvent"
+        },
+        {
+          "weight": "14.395962211653726",
+          "feature": "spraying"
+        },
+        {
+          "weight": "14.395962211653726",
+          "feature": "massimo"
+        }
+      ]
+    },
+    {
+      "title": "393",
+      "text": "mercy killing",
+      "constraint": "#syn(mercy killing)",
+      "model": [
+        {
+          "weight": "0.5",
+          "feature": "killing"
+        },
+        {
+          "weight": "0.5",
+          "feature": "mercy"
+        }
+      ]
+    },
+    {
+      "title": "394",
+      "text": "home schooling",
+      "constraint": "#syn(home schooling)",
+      "model": [
+        {
+          "weight": "0.5",
+          "feature": "home"
+        },
+        {
+          "weight": "0.5",
+          "feature": "schooling"
+        }
+      ]
+    },
+    {
+      "title": "395",
+      "text": "tourism",
+      "constraint": "#syn(tourism)",
+      "model": [
+        {
+          "weight": "261.22698741442315",
+          "feature": "tourism"
+        },
+        {
+          "weight": "131.17824597522866",
+          "feature": "tourist"
+        },
+        {
+          "weight": "99.02516584593724",
+          "feature": "visitors"
+        },
+        {
+          "weight": "86.91752056294719",
+          "feature": "tourists"
+        },
+        {
+          "weight": "67.84476248568511",
+          "feature": "survey"
+        },
+        {
+          "weight": "67.32439667487276",
+          "feature": "hotels"
+        },
+        {
+          "weight": "58.555632370624515",
+          "feature": "gulf"
+        },
+        {
+          "weight": "57.69259264120079",
+          "feature": "arrivals"
+        },
+        {
+          "weight": "53.000596092874034",
+          "feature": "hotel"
+        },
+        {
+          "weight": "50.72259362127805",
+          "feature": "attractions"
+        },
+        {
+          "weight": "43.453210071709044",
+          "feature": "sector"
+        },
+        {
+          "weight": "41.75579820329724",
+          "feature": "industry"
+        },
+        {
+          "weight": "40.124368909202595",
+          "feature": "occupancy"
+        },
+        {
+          "weight": "39.128454079530236",
+          "feature": "local"
+        },
+        {
+          "weight": "38.5441710914178",
+          "feature": "says"
+        },
+        {
+          "weight": "37.32723248273839",
+          "feature": "numbers"
+        },
+        {
+          "weight": "36.69032022283594",
+          "feature": "attract"
+        },
+        {
+          "weight": "36.084159104578085",
+          "feature": "economy"
+        },
+        {
+          "weight": "31.96304259021843",
+          "feature": "travel"
+        },
+        {
+          "weight": "31.666543675047713",
+          "feature": "spending"
+        },
+        {
+          "weight": "31.332022018243435",
+          "feature": "attracting"
+        },
+        {
+          "weight": "28.485651899105953",
+          "feature": "tour"
+        },
+        {
+          "weight": "28.437753859101736",
+          "feature": "development"
+        },
+        {
+          "weight": "27.04971587398671",
+          "feature": "source"
+        },
+        {
+          "weight": "25.148346610234427",
+          "feature": "trippers"
+        },
+        {
+          "weight": "24.952816106966036",
+          "feature": "parks"
+        },
+        {
+          "weight": "23.115391992152368",
+          "feature": "affected"
+        },
+        {
+          "weight": "22.409980536345355",
+          "feature": "campaign"
+        },
+        {
+          "weight": "21.456037897928944",
+          "feature": "doubled"
+        },
+        {
+          "weight": "21.369493695696598",
+          "feature": "promote"
+        },
+        {
+          "weight": "20.542758407425904",
+          "feature": "sea"
+        },
+        {
+          "weight": "20.152891677533724",
+          "feature": "infrastructure"
+        },
+        {
+          "weight": "19.80466407858616",
+          "feature": "egypts"
+        },
+        {
+          "weight": "18.025039776685716",
+          "feature": "heritage"
+        },
+        {
+          "weight": "17.5851703322861",
+          "feature": "gdp"
+        },
+        {
+          "weight": "17.227994027461165",
+          "feature": "cairo"
+        },
+        {
+          "weight": "16.864579625653896",
+          "feature": "destinations"
+        },
+        {
+          "weight": "16.635399665410922",
+          "feature": "egyptians"
+        },
+        {
+          "weight": "16.47834956601425",
+          "feature": "chronic"
+        },
+        {
+          "weight": "16.27323035375642",
+          "feature": "bookings"
+        },
+        {
+          "weight": "16.16165658286522",
+          "feature": "hurghada"
+        },
+        {
+          "weight": "16.16165658286522",
+          "feature": "colwyn"
+        },
+        {
+          "weight": "16.16165658286522",
+          "feature": "sharm"
+        },
+        {
+          "weight": "16.101946046791273",
+          "feature": "egyptian"
+        },
+        {
+          "weight": "16.07806120813732",
+          "feature": "beds"
+        },
+        {
+          "weight": "15.868909278987513",
+          "feature": "nile"
+        },
+        {
+          "weight": "15.779803284578888",
+          "feature": "destination"
+        },
+        {
+          "weight": "15.779803284578888",
+          "feature": "visitor"
+        },
+        {
+          "weight": "15.54838017186192",
+          "feature": "caravan"
+        },
+        {
+          "weight": "14.466985851073561",
+          "feature": "myerscough"
+        },
+        {
+          "weight": "14.466985851073561",
+          "feature": "overdependence"
+        },
+        {
+          "weight": "14.466985851073561",
+          "feature": "fouad"
+        },
+        {
+          "weight": "14.466985851073561",
+          "feature": "coed"
+        },
+        {
+          "weight": "13.9643194879481",
+          "feature": "canarios"
+        },
+        {
+          "weight": "13.9643194879481",
+          "feature": "aswan"
+        },
+        {
+          "weight": "13.9643194879481",
+          "feature": "luxor"
+        }
+      ]
+    },
+    {
+      "title": "396",
+      "text": "sick building syndrome",
+      "constraint": "#syn(sick building syndrome)",
+      "model": [
+        {
+          "weight": "40.82220522583193",
+          "feature": "sick"
+        },
+        {
+          "weight": "31.952995443042497",
+          "feature": "buildings"
+        },
+        {
+          "weight": "31.324192839175954",
+          "feature": "syndrome"
+        },
+        {
+          "weight": "26.843642705701313",
+          "feature": "health"
+        },
+        {
+          "weight": "23.67687856223856",
+          "feature": "building"
+        },
+        {
+          "weight": "20.979061455301366",
+          "feature": "headaches"
+        },
+        {
+          "weight": "20.457021607162318",
+          "feature": "symptoms"
+        },
+        {
+          "weight": "18.664705259046464",
+          "feature": "offices"
+        },
+        {
+          "weight": "18.590731870008735",
+          "feature": "robens"
+        },
+        {
+          "weight": "18.322250524172702",
+          "feature": "cause"
+        },
+        {
+          "weight": "17.77986710838006",
+          "feature": "cure"
+        },
+        {
+          "weight": "17.74967878577886",
+          "feature": "occupational"
+        },
+        {
+          "weight": "16.81593802452747",
+          "feature": "rossiter"
+        },
+        {
+          "weight": "16.21126379905985",
+          "feature": "emeritus"
+        },
+        {
+          "weight": "15.61412783647763",
+          "feature": "flu"
+        },
+        {
+          "weight": "14.781507037339669",
+          "feature": "throats"
+        },
+        {
+          "weight": "14.326502319896381",
+          "feature": "ventilation"
+        }
+      ]
+    },
+    {
+      "title": "397",
+      "text": "automobile recalls",
+      "constraint": "#syn(automobile recalls)",
+      "model": []
+    },
+    {
+      "title": "398",
+      "text": "dismantling europe s arsenal",
+      "constraint": "#syn(dismantling europe s arsenal)",
+      "model": [
+        {
+          "weight": "69.7771230775233",
+          "feature": "cfe"
+        },
+        {
+          "weight": "54.74619314648293",
+          "feature": "soviet"
+        },
+        {
+          "weight": "48.30712569828144",
+          "feature": "conventional"
+        },
+        {
+          "weight": "44.541658363979415",
+          "feature": "nato"
+        },
+        {
+          "weight": "44.248345311562915",
+          "feature": "europe"
+        },
+        {
+          "weight": "38.56908572127728",
+          "feature": "forces"
+        },
+        {
+          "weight": "35.77267979300342",
+          "feature": "arms"
+        },
+        {
+          "weight": "31.512985886833402",
+          "feature": "treaty"
+        },
+        {
+          "weight": "30.248526026710852",
+          "feature": "military"
+        },
+        {
+          "weight": "28.95038647525271",
+          "feature": "weapons"
+        },
+        {
+          "weight": "28.494891376065475",
+          "feature": "warsaw"
+        },
+        {
+          "weight": "27.45127685138633",
+          "feature": "states"
+        },
+        {
+          "weight": "27.39179313110562",
+          "feature": "republics"
+        },
+        {
+          "weight": "25.74749583992086",
+          "feature": "russia"
+        },
+        {
+          "weight": "25.57830137566579",
+          "feature": "ukraine"
+        },
+        {
+          "weight": "23.72034838233828",
+          "feature": "pact"
+        },
+        {
+          "weight": "23.46581140575601",
+          "feature": "commonwealth"
+        },
+        {
+          "weight": "21.49044595120668",
+          "feature": "defence"
+        },
+        {
+          "weight": "20.419664796412786",
+          "feature": "cis"
+        },
+        {
+          "weight": "17.481647489394092",
+          "feature": "belarus"
+        },
+        {
+          "weight": "14.823431691035754",
+          "feature": "ukrainian"
+        },
+        {
+          "weight": "14.089697735664943",
+          "feature": "worner"
+        }
+      ]
+    },
+    {
+      "title": "399",
+      "text": "oceanographic vessels",
+      "constraint": "#syn(oceanographic vessels)",
+      "model": []
+    },
+    {
+      "title": "400",
+      "text": "amazon rain forest",
+      "constraint": "#syn(amazon rain forest)",
+      "model": [
+        {
+          "weight": "132.34982737159322",
+          "feature": "brazil"
+        },
+        {
+          "weight": "122.6208926981835",
+          "feature": "rainforest"
+        },
+        {
+          "weight": "119.83372854018333",
+          "feature": "amazon"
+        },
+        {
+          "weight": "113.48540995068049",
+          "feature": "worlds"
+        },
+        {
+          "weight": "107.72874255750496",
+          "feature": "deforestation"
+        },
+        {
+          "weight": "102.79117640803734",
+          "feature": "environment"
+        },
+        {
+          "weight": "101.30097444672897",
+          "feature": "amazonian"
+        },
+        {
+          "weight": "99.23467959142761",
+          "feature": "forest"
+        },
+        {
+          "weight": "97.77864914044447",
+          "feature": "rio"
+        },
+        {
+          "weight": "94.29904011332987",
+          "feature": "earth"
+        },
+        {
+          "weight": "91.2458584785887",
+          "feature": "environmental"
+        },
+        {
+          "weight": "90.88474911318734",
+          "feature": "world"
+        },
+        {
+          "weight": "89.20286836020338",
+          "feature": "brazils"
+        },
+        {
+          "weight": "88.35652853253231",
+          "feature": "summit"
+        },
+        {
+          "weight": "87.3327650228929",
+          "feature": "forests"
+        },
+        {
+          "weight": "80.75580817888623",
+          "feature": "brazilian"
+        },
+        {
+          "weight": "74.93756223436478",
+          "feature": "sustainable"
+        },
+        {
+          "weight": "68.12932091933827",
+          "feature": "goldemberg"
+        },
+        {
+          "weight": "64.10096163761229",
+          "feature": "tropical"
+        },
+        {
+          "weight": "56.606472697047124",
+          "feature": "development"
+        },
+        {
+          "weight": "52.128775389087345",
+          "feature": "species"
+        },
+        {
+          "weight": "51.93889146523683",
+          "feature": "jose"
+        },
+        {
+          "weight": "49.524778896280246",
+          "feature": "resources"
+        },
+        {
+          "weight": "47.53260684014976",
+          "feature": "conference"
+        },
+        {
+          "weight": "47.31559672391035",
+          "feature": "biodiversity"
+        },
+        {
+          "weight": "46.22153102980653",
+          "feature": "developing"
+        },
+        {
+          "weight": "43.77610773542378",
+          "feature": "technology"
+        },
+        {
+          "weight": "42.87352190346488",
+          "feature": "rain"
+        },
+        {
+          "weight": "42.72419992601334",
+          "feature": "says"
+        },
+        {
+          "weight": "42.668805690709746",
+          "feature": "international"
+        },
+        {
+          "weight": "41.21828341105382",
+          "feature": "collor"
+        },
+        {
+          "weight": "41.15546855891969",
+          "feature": "destruction"
+        },
+        {
+          "weight": "41.068554431900004",
+          "feature": "global"
+        },
+        {
+          "weight": "40.92013285669872",
+          "feature": "environmentalists"
+        },
+        {
+          "weight": "40.08679580884002",
+          "feature": "poverty"
+        },
+        {
+          "weight": "39.700251361668045",
+          "feature": "fernando"
+        },
+        {
+          "weight": "38.28149217326",
+          "feature": "conservation"
+        },
+        {
+          "weight": "37.5680817825115",
+          "feature": "cattle"
+        },
+        {
+          "weight": "36.21707863582674",
+          "feature": "countries"
+        },
+        {
+          "weight": "35.51078345979108",
+          "feature": "trees"
+        },
+        {
+          "weight": "35.34631778212469",
+          "feature": "president"
+        },
+        {
+          "weight": "35.241310992030535",
+          "feature": "convention"
+        },
+        {
+          "weight": "34.733815538196254",
+          "feature": "hectares"
+        },
+        {
+          "weight": "34.39018629950519",
+          "feature": "warming"
+        },
+        {
+          "weight": "34.212017244528006",
+          "feature": "logging"
+        },
+        {
+          "weight": "33.39884789886029",
+          "feature": "green"
+        },
+        {
+          "weight": "32.42699814489734",
+          "feature": "soil"
+        },
+        {
+          "weight": "31.560519922962165",
+          "feature": "people"
+        },
+        {
+          "weight": "31.4786211481607",
+          "feature": "jungle"
+        },
+        {
+          "weight": "31.341027868757934",
+          "feature": "ecologists"
+        },
+        {
+          "weight": "31.000636744032914",
+          "feature": "economic"
+        },
+        {
+          "weight": "30.666515281337077",
+          "feature": "emissions"
+        },
+        {
+          "weight": "30.652447371837837",
+          "feature": "keng"
+        },
+        {
+          "weight": "30.652447371837837",
+          "feature": "yaik"
+        },
+        {
+          "weight": "30.487592792620276",
+          "feature": "protection"
+        },
+        {
+          "weight": "30.06138303086344",
+          "feature": "poor"
+        },
+        {
+          "weight": "28.41124842032713",
+          "feature": "land"
+        },
+        {
+          "weight": "28.19176890046546",
+          "feature": "nations"
+        },
+        {
+          "weight": "27.768984377150012",
+          "feature": "forestry"
+        },
+        {
+          "weight": "27.447779516802175",
+          "feature": "janeiro"
+        },
+        {
+          "weight": "26.774170012277224",
+          "feature": "loggers"
+        },
+        {
+          "weight": "26.76905251438735",
+          "feature": "industrialised"
+        },
+        {
+          "weight": "26.507329492713833",
+          "feature": "pasture"
+        },
+        {
+          "weight": "25.990582065631823",
+          "feature": "lutzenberger"
+        },
+        {
+          "weight": "25.625056595580286",
+          "feature": "binding"
+        },
+        {
+          "weight": "24.844319166770052",
+          "feature": "carbon"
+        },
+        {
+          "weight": "24.56591504515968",
+          "feature": "scientists"
+        },
+        {
+          "weight": "23.932078085301715",
+          "feature": "lim"
+        },
+        {
+          "weight": "23.35811901785792",
+          "feature": "lack"
+        },
+        {
+          "weight": "22.871333686501526",
+          "feature": "means"
+        },
+        {
+          "weight": "22.41716891597749",
+          "feature": "agricultural"
+        },
+        {
+          "weight": "22.092508097067896",
+          "feature": "biologist"
+        },
+        {
+          "weight": "21.987646622734086",
+          "feature": "burning"
+        },
+        {
+          "weight": "21.86024733921876",
+          "feature": "christina"
+        },
+        {
+          "weight": "21.402155488284016",
+          "feature": "ecology"
+        },
+        {
+          "weight": "21.232798750128442",
+          "feature": "rich"
+        },
+        {
+          "weight": "21.161930797740453",
+          "feature": "ranching"
+        },
+        {
+          "weight": "21.056738700540762",
+          "feature": "degradation"
+        },
+        {
+          "weight": "20.92911697791336",
+          "feature": "principles"
+        },
+        {
+          "weight": "20.870310256665302",
+          "feature": "tree"
+        },
+        {
+          "weight": "20.618276135127186",
+          "feature": "defenders"
+        },
+        {
+          "weight": "20.59475565854981",
+          "feature": "environmentally"
+        },
+        {
+          "weight": "20.333472550617717",
+          "feature": "timber"
+        },
+        {
+          "weight": "20.332064784014054",
+          "feature": "genetic"
+        },
+        {
+          "weight": "20.272012840868666",
+          "feature": "protect"
+        },
+        {
+          "weight": "20.15234530834035",
+          "feature": "rainforests"
+        },
+        {
+          "weight": "19.992663615640588",
+          "feature": "protecting"
+        },
+        {
+          "weight": "19.89827214505541",
+          "feature": "living"
+        },
+        {
+          "weight": "19.62917262193953",
+          "feature": "nutrients"
+        },
+        {
+          "weight": "19.60069950029772",
+          "feature": "worldwide"
+        },
+        {
+          "weight": "19.53319900188127",
+          "feature": "hectare"
+        },
+        {
+          "weight": "19.312987821468827",
+          "feature": "preparatory"
+        },
+        {
+          "weight": "19.2703590957573",
+          "feature": "hunger"
+        },
+        {
+          "weight": "19.263834202455413",
+          "feature": "natural"
+        },
+        {
+          "weight": "19.063752171471357",
+          "feature": "ecological"
+        },
+        {
+          "weight": "19.063752171471357",
+          "feature": "greenhouse"
+        },
+        {
+          "weight": "18.983997270071225",
+          "feature": "scientist"
+        },
+        {
+          "weight": "18.94470612550184",
+          "feature": "planet"
+        },
+        {
+          "weight": "18.820288448516326",
+          "feature": "farmers"
+        },
+        {
+          "weight": "18.778544168883926",
+          "feature": "population"
+        },
+        {
+          "weight": "18.767314633149052",
+          "feature": "primary"
+        },
+        {
+          "weight": "18.619474581193057",
+          "feature": "physicist"
+        },
+        {
+          "weight": "18.466098197107588",
+          "feature": "sao"
+        },
+        {
+          "weight": "18.452708758386034",
+          "feature": "tome"
+        },
+        {
+          "weight": "18.363242393862528",
+          "feature": "sovereignty"
+        },
+        {
+          "weight": "18.19761434152083",
+          "feature": "paulo"
+        },
+        {
+          "weight": "18.007404368526824",
+          "feature": "lamb"
+        },
+        {
+          "weight": "18.0016933348775",
+          "feature": "deserts"
+        },
+        {
+          "weight": "17.810591492103455",
+          "feature": "preserve"
+        },
+        {
+          "weight": "17.737969886124677",
+          "feature": "complains"
+        },
+        {
+          "weight": "17.458359327535167",
+          "feature": "indigenous"
+        },
+        {
+          "weight": "17.323003766530057",
+          "feature": "describes"
+        },
+        {
+          "weight": "17.299471490403228",
+          "feature": "exploitation"
+        },
+        {
+          "weight": "17.222320381221433",
+          "feature": "preserving"
+        },
+        {
+          "weight": "17.146620769802166",
+          "feature": "credentials"
+        },
+        {
+          "weight": "17.047853340518063",
+          "feature": "hungry"
+        },
+        {
+          "weight": "16.868177521758394",
+          "feature": "valuable"
+        },
+        {
+          "weight": "16.78811180642739",
+          "feature": "smoke"
+        },
+        {
+          "weight": "16.76054300618458",
+          "feature": "insists"
+        },
+        {
+          "weight": "16.675368608845986",
+          "feature": "dioxide"
+        },
+        {
+          "weight": "16.563185489025273",
+          "feature": "goldmining"
+        },
+        {
+          "weight": "16.563185489025273",
+          "feature": "manaus"
+        },
+        {
+          "weight": "16.563185489025273",
+          "feature": "belem"
+        },
+        {
+          "weight": "16.563185489025273",
+          "feature": "jag"
+        },
+        {
+          "weight": "16.563185489025273",
+          "feature": "maini"
+        },
+        {
+          "weight": "16.41307114418957",
+          "feature": "hydroelectric"
+        },
+        {
+          "weight": "16.17593703885733",
+          "feature": "planets"
+        },
+        {
+          "weight": "16.02764618666978",
+          "feature": "plantation"
+        },
+        {
+          "weight": "15.9824932722546",
+          "feature": "diversity"
+        },
+        {
+          "weight": "15.95615794590472",
+          "feature": "earths"
+        },
+        {
+          "weight": "15.686088046616039",
+          "feature": "villain"
+        },
+        {
+          "weight": "15.607306889271364",
+          "feature": "rubber"
+        },
+        {
+          "weight": "15.541496739852594",
+          "feature": "alves"
+        },
+        {
+          "weight": "15.498358072603587",
+          "feature": "depletion"
+        },
+        {
+          "weight": "15.209392450072087",
+          "feature": "extinction"
+        },
+        {
+          "weight": "14.868514764266271",
+          "feature": "burnings"
+        },
+        {
+          "weight": "14.868514764266271",
+          "feature": "favelas"
+        },
+        {
+          "weight": "14.84648884950608",
+          "feature": "substances"
+        },
+        {
+          "weight": "13.964469509982656",
+          "feature": "extractive"
+        }
+      ]
+    }
+  ]
+}

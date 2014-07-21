@@ -130,8 +130,11 @@ public class ScorerSMART extends QueryDocScorer
         }
     }
     
-    public void setQuery(GQuery gQuery) {
-        this.gQuery = gQuery;
+    public void setQuery(GQuery query) {
+        this.gQuery = new GQuery();
+        gQuery.setFeatureVector(query.getFeatureVector().deepCopy());
+        gQuery.setTitle(query.getTitle());
+        gQuery.setText(query.getText());
         
         // Initialize the query vector, apply weights and normalize
         qfv = gQuery.getFeatureVector();
@@ -274,5 +277,8 @@ public class ScorerSMART extends QueryDocScorer
         }
     }
     
+    public double scoreCollection() {
+        return -1;
+    }
 
 }

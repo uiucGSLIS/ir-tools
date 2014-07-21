@@ -1,6 +1,7 @@
 package edu.gslis.indexes;
 
 import java.util.Iterator;
+import java.util.List;
 
 import lemurproject.indri.QueryEnvironment;
 import lemurproject.indri.ScoredExtentResult;
@@ -211,6 +212,7 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 		return this.getDocVector(docID, stopper);
 	}
 	
+
 	public Object getActualIndex() {
 		return index;
 	}
@@ -255,6 +257,38 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 		
 		return -1;
 	}
-
-
+	
+	/**
+	 * Return a single SearchHit for the specified docno
+	 * @param docno
+	 * @param stopper
+	 * @return
+	 */
+   public SearchHit getSearchHit(String docno, Stopper stopper) {
+       SearchHit hit = new SearchHit();
+       FeatureVector dv = getDocVector(docno, stopper);
+       int docid = getDocId(docno);
+       hit.setFeatureVector(dv);
+       hit.setDocID(docid);
+        
+       String timeString = getMetadataValue(docno, timeFieldName);
+       if (timeString != null) {
+           double time = Double.parseDouble(timeString);
+           hit.setMetadataValue(timeFieldName, time);
+       }
+       return hit;
+   }
+   
+   public String getDocText(int docid) {
+       IndriDocument doc = new IndriDocument(index);
+       return doc.getDocString(docid);       
+   }
+   
+   /**
+    * Returns an ordered list of terms
+    */
+   public List<String> getDocTerms(int docid) {
+       IndriDocument doc = new IndriDocument(index);
+       return doc.getTerms(docid);
+   }
 }

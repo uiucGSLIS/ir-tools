@@ -1,6 +1,9 @@
 package edu.gslis.indexes;
 
+import java.util.List;
+
 import edu.gslis.queries.GQuery;
+import edu.gslis.searchhits.SearchHit;
 import edu.gslis.searchhits.SearchHits;
 import edu.gslis.textrepresentation.FeatureVector;
 import edu.gslis.utils.Stopper;
@@ -34,6 +37,20 @@ public interface IndexWrapper {
 	
 	public double termTypeCount();
 	
+	public SearchHit getSearchHit(String docno, Stopper stopper);
+	
 	// really shouldn't use this
 	public Object getActualIndex();
+	
+	public String getDocText(int docid);
+	
+	/**
+	 * Returns an ordered list of terms in the document. 
+	 * Used by proximity-based models
+	 * 
+	 * @param docid
+	 * @return
+	 */
+	public List<String> getDocTerms (int docid);
+
 }

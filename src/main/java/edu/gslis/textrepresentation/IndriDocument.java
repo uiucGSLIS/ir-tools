@@ -1,5 +1,9 @@
 package edu.gslis.textrepresentation;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import lemurproject.indri.DocumentVector;
 import lemurproject.indri.ParsedDocument;
 import lemurproject.indri.QueryEnvironment;
@@ -145,5 +149,34 @@ public class IndriDocument {
 	public void setIndex(QueryEnvironment e) {
 		env = e;
 	}
+	
+	/**
+	 * Returns an ordered list of terms for the specified document.
+	 * @param docID
+	 * @return
+	 */
+    public List<String> getTerms(int docID) {
+        List<String> terms = new ArrayList<String>();
+        int[] inds = new int[1];
+        inds[0] = docID;
+        String[] stems = null;
+        int[] positions = null;
+        inds[0] = docID;
+        try{
+            DocumentVector[] dv = env.documentVectors(inds);
+            stems = dv[0].stems;
+            positions = dv[0].positions;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        for(int i=0; i<positions.length; i++) {
+            if(stems[positions[i]].equals("[OOV]"))
+                continue;
+
+            terms.add(stems[positions[i]]);
+        }
+        return terms;
+    }
 
 }

@@ -195,4 +195,27 @@ public class FilterEvaluation {
 		return mean;
 	}
 	
+    public double avgPrecision(String queryName) {
+        
+        double avgPrecision  = 0.0;
+        
+        if(results == null)
+            return 0.0;
+        
+        Iterator<SearchHit> resultIterator = results.iterator();
+        int k = 1;
+        int numRelRet = 0;
+        while(resultIterator.hasNext()) {
+            SearchHit result = resultIterator.next();
+            if(qrels.isRel(queryName, result.getDocno())) {
+                numRelRet++;
+                avgPrecision += (double)numRelRet/k;
+            }
+            k++;
+        }
+        avgPrecision /= numRet(queryName);
+        
+        return avgPrecision;
+    }
+	
 }
