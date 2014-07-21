@@ -1,6 +1,7 @@
 package edu.gslis.textrepresentation;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import lemurproject.indri.DocumentVector;
@@ -150,12 +151,12 @@ public class IndriDocument {
 	}
 	
 	/**
-	 * Returns a map of positions (key) to terms for the specified document.
+	 * Returns an ordered list of terms for the specified document.
 	 * @param docID
 	 * @return
 	 */
-    public Map<Integer, String> getTermPos(int docID) {
-        Map<Integer, String> termPos = new HashMap<Integer, String>();
+    public List<String> getTerms(int docID) {
+        List<String> terms = new ArrayList<String>();
         int[] inds = new int[1];
         inds[0] = docID;
         String[] stems = null;
@@ -169,15 +170,13 @@ public class IndriDocument {
             e.printStackTrace();
         }
 
-        int j = 0;
         for(int i=0; i<positions.length; i++) {
             if(stems[positions[i]].equals("[OOV]"))
                 continue;
 
-            termPos.put(j, stems[positions[i]]);
-            j++;
+            terms.add(stems[positions[i]]);
         }
-        return termPos;
+        return terms;
     }
 
 }
