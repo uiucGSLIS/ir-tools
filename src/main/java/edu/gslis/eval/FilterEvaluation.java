@@ -184,7 +184,7 @@ public class FilterEvaluation {
 		}
 		
 		double mean = 0.0;
-		
+
 		Iterator<Double> statIterator = aggregateStats.get(statName).iterator();
 		while(statIterator.hasNext()) {
 			mean += statIterator.next();
