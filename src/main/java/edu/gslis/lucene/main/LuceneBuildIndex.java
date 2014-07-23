@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +31,7 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 import edu.gslis.lucene.indexer.Indexer;
+import edu.gslis.lucene.indexer.StreamCorpusIndexer;
 import edu.gslis.lucene.indexer.TikaIndexer;
 import edu.gslis.lucene.indexer.TrecTextIndexer;
 import edu.gslis.lucene.indexer.WikiTextIndexer;
@@ -60,7 +63,7 @@ public class LuceneBuildIndex {
      */
     public void buildIndex() throws Exception {
 
-        String indexPath = config.getIndexPath();
+        String indexPath = config.getIndexPath();        
         Directory dir = FSDirectory.open(new File(indexPath));
 
         // Initialize the analyzer
@@ -133,6 +136,8 @@ public class LuceneBuildIndex {
                 indexer = new TrecTextIndexer();
             } else if (corpusType.equals(Indexer.FORMAT_TIKA)) {
                 indexer = new TikaIndexer();                
+            } else if (corpusType.equals(Indexer.FORMAT_STREAMCORPUS)) {
+                indexer = new StreamCorpusIndexer();                
             } else {
                 throw new Exception("Unsupported corpus type/format.");                
             }
@@ -149,11 +154,25 @@ public class LuceneBuildIndex {
                 indexer.buildIndex(writer,  fields, new File(corpusPath));
             }
 
+            writeIndexMetadata(indexPath, config);
         } finally {
             writer.close();
         }   
     }
     
+    public void writeIndexMetadata(String indexPath, IndexConfig config) 
+            throws IOException {
+        // Need to hold on to a few pieces of information
+        FileWriter metadataWriter = new FileWriter(indexPath + File.separator + "index.metadata");
+        
+        String analyzer = config.getAnalyzer();
+        if (!StringUtils.isEmpty(analyzer))
+            metadataWriter.write("analyzer=" + analyzer);
+        String similarity = config.getSimilarity();
+        if (!StringUtils.isEmpty(similarity))
+            metadataWriter.write("similarity=" + similarity);
+        metadataWriter.close();
+    }
 
     public static void main(String[] args) throws Exception {
         

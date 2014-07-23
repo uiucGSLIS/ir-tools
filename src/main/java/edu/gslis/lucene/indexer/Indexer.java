@@ -43,6 +43,7 @@ public abstract class Indexer
     public static final String FORMAT_TRECTEXT = "trectext";
     public static final String FORMAT_WIKI = "wiki";
     public static final String FORMAT_TIKA = "tika";
+    public static final String FORMAT_STREAMCORPUS = "streamcorpus";
 
     public static final String FIELD_TYPE_STRING = "string";
     public static final String FIELD_TYPE_TEXT = "text";
