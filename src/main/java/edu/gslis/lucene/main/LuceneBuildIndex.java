@@ -118,7 +118,7 @@ public class LuceneBuildIndex {
         
         Analyzer analyzer = new PerFieldAnalyzerWrapper(defaultAnalyzer, perFieldAnalyzers);
         IndexWriterConfig iwc = new IndexWriterConfig(Indexer.VERSION, analyzer);
-        iwc.setOpenMode(OpenMode.CREATE);
+        iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
         iwc.setRAMBufferSizeMB(256.0);
         iwc.setSimilarity(similarity);
         
