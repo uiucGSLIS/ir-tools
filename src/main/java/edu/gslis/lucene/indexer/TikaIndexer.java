@@ -16,6 +16,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
@@ -32,15 +33,7 @@ public class TikaIndexer extends Indexer {
         if (file.isDirectory()) {
             File[] files = file.listFiles();
             for (File f: files) {
-                String name = f.getName();
-                InputStream is = new FileInputStream(f);
-                try
-                {
-                    buildIndex(writer, fields, name, is);
-                } catch (Exception  e) {
-                    System.err.println("Error processing " +  f.getAbsolutePath());
-                    e.printStackTrace();
-                }
+                buildIndex(writer, fields, f);
             }
         }
         else if (file.getName().endsWith("tgz")) {
@@ -78,9 +71,20 @@ public class TikaIndexer extends Indexer {
             tis.close();
         }
         else {
-            String name = file.getName();
-            InputStream is = new FileInputStream(file);
-            buildIndex(writer, fields, name, is);
+            try
+            { 
+                String name = file.getName();
+//                if (! (name.endsWith(".png") || name.endsWith(".gif") || name.endsWith(".jpg")) ) {
+                    name = name.substring(0, name.lastIndexOf("."));
+                    name = name.replaceAll("/", "_");
+                    InputStream is = new FileInputStream(file);
+                    buildIndex(writer, fields, name, is);
+                    is.close();
+     //           }
+            } catch (Exception e) { 
+                System.out.println("Error processing " + file.getAbsolutePath());
+                e.printStackTrace();              
+            }
         }
 
     }
@@ -99,6 +103,9 @@ public class TikaIndexer extends Indexer {
         
         String output = handler.toString();
         
+        if (StringUtils.isEmpty(output))
+            return;
+        
         for (FieldConfig field: fields) {
             String source = field.getSource();
 
@@ -114,7 +121,37 @@ public class TikaIndexer extends Indexer {
                 }
                 else if (source.equals(FieldConfig.SOURCE_FILE)) {
                     addField(luceneDoc, field, output, analyzer);
-                }                    
+                }      
+                else if (source.equals("title"))
+                {
+                    String title = metadata.get(TikaCoreProperties.TITLE);
+                    if (title != null)
+                        addField(luceneDoc, field, title, analyzer);
+                }
+                else if (source.equals("description"))
+                {
+                    String description = metadata.get(TikaCoreProperties.DESCRIPTION);
+                    if (description != null)
+                        addField(luceneDoc, field, description, analyzer);
+                }
+                else if (source.equals("creator"))
+                {
+                    String creator = metadata.get(TikaCoreProperties.CREATOR);
+                    if (creator != null)
+                        addField(luceneDoc, field, creator, analyzer);
+                }
+                else if (source.equals("date"))
+                {
+                    String date= metadata.get(TikaCoreProperties.METADATA_DATE);
+                    if (date != null)
+                        addField(luceneDoc, field, date, analyzer);
+                }
+                else if (source.equals("keywords"))
+                {
+                    String keyword = metadata.get(TikaCoreProperties.KEYWORDS);
+                    if (keyword != null)
+                        addField(luceneDoc, field, keyword, analyzer);                    
+                }
             }
         }
         writer.addDocument(luceneDoc);

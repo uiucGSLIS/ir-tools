@@ -36,6 +36,11 @@ public class Qrels {
 	private Map<String,Set<String>> rel;
 	
 	/**
+	 * A map of queryName to rel_docnos->rel_level map
+	 */
+	private Map<String,Map<String, Integer>> relLevels;
+	
+	/**
 	 * A map of queryName to set_of_non_rel_docnos.  Probably unused.
 	 */
 	private Map<String,Set<String>> nonRel;
@@ -49,6 +54,7 @@ public class Qrels {
 	public Qrels() {
 		orderedQueryNames = new LinkedList<String>();
 		rel = new HashMap<String,Set<String>>();
+		relLevels = new HashMap<String,Map<String,Integer>>();
 	}
 	
 	/**
@@ -62,6 +68,7 @@ public class Qrels {
 		try {
 
 			rel = new HashMap<String,Set<String>>();
+			relLevels = new HashMap<String,Map<String,Integer>>();
 
 			if(storeNonRel)
 				nonRel = new HashMap<String,Set<String>>();
@@ -80,26 +87,37 @@ public class Qrels {
 				int r = Integer.parseInt(toks[REL_COLUMN]);
 				if(r >= minRel) {
 					Set<String> relDocs = null;
+					Map<String, Integer> relDocLevels = null;
 					if(!rel.containsKey(query)) {
 						relDocs = new HashSet<String>();
+						relDocLevels = new HashMap<String, Integer>();
 					} else {
 						relDocs = rel.get(query);
+						relDocLevels = relLevels.get(query);
 					}
 
 					
 					relDocs.add(docno);
+					relDocLevels.put(docno, r);
 					rel.put(query, relDocs);
+					relLevels.put(query, relDocLevels);
 				} else {
 					if(killRepeats) {
 						Set<String> relDocs = null;
+						Map<String, Integer> relDocLevels = null;
 						if(!rel.containsKey(query)) {
 							relDocs = new HashSet<String>();
+							relDocLevels = new HashMap<String, Integer>();
 						} else {
 							relDocs = rel.get(query);
+							relDocLevels = relLevels.get(query);
 						}
 						if(relDocs.contains(docno))
-							relDocs.remove(docno);						
+							relDocs.remove(docno);
+						if(relLevels.containsKey(docno))
+							relDocLevels.remove(docno);
 						rel.put(query, relDocs);
+						relLevels.put(query, relDocLevels);
 					}
 					
 					if(storeNonRel) {
@@ -128,6 +146,17 @@ public class Qrels {
 			return false;
 		}
 		return rel.get(query).contains(docno);
+	}
+	
+	public int getRelLevel(String query, String docno) {
+		if (!relLevels.containsKey(query)) {
+			return 0;
+		}
+		try {
+			return relLevels.get(query).get(docno);
+		} catch (NullPointerException e) {
+			return 0;
+		}
 	}
 
 	/**

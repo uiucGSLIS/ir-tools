@@ -3,9 +3,12 @@ package edu.gslis.lucene.main;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.Reader;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -59,7 +62,14 @@ public class LuceneRunQuery {
         String docnoField = config.getDocno();
         if (StringUtils.isEmpty(docnoField))
             docnoField = "docno";
+        String similarityClass = config.getSimilarity();
         
+        Map<String, String> indexMetadata = readIndexMetadata(indexPath);
+        if (StringUtils.isEmpty(analyzerClass) && indexMetadata.get("analyzer") != null) 
+            analyzerClass = indexMetadata.get("analyzer");
+        if (StringUtils.isEmpty(similarityClass) && indexMetadata.get("similarity") != null) 
+            similarityClass = indexMetadata.get("similarity");
+                                
         if (!StringUtils.isEmpty(stopwordsPath))
         {
             @SuppressWarnings("rawtypes")
@@ -76,7 +86,6 @@ public class LuceneRunQuery {
         }
         
         Similarity similarity = new DefaultSimilarity();
-        String similarityClass = config.getSimilarity();
         if (!StringUtils.isEmpty(similarityClass))
             similarity = (Similarity)loader.loadClass(similarityClass).newInstance();
         IndexReader reader = DirectoryReader.open(FSDirectory.open(new File(indexPath)));
@@ -178,6 +187,23 @@ public class LuceneRunQuery {
         }            
         LuceneRunQuery runner = new LuceneRunQuery(config);
         runner.run();
+    }
+    
+    public Map<String, String> readIndexMetadata(String indexPath) 
+    {
+        Map<String, String> map = new HashMap<String, String>();
+        try
+        {
+            File metadata = new File(indexPath + File.separator + "index.metadata");
+            List<String> lines = FileUtils.readLines(metadata);
+            for (String line: lines) {
+                String[] fields = line.split("=");
+                map.put(fields[0], fields[1]);            
+            }
+        } catch (IOException e) {
+            // Can't find the index.metadata file, use overrides
+        }
+        return map;
     }
     
     public static Set<QueryConfig> readDelimitedFile(File file, String format) throws Exception 
