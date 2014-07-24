@@ -62,6 +62,7 @@ public class TikaIndexer extends Indexer {
                         name = name.replaceAll("/", "_");
                         InputStream is = new ByteArrayInputStream(bos.toByteArray());
                         buildIndex(writer, fields, name, is);
+                        is.close();
                     } catch (Exception e) {
                         System.err.println("Error processing entry " + entry.getName());
                         e.printStackTrace();
@@ -71,19 +72,21 @@ public class TikaIndexer extends Indexer {
             tis.close();
         }
         else {
+            InputStream is = null;
             try
             { 
                 String name = file.getName();
-//                if (! (name.endsWith(".png") || name.endsWith(".gif") || name.endsWith(".jpg")) ) {
-                    name = name.substring(0, name.lastIndexOf("."));
-                    name = name.replaceAll("/", "_");
-                    InputStream is = new FileInputStream(file);
-                    buildIndex(writer, fields, name, is);
-                    is.close();
-     //           }
+                name = name.substring(0, name.lastIndexOf("."));
+                name = name.replaceAll("/", "_");
+                is = new FileInputStream(file);
+                buildIndex(writer, fields, name, is);
             } catch (Exception e) { 
                 System.out.println("Error processing " + file.getAbsolutePath());
                 e.printStackTrace();              
+            }
+            finally {
+                if (is != null) 
+                    is.close();
             }
         }
 
