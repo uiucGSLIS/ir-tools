@@ -35,7 +35,7 @@ public class TikaIndexer extends Indexer {
         if (file.isDirectory()) {
             File[] files = file.listFiles();
             for (File f: files) {
-                buildIndex(writer, fields, f);
+                count += buildIndex(writer, fields, f);
             }
         }
         else if (file.getName().endsWith("tgz")) {
@@ -84,6 +84,7 @@ public class TikaIndexer extends Indexer {
                 name = name.substring(0, name.lastIndexOf("."));
                 is = new FileInputStream(file);
                 buildIndex(writer, fields, parent, name, is);
+                count++;
             } catch (Exception e) { 
                 System.out.println("Error processing " + file.getAbsolutePath());
                 e.printStackTrace();              
