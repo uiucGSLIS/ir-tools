@@ -7,12 +7,11 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import java.util.TreeSet;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -35,8 +34,6 @@ import org.apache.lucene.search.similarities.DefaultSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
@@ -44,6 +41,11 @@ import edu.gslis.lucene.indexer.Indexer;
 import edu.gslis.lucene.main.config.QueryConfig;
 import edu.gslis.lucene.main.config.QueryFile;
 import edu.gslis.lucene.main.config.RunQueryConfig;
+import edu.gslis.queries.GQueries;
+import edu.gslis.queries.GQueriesFedwebImpl;
+import edu.gslis.queries.GQueriesIndriImpl;
+import edu.gslis.queries.GQueriesJsonImpl;
+import edu.gslis.queries.GQuery;
 
 
 public class LuceneRunQuery {
@@ -103,11 +105,8 @@ public class LuceneRunQuery {
         if (queryFile != null) {
             String path = queryFile.getPath();
             String format = queryFile.getFormat();
-            if (format.startsWith("fedweb"))
-                queries = readDelimitedFile(new File(path), format);
-            else if (format.equals("indri")) {
-                queries = readIndriQueries(new File(path));
-            }
+            
+            queries = readQueries(path, format);
         }
         
         for (QueryConfig query: queries) {
@@ -170,11 +169,7 @@ public class LuceneRunQuery {
                 querycfg.setText(query.replaceAll("'", "\""));
                 queries.add(querycfg);
             } else if (!StringUtils.isEmpty(queryfile)) {
-                if (format.startsWith("fedweb"))
-                    queries = readDelimitedFile(new File(queryfile), format);
-                else if (format.equals("indri")) {
-                    queries = readIndriQueries(new File(queryfile));
-                }
+                queries = readQueries(queryfile, format);
             }
             
             config.setAnalyzer(analyzer);
@@ -206,50 +201,35 @@ public class LuceneRunQuery {
         return map;
     }
     
-    public static Set<QueryConfig> readDelimitedFile(File file, String format) throws Exception 
+    public static Set<QueryConfig> readQueries(String file, String format) throws Exception 
     {
-        Set<QueryConfig> queries = new HashSet<QueryConfig>();
+        Set<QueryConfig> queries = new TreeSet<QueryConfig>();
 
-        List<String> rows = FileUtils.readLines(file);
-        for (String row: rows) {
-            if (format.equals("fedweb14")) {
-                String[] fields = row.split("\t");
-                QueryConfig q = new QueryConfig();
-                q.setNumber(fields[0]);
-                q.setText(fields[1]);
-                queries.add(q);
-            }
-            else if (format.equals("fedweb13")) {
-                String[] fields = row.split(":");
-                QueryConfig q = new QueryConfig();
-                q.setNumber(fields[0]);
-                q.setText(fields[1]);
-                queries.add(q);
-            }
+        GQueries gqueries = null;
+        if (format.equals("fedweb")) {
+           gqueries = new GQueriesFedwebImpl();
         }
+        else if (format.equals("json")) {
+            gqueries = new GQueriesJsonImpl();
+        }
+        else if (format.equals("indri")) {
+            gqueries = new GQueriesIndriImpl();
+        }
+        
+        gqueries.read(file);
+        
+        Iterator<GQuery> it = gqueries.iterator();
+        while(it.hasNext()) {
+            GQuery query = it.next();
+            QueryConfig qc = new QueryConfig();
+            qc.setText(query.getText());
+            qc.setNumber(query.getTitle());
+            queries.add(qc);
+        }
+        
         return queries;
     }
     
-    public static Set<QueryConfig> readIndriQueries(File file) throws Exception 
-    {
-        Set<QueryConfig> queries = new HashSet<QueryConfig>();
-        DocumentBuilderFactory factory =  DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        org.w3c.dom.Document xml = builder.parse(new FileInputStream(file));
-        NodeList queryNodes = xml.getElementsByTagName("query");
-        for (int i=0; i<queryNodes.getLength(); i++) {
-            Element queryElem = (Element) queryNodes.item(i);
-            QueryConfig query = new QueryConfig();
-            
-            String number = queryElem.getElementsByTagName("number").item(0).getFirstChild().getNodeValue();
-            String text   = queryElem.getElementsByTagName("text").item(0).getFirstChild().getNodeValue();
-            text = text.replaceAll("\\\n", "");
-            query.setNumber(number);
-            query.setText(text);
-            queries.add(query);
-        }
-        return queries;
-    }
     
     public static Options createOptions()
     {
