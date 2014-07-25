@@ -131,6 +131,9 @@ public class TikaIndexer extends Indexer {
                     if (name.contains("."))
                         name = name.substring(0, name.indexOf("."));
                     
+                    if (parentDir != null)
+                        name = parentDir + "_" + name;
+                    
                     addField(luceneDoc, field, name, analyzer);
                 }
                 else if (source.equals(FieldConfig.SOURCE_FILE)) {
