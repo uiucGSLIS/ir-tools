@@ -26,10 +26,12 @@ import edu.gslis.lucene.main.config.FieldConfig;
 
 
 public class TikaIndexer extends Indexer {
+    
     @Override
-    public void buildIndex(IndexWriter writer, Set<FieldConfig> fields,
+    public long buildIndex(IndexWriter writer, Set<FieldConfig> fields,
             File file) throws Exception 
     {
+        long count = 0;
         if (file.isDirectory()) {
             File[] files = file.listFiles();
             for (File f: files) {
@@ -75,11 +77,13 @@ public class TikaIndexer extends Indexer {
             InputStream is = null;
             try
             { 
+                String parent = "";
+                if (file.getParentFile() != null)
+                    parent = file.getParentFile().getName();
                 String name = file.getName();
                 name = name.substring(0, name.lastIndexOf("."));
-                name = name.replaceAll("/", "_");
                 is = new FileInputStream(file);
-                buildIndex(writer, fields, name, is);
+                buildIndex(writer, fields, parent, name, is);
             } catch (Exception e) { 
                 System.out.println("Error processing " + file.getAbsolutePath());
                 e.printStackTrace();              
@@ -89,10 +93,17 @@ public class TikaIndexer extends Indexer {
                     is.close();
             }
         }
+        return count;
 
     }
-        
+    
     public void buildIndex(IndexWriter writer, Set<FieldConfig> fields, String name,
+        InputStream is) throws Exception  
+    {
+        buildIndex(writer, fields, "", name, is);
+    }
+        
+    public void buildIndex(IndexWriter writer, Set<FieldConfig> fields, String parentDir, String name,
             InputStream is) throws Exception 
     {
         Analyzer analyzer = writer.getAnalyzer();
@@ -154,6 +165,11 @@ public class TikaIndexer extends Indexer {
                     String keyword = metadata.get(TikaCoreProperties.KEYWORDS);
                     if (keyword != null)
                         addField(luceneDoc, field, keyword, analyzer);                    
+                }
+                else if (source.equals("parent"))
+                {
+                    if (parentDir != null)
+                        addField(luceneDoc, field, parentDir, analyzer);                    
                 }
             }
         }
