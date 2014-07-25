@@ -117,9 +117,10 @@ public abstract class Indexer
     }
     
     
-    public void buildIndex(IndexWriter writer, Set<FieldConfig> fields,
+    public long buildIndex(IndexWriter writer, Set<FieldConfig> fields,
             File file) throws Exception 
     {
+        long count = 0;
         if (file.isDirectory()) {
             File[] files = file.listFiles();
             for (File f: files) {
@@ -164,6 +165,7 @@ public abstract class Indexer
             InputStream is = new FileInputStream(file);
             buildIndex(writer, fields, name, is);
         }
+        return count;
 
     }
 }
