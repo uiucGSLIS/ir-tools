@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -31,7 +32,8 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.similarities.DefaultSimilarity;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.search.similarities.LMDirichletSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
@@ -60,13 +62,13 @@ public class LuceneRunQuery {
     
     public void run() throws Exception {
         String indexPath = config.getIndex();
-        StopwordAnalyzerBase analyzer;
-        String stopwordsPath = config.getStopwords();
-        String analyzerClass = config.getAnalyzer();
         String docnoField = config.getDocno();
         if (StringUtils.isEmpty(docnoField))
             docnoField = "docno";
         String similarityClass = config.getSimilarity();
+        String stopwordsPath = config.getStopwords();
+        String analyzerClass = config.getAnalyzer();
+        StopwordAnalyzerBase defaultAnalyzer;
         
         Map<String, String> indexMetadata = readIndexMetadata(indexPath);
         if (StringUtils.isEmpty(analyzerClass) && indexMetadata.get("analyzer") != null) 
@@ -74,22 +76,29 @@ public class LuceneRunQuery {
         if (StringUtils.isEmpty(similarityClass) && indexMetadata.get("similarity") != null) 
             similarityClass = indexMetadata.get("similarity");
                                 
-        if (!StringUtils.isEmpty(stopwordsPath))
+        if (!StringUtils.isEmpty(analyzerClass))
         {
             @SuppressWarnings("rawtypes")
             Class analyzerCls = loader.loadClass(analyzerClass);
-            @SuppressWarnings({ "rawtypes", "unchecked" })
-            java.lang.reflect.Constructor analyzerConst = analyzerCls.getConstructor(Version.class, Reader.class);
-            analyzer = (StopwordAnalyzerBase)analyzerConst.newInstance(Indexer.VERSION, new FileReader(stopwordsPath));            
+
+            if (!StringUtils.isEmpty(stopwordsPath))
+            {
+                @SuppressWarnings({ "rawtypes", "unchecked" })
+                java.lang.reflect.Constructor analyzerConst = analyzerCls.getConstructor(Version.class, Reader.class);
+                defaultAnalyzer = (StopwordAnalyzerBase)analyzerConst.newInstance(Indexer.VERSION, new FileReader(stopwordsPath));
+            } else {
+                @SuppressWarnings({ "rawtypes", "unchecked" })
+                java.lang.reflect.Constructor analyzerConst = analyzerCls.getConstructor(Version.class);
+                defaultAnalyzer = (StopwordAnalyzerBase)analyzerConst.newInstance(Indexer.VERSION);
+            }
         } else {
-            @SuppressWarnings("rawtypes")
-            Class analyzerCls = loader.loadClass(analyzerClass);
-            @SuppressWarnings({ "rawtypes", "unchecked" })
-            java.lang.reflect.Constructor analyzerConst = analyzerCls.getConstructor(Version.class, CharArraySet.class);
-            analyzer = (StopwordAnalyzerBase)analyzerConst.newInstance(Indexer.VERSION, new CharArraySet(Indexer.VERSION, 0, true));           
+            defaultAnalyzer = new StandardAnalyzer(Indexer.VERSION, new CharArraySet(Indexer.VERSION, 0, true));
         }
-        
-        Similarity similarity = new DefaultSimilarity();
+
+
+
+        // Assumes LM similarity, but can be changed via config file
+        Similarity similarity = new LMDirichletSimilarity();
         if (!StringUtils.isEmpty(similarityClass))
             similarity = (Similarity)loader.loadClass(similarityClass).newInstance();
         IndexReader reader = DirectoryReader.open(FSDirectory.open(new File(indexPath)));
@@ -99,6 +108,11 @@ public class LuceneRunQuery {
         if (StringUtils.isEmpty(field))
             field = "text";
         String[] fields = field.split(",");
+ 
+
+         System.err.println("Similarity: " + similarityClass);
+         System.err.println("Analyzer: " + analyzerClass);
+
 
         Set<QueryConfig> queries = config.getQueries();        
         if (queries == null)
@@ -112,10 +126,11 @@ public class LuceneRunQuery {
         }
         
         for (QueryConfig query: queries) {
-            QueryParser parser = new MultiFieldQueryParser(Indexer.VERSION, fields, analyzer);
+            QueryParser parser = new MultiFieldQueryParser(Indexer.VERSION, fields, defaultAnalyzer);
             Query q = parser.parse(query.getText());
             TopDocs topDocs = searcher.search(q, 1000);
             ScoreDoc[] docs = topDocs.scoreDocs;
+            Set<String> seen = new HashSet<String>();
             for (int i=0; i<docs.length; i++) {
                 int docid = docs[i].doc;
                 double score = docs[i].score;
@@ -124,8 +139,11 @@ public class LuceneRunQuery {
                 String docno = doc.getField(docnoField).stringValue();
                 long doclen = doc.getField(Indexer.FIELD_DOC_LEN).numericValue().longValue();
 
-                //http://en.wikipedia.org/wiki/Shafi_Goldwasser Q0 1325799600-2efdd8d6cd5b665a3a61a1faeb0c3410 161 -32.654207071883675 plm
-                System.out.println(query.getNumber() + " Q0 " + docno + " " + i + " " + score + " " + doclen);
+                if (!seen.contains(docno)) {
+                    //http://en.wikipedia.org/wiki/Shafi_Goldwasser Q0 1325799600-2efdd8d6cd5b665a3a61a1faeb0c3410 161 -32.654207071883675 plm
+                    System.out.println(query.getNumber() + " Q0 " + docno + " " + i + " "  + score + " gslis");
+                    seen.add(docno);
+                }
             }
 
         }
@@ -156,6 +174,7 @@ public class LuceneRunQuery {
             String docno = cmd.getOptionValue("docno", Indexer.FIELD_DOCNO);
             String field = cmd.getOptionValue("field", Indexer.FIELD_TEXT);
             String querynum = cmd.getOptionValue("querynum", "1");
+            String runname = cmd.getOptionValue("name", "gslis");
             
             String similarity = cmd.getOptionValue("similarity", Indexer.DEFAULT_SIMILARITY);
 
@@ -220,7 +239,8 @@ public class LuceneRunQuery {
         }
         
         gqueries.read(file);
-        
+
+
         Iterator<GQuery> it = gqueries.iterator();
         while(it.hasNext()) {
             GQuery query = it.next();
@@ -260,6 +280,7 @@ public class LuceneRunQuery {
         options.addOption("format", true, "Query file format");
         options.addOption("similarity", true, "Similarity class");
         options.addOption("stopwords", true, "Stopwords list");
+        options.addOption("name", true, "Run name");
         return options;
     }
 
