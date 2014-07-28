@@ -167,8 +167,10 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
                     hit.setLength(dl.numericValue().longValue());
                 if(timeFieldName != null) {
                     String timeString = d.get(timeFieldName);
-                    double time = Double.parseDouble(timeString);
-                    hit.setMetadataValue(timeFieldName, time);
+                    if (timeString != null) {
+				double time = Double.parseDouble(timeString);
+			    hit.setMetadataValue(timeFieldName, time);
+                    }
                 }
                 FeatureVector dv = getDocVector(docid, null);
                 hit.setFeatureVector(dv);
