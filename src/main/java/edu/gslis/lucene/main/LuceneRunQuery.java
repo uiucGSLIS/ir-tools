@@ -1,6 +1,7 @@
 package edu.gslis.lucene.main;
 
 import java.io.File;
+
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -46,6 +47,7 @@ import edu.gslis.queries.GQueriesFedwebImpl;
 import edu.gslis.queries.GQueriesIndriImpl;
 import edu.gslis.queries.GQueriesJsonImpl;
 import edu.gslis.queries.GQuery;
+import edu.gslis.textrepresentation.FeatureVector;
 
 
 public class LuceneRunQuery {
@@ -122,7 +124,8 @@ public class LuceneRunQuery {
                 String docno = doc.getField(docnoField).stringValue();
                 long doclen = doc.getField(Indexer.FIELD_DOC_LEN).numericValue().longValue();
 
-                System.out.println(query.getNumber() + " " + docno + " " + score + " " + doclen);
+                //http://en.wikipedia.org/wiki/Shafi_Goldwasser Q0 1325799600-2efdd8d6cd5b665a3a61a1faeb0c3410 161 -32.654207071883675 plm
+                System.out.println(query.getNumber() + " Q0 " + docno + " " + i + " " + score + " " + doclen);
             }
 
         }
@@ -221,8 +224,21 @@ public class LuceneRunQuery {
         Iterator<GQuery> it = gqueries.iterator();
         while(it.hasNext()) {
             GQuery query = it.next();
+            
+            StringBuffer qstr = new StringBuffer();
+            FeatureVector fv = query.getFeatureVector();
+            Iterator<String> fit = fv.iterator();
+            while (fit.hasNext()) {
+                String feature = fit.next();
+                double weight = fv.getFeatureWeight(feature);
+                qstr.append(feature + "^" + weight);
+                if (fit.hasNext()) 
+                    qstr.append(" ");
+                
+            }
+            
             QueryConfig qc = new QueryConfig();
-            qc.setText(query.getText());
+            qc.setText(qstr.toString());
             qc.setNumber(query.getTitle());
             queries.add(qc);
         }
