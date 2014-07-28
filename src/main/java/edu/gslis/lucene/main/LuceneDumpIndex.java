@@ -10,8 +10,10 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.collections.Bag;
 import org.apache.commons.collections.bag.TreeBag;
 import org.apache.commons.lang.StringUtils;
+import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.MultiFields;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
@@ -87,7 +89,12 @@ public class LuceneDumpIndex
                 System.out.println(index.getDocText(docId));
                 
        }
-        else if (cmd.equals("documentvector") || cmd.equals("dv")) {
+       else if (cmd.equals("dl")) {
+             int docId = index.getDocId(docno, arg);             
+             double len = index.getDocLength(docId);
+             System.out.println(len);
+       }
+       else if (cmd.equals("documentvector") || cmd.equals("dv")) {
             int docId = index.getDocId(docno, arg);
             FeatureVector fv;
             if (!StringUtils.isEmpty(field)) 
