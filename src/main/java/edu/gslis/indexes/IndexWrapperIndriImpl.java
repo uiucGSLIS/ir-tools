@@ -7,6 +7,7 @@ import lemurproject.indri.QueryEnvironment;
 import lemurproject.indri.ScoredExtentResult;
 import lemurproject.lemur.Index;
 import lemurproject.lemur.IndexManager;
+import edu.gslis.lucene.indexer.Indexer;
 import edu.gslis.queries.GQuery;
 import edu.gslis.searchhits.SearchHit;
 import edu.gslis.searchhits.SearchHits;
@@ -23,7 +24,7 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 	private QueryEnvironment index;
 	private double vocabularySize = -1.0;
 	private double docLengthAvg   = -1.0;
-	private String timeFieldName  = null;
+	private String timeFieldName  = Indexer.FIELD_EPOCH;
 	
 	public IndexWrapperIndriImpl(String pathToIndex) {
 		index = new QueryEnvironment();
@@ -95,10 +96,11 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 				SearchHit hit = new SearchHit();
 				hit.setDocID(r.document);
 				hit.setScore(r.score);
-
 				if(times != null)  {
 					hit.setMetadataValue(timeFieldName, times[k]);
 				}
+                double length = (double)index.documentLength(r.document);
+                hit.setLength(length);
 				hit.setDocno(docnos[k++]);
 				hits.add(hit);
 			}
@@ -134,6 +136,9 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 				if(times != null)  {
 					hit.setMetadataValue(timeFieldName, times[k]);
 				}
+                double length = (double)index.documentLength(r.document);
+                hit.setLength(length);
+
 				hit.setDocno(docnos[k++]);
 				hits.add(hit);
 			}
