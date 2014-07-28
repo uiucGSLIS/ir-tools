@@ -157,6 +157,9 @@ public class LuceneBuildIndex {
             System.out.println("Indexed " + count + " files");
 
             writeIndexMetadata(indexPath, config);
+        } catch (Exception e) {
+            System.out.println("Fatal: " + e.getMessage());
+            e.printStackTrace();
         } finally {
             writer.close();
         }   
