@@ -127,6 +127,7 @@ public abstract class Indexer
                 String name = f.getName();
                 InputStream is = new FileInputStream(f);
                 buildIndex(writer, fields, name, is);
+                count++;
             }
         }
         else if (file.getName().endsWith("tgz")) {
@@ -164,6 +165,7 @@ public abstract class Indexer
             String name = file.getName();
             InputStream is = new FileInputStream(file);
             buildIndex(writer, fields, name, is);
+            count++;
         }
         return count;
 
