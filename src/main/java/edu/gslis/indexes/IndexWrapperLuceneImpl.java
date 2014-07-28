@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
-import org.apache.lucene.analysis.core.SimpleAnalyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.DocsAndPositionsEnum;
@@ -32,7 +32,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.similarities.DefaultSimilarity;
+import org.apache.lucene.search.similarities.LMDirichletSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.FSDirectory;
 
@@ -145,8 +145,8 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	    try
 	    {            
             IndexSearcher searcher = new IndexSearcher(index);
-            Similarity similarity = new DefaultSimilarity();
-            Analyzer analyzer = new SimpleAnalyzer(Indexer.VERSION);
+            Similarity similarity = new LMDirichletSimilarity();
+            Analyzer analyzer = new StandardAnalyzer(Indexer.VERSION);
             QueryParser parser = new MultiFieldQueryParser(Indexer.VERSION, field, analyzer);
             Query query = parser.parse(q);
             searcher.setSimilarity(similarity);
@@ -172,7 +172,7 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
                 }
                 FeatureVector dv = getDocVector(docid, null);
                 hit.setFeatureVector(dv);
-                hit.setLength(dv.getLength());
+                //hit.setLength(dv.getLength());
                 hits.add(hit);                
             }
 	    } catch (Exception e) {
