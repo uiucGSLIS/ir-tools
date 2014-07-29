@@ -3,6 +3,7 @@ package edu.gslis.indexes;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -19,6 +20,7 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.DocsAndPositionsEnum;
+import org.apache.lucene.index.DocsEnum;
 import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexableField;
@@ -35,6 +37,7 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.similarities.LMDirichletSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.BytesRef;
 
 import edu.gslis.docscoring.ScorerDirichlet;
 import edu.gslis.docscoring.support.CollectionStats;
@@ -73,10 +76,19 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	double docLengthAvg   = -1.0;
 	String timeFieldName  =  Indexer.FIELD_EPOCH;
 	
+    IndexSearcher searcher;
+    Similarity similarity;
+    Analyzer analyzer;
+
+	
 	public IndexWrapperLuceneImpl(String pathToIndex) {
 	    try
 	    {
-	        index = DirectoryReader.open(FSDirectory.open(new File(pathToIndex)));            
+	        index = DirectoryReader.open(FSDirectory.open(new File(pathToIndex))); 
+	        searcher = new IndexSearcher(index);
+	        similarity = new LMDirichletSimilarity();
+	        analyzer = new StandardAnalyzer(Indexer.VERSION);
+	        
         } catch (Exception e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -141,12 +153,12 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	public SearchHits runQuery(String q, String[] field, int count) {
 				
 	    SearchHits hits = new SearchHits();
-	    
+	    Set<String> fields = new HashSet<String>();
+	    fields.add(Indexer.FIELD_DOCNO);
+	    fields.add(Indexer.FIELD_DOC_LEN);
+	    fields.add(timeFieldName);
 	    try
 	    {            
-            IndexSearcher searcher = new IndexSearcher(index);
-            Similarity similarity = new LMDirichletSimilarity();
-            Analyzer analyzer = new StandardAnalyzer(Indexer.VERSION);
             QueryParser parser = new MultiFieldQueryParser(Indexer.VERSION, field, analyzer);
             Query query = parser.parse(q);
             searcher.setSimilarity(similarity);
@@ -156,7 +168,8 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
             for (int i=0; i<docs.length; i++) {
                 SearchHit hit = new SearchHit();
                 int docid = docs[i].doc;
-                Document d = index.document(docid);
+                                
+                Document d = index.document(docid, fields);
                 
                 String docno = d.get(Indexer.FIELD_DOCNO);
                 hit.setDocID(docid);
@@ -168,13 +181,11 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
                 if(timeFieldName != null) {
                     String timeString = d.get(timeFieldName);
                     if (timeString != null) {
-				double time = Double.parseDouble(timeString);
-			    hit.setMetadataValue(timeFieldName, time);
+                        double time = Double.parseDouble(timeString);
+                        hit.setMetadataValue(timeFieldName, time);
                     }
                 }
-                FeatureVector dv = getDocVector(docid, null);
-                hit.setFeatureVector(dv);
-                //hit.setLength(dv.getLength());
+
                 hits.add(hit);                
             }
 	    } catch (Exception e) {
@@ -320,7 +331,7 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	 * @param term Term
 	 */
     public double termFreq(String term) {
-        double tf = -1;
+        double tf = 0;
         
         try {
             Fields fields = MultiFields.getFields(index);  
@@ -672,5 +683,28 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
            System.out.println(hit.getDocno() + "\t" + hit.getScore());
        }
 
+   }
+   
+   public Map<Integer, Integer> getDocsByTerm(String term) {
+       Map<Integer, Integer> df = new HashMap<Integer, Integer>();
+       try
+       {
+           Fields fields = MultiFields.getFields(index);
+           Iterator<String> it = fields.iterator();
+           while (it.hasNext()) {
+               String field = it.next();
+               DocsEnum de =  MultiFields.getTermDocsEnum(index, MultiFields.getLiveDocs(index), 
+                       field, new BytesRef(term));
+               if (de != null) {
+                   int doc;
+                   while((doc = de.nextDoc()) != DocsEnum.NO_MORE_DOCS) {
+                       df.put(doc,  de.freq());
+                   }
+               }
+           }
+       } catch (Exception e) {
+           e.printStackTrace();
+       }
+       return df;
    }
 }
