@@ -121,7 +121,7 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
      * Convert GQuery to Lucene query
      * @param query        Query
      */
-    private String getLuceneQueryString(GQuery gquery) {
+    public String getLuceneQueryString(GQuery gquery) {
     	StringBuilder queryString = new StringBuilder();
         Iterator<String> qt = gquery.getFeatureVector().iterator();
         while(qt.hasNext()) {
