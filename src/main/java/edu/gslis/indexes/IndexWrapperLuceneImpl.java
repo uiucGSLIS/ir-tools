@@ -71,16 +71,18 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
     Logger logger = Logger.getLogger(IndexWrapperLuceneImpl.class.getName());
     
     IndexReader index;
+    IndexSearcher searcher;
+    Similarity similarity;
+    Analyzer analyzer;
     
 	double vocabularySize = -1.0;
 	double docLengthAvg   = -1.0;
 	String timeFieldName  =  Indexer.FIELD_EPOCH;
 	
-    IndexSearcher searcher;
-    Similarity similarity;
-    Analyzer analyzer;
-
-	
+	/**
+	 * Construct an instance of this index wrapper using the specified path
+	 * @param pathToIndex
+	 */
 	public IndexWrapperLuceneImpl(String pathToIndex) {
 	    try
 	    {
@@ -100,26 +102,26 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	 * @param count  Number of hits
 	 */
     public SearchHits runQuery(GQuery gquery, int count) {
-        String queryString = gQueryToString(gquery);
+        String queryString = getLuceneQueryString(gquery);
         return runQuery(queryString, count);
     }
     
     /**
-	 * Execute a query given a GQuery object
+	 * Execute a query given a GQuery object and set of fields
 	 * @param gquery GQuery object
 	 * @param fields Array of fields to search
 	 * @param count  Number of hits
 	 */
     public SearchHits runQuery(GQuery gquery, String[] fields, int count) {
-    	String queryString = gQueryToString(gquery);
+    	String queryString = getLuceneQueryString(gquery);
     	return runQuery(queryString, fields, count);
     }
     
     /**
-     * Convert GQuery to String
+     * Convert GQuery to Lucene query
      * @param query        Query
      */
-    private String gQueryToString(GQuery gquery) {
+    private String getLuceneQueryString(GQuery gquery) {
     	StringBuilder queryString = new StringBuilder();
         Iterator<String> qt = gquery.getFeatureVector().iterator();
         while(qt.hasNext()) {
@@ -383,6 +385,14 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
         return getDocVector(docID, null, stopper);
     }
     
+    /**
+     * Returns the complete feature vector for the specified document
+     * based on the specified field
+     * @param docID     Lucene internal identifier
+     * @param field     Field   
+     * @param stopper   Stopper
+     * @return
+     */
 	public FeatureVector getDocVector(int docID,  String field, Stopper stopper) {
 	   
 	    FeatureVector fv = new FeatureVector(stopper);
@@ -427,22 +437,6 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	    return fv;
 	}
 	
-	public String getDocText(int docID) {
-	    StringBuffer text = new StringBuffer();
-	    try
-	    {
-            Fields fields = index.getTermVectors(docID);
-            Iterator<String> it = fields.iterator();
-            while (it.hasNext()) {
-                String fieldName = it.next();
-                text.append(getDocText(docID, fieldName));
-                text.append(" ");
-            }
-	    } catch (Exception e) {
-	        logger.log(Level.SEVERE, e.getMessage(), e);	        
-	    }
-	    return text.toString();
-	}
 	
 	
 	/**
@@ -487,7 +481,28 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
         termList.addAll(termPos.values());
         return termList;
      }	
-    
+ 
+    /**
+     * Recomposes the document text
+     * @param docID    Lucene internal document identifier
+     */
+    public String getDocText(int docID) {
+        StringBuffer text = new StringBuffer();
+        try
+        {
+            Fields fields = index.getTermVectors(docID);
+            Iterator<String> it = fields.iterator();
+            while (it.hasNext()) {
+                String fieldName = it.next();
+                text.append(getDocText(docID, fieldName));
+                text.append(" ");
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);            
+        }
+        return text.toString();
+    }
+
     /**
      * Recomposes the document text from term position information.
      * @param docID
@@ -534,7 +549,13 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	    return getDocId(Indexer.FIELD_DOCNO, docno);
 	}
 	
-	public int getDocId(String field, String docno) {
+	/**
+	 * Get the internal document ID the field with the specified value
+	 * @param field    Field name
+	 * @param value    value
+	 * @return
+	 */
+	public int getDocId(String field, String value) {
         int docid = -1;
         
         try
@@ -542,7 +563,7 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
             IndexSearcher searcher = new IndexSearcher(index);
             Analyzer analyzer = new KeywordAnalyzer();
             QueryParser parser = new QueryParser(Indexer.VERSION, field, analyzer);
-            Query q = parser.parse("\"" + docno + "\"");
+            Query q = parser.parse("\"" + value + "\"");
     
     //        TermQuery q = new TermQuery(new Term(field, docno));
                             
