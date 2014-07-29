@@ -100,14 +100,34 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	 * @param count  Number of hits
 	 */
     public SearchHits runQuery(GQuery gquery, int count) {
-        StringBuilder queryString = new StringBuilder();
+        String queryString = gQueryToString(gquery);
+        return runQuery(queryString, count);
+    }
+    
+    /**
+	 * Execute a query given a GQuery object
+	 * @param gquery GQuery object
+	 * @param fields Array of fields to search
+	 * @param count  Number of hits
+	 */
+    public SearchHits runQuery(GQuery gquery, String[] fields, int count) {
+    	String queryString = gQueryToString(gquery);
+    	return runQuery(queryString, fields, count);
+    }
+    
+    /**
+     * Convert GQuery to String
+     * @param query        Query
+     */
+    private String gQueryToString(GQuery gquery) {
+    	StringBuilder queryString = new StringBuilder();
         Iterator<String> qt = gquery.getFeatureVector().iterator();
         while(qt.hasNext()) {
             String term = qt.next();
             queryString.append(" ");
             queryString.append(term+"^"+gquery.getFeatureVector().getFeatureWeight(term));
         }
-        return runQuery(queryString.toString(), count);
+        return queryString.toString();
     }
     
     /**
