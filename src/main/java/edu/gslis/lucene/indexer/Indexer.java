@@ -51,7 +51,7 @@ public abstract class Indexer
     public static final String FIELD_TYPE_LONG = "long";
     public static final String FIELD_TYPE_DOUBLE = "double";
     
-    public static final String DEFAULT_SIMILARITY = "org.apache.lucene.search.similarities.DefaultSimilarity";
+    public static final String DEFAULT_SIMILARITY = "org.apache.lucene.search.similarities.LMDirichletSimilarity";
     public static final String DEFAULT_ANALYZER = "org.apache.lucene.analysis.standard.StandardAnalyzer";
 
 
@@ -117,15 +117,17 @@ public abstract class Indexer
     }
     
     
-    public void buildIndex(IndexWriter writer, Set<FieldConfig> fields,
+    public long buildIndex(IndexWriter writer, Set<FieldConfig> fields,
             File file) throws Exception 
     {
+        long count = 0;
         if (file.isDirectory()) {
             File[] files = file.listFiles();
             for (File f: files) {
                 String name = f.getName();
                 InputStream is = new FileInputStream(f);
                 buildIndex(writer, fields, name, is);
+                count++;
             }
         }
         else if (file.getName().endsWith("tgz")) {
@@ -163,7 +165,9 @@ public abstract class Indexer
             String name = file.getName();
             InputStream is = new FileInputStream(file);
             buildIndex(writer, fields, name, is);
+            count++;
         }
+        return count;
 
     }
 }

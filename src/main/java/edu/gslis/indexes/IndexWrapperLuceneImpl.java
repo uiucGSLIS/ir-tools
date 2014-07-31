@@ -3,6 +3,7 @@ package edu.gslis.indexes;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -15,10 +16,11 @@ import java.util.logging.Logger;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
-import org.apache.lucene.analysis.core.SimpleAnalyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.DocsAndPositionsEnum;
+import org.apache.lucene.index.DocsEnum;
 import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexableField;
@@ -32,9 +34,10 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.similarities.DefaultSimilarity;
+import org.apache.lucene.search.similarities.LMDirichletSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.BytesRef;
 
 import edu.gslis.docscoring.ScorerDirichlet;
 import edu.gslis.docscoring.support.CollectionStats;
@@ -68,15 +71,26 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
     Logger logger = Logger.getLogger(IndexWrapperLuceneImpl.class.getName());
     
     IndexReader index;
+    IndexSearcher searcher;
+    Similarity similarity;
+    Analyzer analyzer;
     
 	double vocabularySize = -1.0;
 	double docLengthAvg   = -1.0;
 	String timeFieldName  =  Indexer.FIELD_EPOCH;
 	
+	/**
+	 * Construct an instance of this index wrapper using the specified path
+	 * @param pathToIndex
+	 */
 	public IndexWrapperLuceneImpl(String pathToIndex) {
 	    try
 	    {
-	        index = DirectoryReader.open(FSDirectory.open(new File(pathToIndex)));            
+	        index = DirectoryReader.open(FSDirectory.open(new File(pathToIndex))); 
+	        searcher = new IndexSearcher(index);
+	        similarity = new LMDirichletSimilarity();
+	        analyzer = new StandardAnalyzer(Indexer.VERSION);
+	        
         } catch (Exception e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -88,14 +102,34 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	 * @param count  Number of hits
 	 */
     public SearchHits runQuery(GQuery gquery, int count) {
-        StringBuilder queryString = new StringBuilder();
+        String queryString = getLuceneQueryString(gquery);
+        return runQuery(queryString, count);
+    }
+    
+    /**
+	 * Execute a query given a GQuery object and set of fields
+	 * @param gquery GQuery object
+	 * @param fields Array of fields to search
+	 * @param count  Number of hits
+	 */
+    public SearchHits runQuery(GQuery gquery, String[] fields, int count) {
+    	String queryString = getLuceneQueryString(gquery);
+    	return runQuery(queryString, fields, count);
+    }
+    
+    /**
+     * Convert GQuery to Lucene query
+     * @param query        Query
+     */
+    public String getLuceneQueryString(GQuery gquery) {
+    	StringBuilder queryString = new StringBuilder();
         Iterator<String> qt = gquery.getFeatureVector().iterator();
         while(qt.hasNext()) {
             String term = qt.next();
             queryString.append(" ");
             queryString.append(term+"^"+gquery.getFeatureVector().getFeatureWeight(term));
         }
-        return runQuery(queryString.toString(), count);
+        return queryString.toString();
     }
     
     /**
@@ -141,12 +175,12 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	public SearchHits runQuery(String q, String[] field, int count) {
 				
 	    SearchHits hits = new SearchHits();
-	    
+	    Set<String> fields = new HashSet<String>();
+	    fields.add(Indexer.FIELD_DOCNO);
+	    fields.add(Indexer.FIELD_DOC_LEN);
+	    fields.add(timeFieldName);
 	    try
 	    {            
-            IndexSearcher searcher = new IndexSearcher(index);
-            Similarity similarity = new DefaultSimilarity();
-            Analyzer analyzer = new SimpleAnalyzer(Indexer.VERSION);
             QueryParser parser = new MultiFieldQueryParser(Indexer.VERSION, field, analyzer);
             Query query = parser.parse(q);
             searcher.setSimilarity(similarity);
@@ -156,7 +190,8 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
             for (int i=0; i<docs.length; i++) {
                 SearchHit hit = new SearchHit();
                 int docid = docs[i].doc;
-                Document d = index.document(docid);
+                                
+                Document d = index.document(docid, fields);
                 
                 String docno = d.get(Indexer.FIELD_DOCNO);
                 hit.setDocID(docid);
@@ -167,12 +202,12 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
                     hit.setLength(dl.numericValue().longValue());
                 if(timeFieldName != null) {
                     String timeString = d.get(timeFieldName);
-                    double time = Double.parseDouble(timeString);
-                    hit.setMetadataValue(timeFieldName, time);
+                    if (timeString != null) {
+                        double time = Double.parseDouble(timeString);
+                        hit.setMetadataValue(timeFieldName, time);
+                    }
                 }
-                FeatureVector dv = getDocVector(docid, null);
-                hit.setFeatureVector(dv);
-                hit.setLength(dv.getLength());
+
                 hits.add(hit);                
             }
 	    } catch (Exception e) {
@@ -318,7 +353,7 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	 * @param term Term
 	 */
     public double termFreq(String term) {
-        double tf = -1;
+        double tf = 0;
         
         try {
             Fields fields = MultiFields.getFields(index);  
@@ -350,6 +385,14 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
         return getDocVector(docID, null, stopper);
     }
     
+    /**
+     * Returns the complete feature vector for the specified document
+     * based on the specified field
+     * @param docID     Lucene internal identifier
+     * @param field     Field   
+     * @param stopper   Stopper
+     * @return
+     */
 	public FeatureVector getDocVector(int docID,  String field, Stopper stopper) {
 	   
 	    FeatureVector fv = new FeatureVector(stopper);
@@ -394,22 +437,6 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	    return fv;
 	}
 	
-	public String getDocText(int docID) {
-	    StringBuffer text = new StringBuffer();
-	    try
-	    {
-            Fields fields = index.getTermVectors(docID);
-            Iterator<String> it = fields.iterator();
-            while (it.hasNext()) {
-                String fieldName = it.next();
-                text.append(getDocText(docID, fieldName));
-                text.append(" ");
-            }
-	    } catch (Exception e) {
-	        logger.log(Level.SEVERE, e.getMessage(), e);	        
-	    }
-	    return text.toString();
-	}
 	
 	
 	/**
@@ -454,7 +481,28 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
         termList.addAll(termPos.values());
         return termList;
      }	
-    
+ 
+    /**
+     * Recomposes the document text
+     * @param docID    Lucene internal document identifier
+     */
+    public String getDocText(int docID) {
+        StringBuffer text = new StringBuffer();
+        try
+        {
+            Fields fields = index.getTermVectors(docID);
+            Iterator<String> it = fields.iterator();
+            while (it.hasNext()) {
+                String fieldName = it.next();
+                text.append(getDocText(docID, fieldName));
+                text.append(" ");
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);            
+        }
+        return text.toString();
+    }
+
     /**
      * Recomposes the document text from term position information.
      * @param docID
@@ -501,7 +549,13 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	    return getDocId(Indexer.FIELD_DOCNO, docno);
 	}
 	
-	public int getDocId(String field, String docno) {
+	/**
+	 * Get the internal document ID the field with the specified value
+	 * @param field    Field name
+	 * @param value    value
+	 * @return
+	 */
+	public int getDocId(String field, String value) {
         int docid = -1;
         
         try
@@ -509,7 +563,7 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
             IndexSearcher searcher = new IndexSearcher(index);
             Analyzer analyzer = new KeywordAnalyzer();
             QueryParser parser = new QueryParser(Indexer.VERSION, field, analyzer);
-            Query q = parser.parse("\"" + docno + "\"");
+            Query q = parser.parse("\"" + value + "\"");
     
     //        TermQuery q = new TermQuery(new Term(field, docno));
                             
@@ -670,5 +724,28 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
            System.out.println(hit.getDocno() + "\t" + hit.getScore());
        }
 
+   }
+   
+   public Map<Integer, Integer> getDocsByTerm(String term) {
+       Map<Integer, Integer> df = new HashMap<Integer, Integer>();
+       try
+       {
+           Fields fields = MultiFields.getFields(index);
+           Iterator<String> it = fields.iterator();
+           while (it.hasNext()) {
+               String field = it.next();
+               DocsEnum de =  MultiFields.getTermDocsEnum(index, MultiFields.getLiveDocs(index), 
+                       field, new BytesRef(term));
+               if (de != null) {
+                   int doc;
+                   while((doc = de.nextDoc()) != DocsEnum.NO_MORE_DOCS) {
+                       df.put(doc,  de.freq());
+                   }
+               }
+           }
+       } catch (Exception e) {
+           e.printStackTrace();
+       }
+       return df;
    }
 }

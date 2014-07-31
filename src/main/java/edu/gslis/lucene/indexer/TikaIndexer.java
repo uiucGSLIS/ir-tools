@@ -26,14 +26,16 @@ import edu.gslis.lucene.main.config.FieldConfig;
 
 
 public class TikaIndexer extends Indexer {
+    
     @Override
-    public void buildIndex(IndexWriter writer, Set<FieldConfig> fields,
+    public long buildIndex(IndexWriter writer, Set<FieldConfig> fields,
             File file) throws Exception 
     {
+        long count = 0;
         if (file.isDirectory()) {
             File[] files = file.listFiles();
             for (File f: files) {
-                buildIndex(writer, fields, f);
+                count += buildIndex(writer, fields, f);
             }
         }
         else if (file.getName().endsWith("tgz")) {
@@ -62,6 +64,7 @@ public class TikaIndexer extends Indexer {
                         name = name.replaceAll("/", "_");
                         InputStream is = new ByteArrayInputStream(bos.toByteArray());
                         buildIndex(writer, fields, name, is);
+                        is.close();
                     } catch (Exception e) {
                         System.err.println("Error processing entry " + entry.getName());
                         e.printStackTrace();
@@ -71,25 +74,37 @@ public class TikaIndexer extends Indexer {
             tis.close();
         }
         else {
+            InputStream is = null;
             try
             { 
+                String parent = "";
+                if (file.getParentFile() != null)
+                    parent = file.getParentFile().getName();
                 String name = file.getName();
-//                if (! (name.endsWith(".png") || name.endsWith(".gif") || name.endsWith(".jpg")) ) {
-                    name = name.substring(0, name.lastIndexOf("."));
-                    name = name.replaceAll("/", "_");
-                    InputStream is = new FileInputStream(file);
-                    buildIndex(writer, fields, name, is);
-                    is.close();
-     //           }
+                name = name.substring(0, name.lastIndexOf("."));
+                is = new FileInputStream(file);
+                buildIndex(writer, fields, parent, name, is);
+                count++;
             } catch (Exception e) { 
                 System.out.println("Error processing " + file.getAbsolutePath());
                 e.printStackTrace();              
             }
+            finally {
+                if (is != null) 
+                    is.close();
+            }
         }
+        return count;
 
     }
-        
+    
     public void buildIndex(IndexWriter writer, Set<FieldConfig> fields, String name,
+        InputStream is) throws Exception  
+    {
+        buildIndex(writer, fields, "", name, is);
+    }
+        
+    public void buildIndex(IndexWriter writer, Set<FieldConfig> fields, String parentDir, String name,
             InputStream is) throws Exception 
     {
         Analyzer analyzer = writer.getAnalyzer();
@@ -116,6 +131,9 @@ public class TikaIndexer extends Indexer {
                     // Index the current file, assume the file name is the document identifier
                     if (name.contains("."))
                         name = name.substring(0, name.indexOf("."));
+                    
+                    if (parentDir != null)
+                        name = parentDir + "_" + name;
                     
                     addField(luceneDoc, field, name, analyzer);
                 }
@@ -151,6 +169,11 @@ public class TikaIndexer extends Indexer {
                     String keyword = metadata.get(TikaCoreProperties.KEYWORDS);
                     if (keyword != null)
                         addField(luceneDoc, field, keyword, analyzer);                    
+                }
+                else if (source.equals("parent"))
+                {
+                    if (parentDir != null)
+                        addField(luceneDoc, field, parentDir, analyzer);                    
                 }
             }
         }

@@ -1,18 +1,19 @@
 package edu.gslis.lucene.main;
 
 import java.io.File;
+
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -31,12 +32,11 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.similarities.DefaultSimilarity;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.search.similarities.LMDirichletSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
@@ -44,6 +44,12 @@ import edu.gslis.lucene.indexer.Indexer;
 import edu.gslis.lucene.main.config.QueryConfig;
 import edu.gslis.lucene.main.config.QueryFile;
 import edu.gslis.lucene.main.config.RunQueryConfig;
+import edu.gslis.queries.GQueries;
+import edu.gslis.queries.GQueriesFedwebImpl;
+import edu.gslis.queries.GQueriesIndriImpl;
+import edu.gslis.queries.GQueriesJsonImpl;
+import edu.gslis.queries.GQuery;
+import edu.gslis.textrepresentation.FeatureVector;
 
 
 public class LuceneRunQuery {
@@ -56,13 +62,13 @@ public class LuceneRunQuery {
     
     public void run() throws Exception {
         String indexPath = config.getIndex();
-        StopwordAnalyzerBase analyzer;
-        String stopwordsPath = config.getStopwords();
-        String analyzerClass = config.getAnalyzer();
         String docnoField = config.getDocno();
         if (StringUtils.isEmpty(docnoField))
             docnoField = "docno";
         String similarityClass = config.getSimilarity();
+        String stopwordsPath = config.getStopwords();
+        String analyzerClass = config.getAnalyzer();
+        StopwordAnalyzerBase defaultAnalyzer;
         
         Map<String, String> indexMetadata = readIndexMetadata(indexPath);
         if (StringUtils.isEmpty(analyzerClass) && indexMetadata.get("analyzer") != null) 
@@ -70,22 +76,29 @@ public class LuceneRunQuery {
         if (StringUtils.isEmpty(similarityClass) && indexMetadata.get("similarity") != null) 
             similarityClass = indexMetadata.get("similarity");
                                 
-        if (!StringUtils.isEmpty(stopwordsPath))
+        if (!StringUtils.isEmpty(analyzerClass))
         {
             @SuppressWarnings("rawtypes")
             Class analyzerCls = loader.loadClass(analyzerClass);
-            @SuppressWarnings({ "rawtypes", "unchecked" })
-            java.lang.reflect.Constructor analyzerConst = analyzerCls.getConstructor(Version.class, Reader.class);
-            analyzer = (StopwordAnalyzerBase)analyzerConst.newInstance(Indexer.VERSION, new FileReader(stopwordsPath));            
+
+            if (!StringUtils.isEmpty(stopwordsPath))
+            {
+                @SuppressWarnings({ "rawtypes", "unchecked" })
+                java.lang.reflect.Constructor analyzerConst = analyzerCls.getConstructor(Version.class, Reader.class);
+                defaultAnalyzer = (StopwordAnalyzerBase)analyzerConst.newInstance(Indexer.VERSION, new FileReader(stopwordsPath));
+            } else {
+                @SuppressWarnings({ "rawtypes", "unchecked" })
+                java.lang.reflect.Constructor analyzerConst = analyzerCls.getConstructor(Version.class);
+                defaultAnalyzer = (StopwordAnalyzerBase)analyzerConst.newInstance(Indexer.VERSION);
+            }
         } else {
-            @SuppressWarnings("rawtypes")
-            Class analyzerCls = loader.loadClass(analyzerClass);
-            @SuppressWarnings({ "rawtypes", "unchecked" })
-            java.lang.reflect.Constructor analyzerConst = analyzerCls.getConstructor(Version.class, CharArraySet.class);
-            analyzer = (StopwordAnalyzerBase)analyzerConst.newInstance(Indexer.VERSION, new CharArraySet(Indexer.VERSION, 0, true));           
+            defaultAnalyzer = new StandardAnalyzer(Indexer.VERSION, new CharArraySet(Indexer.VERSION, 0, true));
         }
-        
-        Similarity similarity = new DefaultSimilarity();
+
+
+
+        // Assumes LM similarity, but can be changed via config file
+        Similarity similarity = new LMDirichletSimilarity();
         if (!StringUtils.isEmpty(similarityClass))
             similarity = (Similarity)loader.loadClass(similarityClass).newInstance();
         IndexReader reader = DirectoryReader.open(FSDirectory.open(new File(indexPath)));
@@ -95,6 +108,11 @@ public class LuceneRunQuery {
         if (StringUtils.isEmpty(field))
             field = "text";
         String[] fields = field.split(",");
+ 
+
+         System.err.println("Similarity: " + similarityClass);
+         System.err.println("Analyzer: " + analyzerClass);
+
 
         Set<QueryConfig> queries = config.getQueries();        
         if (queries == null)
@@ -103,18 +121,16 @@ public class LuceneRunQuery {
         if (queryFile != null) {
             String path = queryFile.getPath();
             String format = queryFile.getFormat();
-            if (format.startsWith("fedweb"))
-                queries = readDelimitedFile(new File(path), format);
-            else if (format.equals("indri")) {
-                queries = readIndriQueries(new File(path));
-            }
+            
+            queries = readQueries(path, format);
         }
         
         for (QueryConfig query: queries) {
-            QueryParser parser = new MultiFieldQueryParser(Indexer.VERSION, fields, analyzer);
+            QueryParser parser = new MultiFieldQueryParser(Indexer.VERSION, fields, defaultAnalyzer);
             Query q = parser.parse(query.getText());
             TopDocs topDocs = searcher.search(q, 1000);
             ScoreDoc[] docs = topDocs.scoreDocs;
+            Set<String> seen = new HashSet<String>();
             for (int i=0; i<docs.length; i++) {
                 int docid = docs[i].doc;
                 double score = docs[i].score;
@@ -123,7 +139,11 @@ public class LuceneRunQuery {
                 String docno = doc.getField(docnoField).stringValue();
                 long doclen = doc.getField(Indexer.FIELD_DOC_LEN).numericValue().longValue();
 
-                System.out.println(query.getNumber() + " " + docno + " " + score + " " + doclen);
+                if (!seen.contains(docno)) {
+                    //http://en.wikipedia.org/wiki/Shafi_Goldwasser Q0 1325799600-2efdd8d6cd5b665a3a61a1faeb0c3410 161 -32.654207071883675 plm
+                    System.out.println(query.getNumber() + " Q0 " + docno + " " + i + " "  + score + " gslis");
+                    seen.add(docno);
+                }
             }
 
         }
@@ -154,6 +174,7 @@ public class LuceneRunQuery {
             String docno = cmd.getOptionValue("docno", Indexer.FIELD_DOCNO);
             String field = cmd.getOptionValue("field", Indexer.FIELD_TEXT);
             String querynum = cmd.getOptionValue("querynum", "1");
+            String runname = cmd.getOptionValue("name", "gslis");
             
             String similarity = cmd.getOptionValue("similarity", Indexer.DEFAULT_SIMILARITY);
 
@@ -170,11 +191,7 @@ public class LuceneRunQuery {
                 querycfg.setText(query.replaceAll("'", "\""));
                 queries.add(querycfg);
             } else if (!StringUtils.isEmpty(queryfile)) {
-                if (format.startsWith("fedweb"))
-                    queries = readDelimitedFile(new File(queryfile), format);
-                else if (format.equals("indri")) {
-                    queries = readIndriQueries(new File(queryfile));
-                }
+                queries = readQueries(queryfile, format);
             }
             
             config.setAnalyzer(analyzer);
@@ -206,50 +223,49 @@ public class LuceneRunQuery {
         return map;
     }
     
-    public static Set<QueryConfig> readDelimitedFile(File file, String format) throws Exception 
+    public static Set<QueryConfig> readQueries(String file, String format) throws Exception 
     {
-        Set<QueryConfig> queries = new HashSet<QueryConfig>();
+        Set<QueryConfig> queries = new TreeSet<QueryConfig>();
 
-        List<String> rows = FileUtils.readLines(file);
-        for (String row: rows) {
-            if (format.equals("fedweb14")) {
-                String[] fields = row.split("\t");
-                QueryConfig q = new QueryConfig();
-                q.setNumber(fields[0]);
-                q.setText(fields[1]);
-                queries.add(q);
-            }
-            else if (format.equals("fedweb13")) {
-                String[] fields = row.split(":");
-                QueryConfig q = new QueryConfig();
-                q.setNumber(fields[0]);
-                q.setText(fields[1]);
-                queries.add(q);
-            }
+        GQueries gqueries = null;
+        if (format.equals("fedweb")) {
+           gqueries = new GQueriesFedwebImpl();
         }
+        else if (format.equals("json")) {
+            gqueries = new GQueriesJsonImpl();
+        }
+        else if (format.equals("indri")) {
+            gqueries = new GQueriesIndriImpl();
+        }
+        
+        gqueries.read(file);
+
+
+        Iterator<GQuery> it = gqueries.iterator();
+        while(it.hasNext()) {
+            GQuery query = it.next();
+            
+            StringBuffer qstr = new StringBuffer();
+            FeatureVector fv = query.getFeatureVector();
+            Iterator<String> fit = fv.iterator();
+            while (fit.hasNext()) {
+                String feature = fit.next();
+                double weight = fv.getFeatureWeight(feature);
+                qstr.append(feature + "^" + weight);
+                if (fit.hasNext()) 
+                    qstr.append(" ");
+                
+            }
+            
+            QueryConfig qc = new QueryConfig();
+            qc.setText(qstr.toString());
+            qc.setNumber(query.getTitle());
+            queries.add(qc);
+        }
+        
         return queries;
     }
     
-    public static Set<QueryConfig> readIndriQueries(File file) throws Exception 
-    {
-        Set<QueryConfig> queries = new HashSet<QueryConfig>();
-        DocumentBuilderFactory factory =  DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        org.w3c.dom.Document xml = builder.parse(new FileInputStream(file));
-        NodeList queryNodes = xml.getElementsByTagName("query");
-        for (int i=0; i<queryNodes.getLength(); i++) {
-            Element queryElem = (Element) queryNodes.item(i);
-            QueryConfig query = new QueryConfig();
-            
-            String number = queryElem.getElementsByTagName("number").item(0).getFirstChild().getNodeValue();
-            String text   = queryElem.getElementsByTagName("text").item(0).getFirstChild().getNodeValue();
-            text = text.replaceAll("\\\n", "");
-            query.setNumber(number);
-            query.setText(text);
-            queries.add(query);
-        }
-        return queries;
-    }
     
     public static Options createOptions()
     {
@@ -264,6 +280,7 @@ public class LuceneRunQuery {
         options.addOption("format", true, "Query file format");
         options.addOption("similarity", true, "Similarity class");
         options.addOption("stopwords", true, "Stopwords list");
+        options.addOption("name", true, "Run name");
         return options;
     }
 

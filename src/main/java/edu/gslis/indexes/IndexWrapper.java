@@ -1,6 +1,7 @@
 package edu.gslis.indexes;
 
 import java.util.List;
+import java.util.Map;
 
 import edu.gslis.queries.GQuery;
 import edu.gslis.searchhits.SearchHit;
@@ -52,5 +53,7 @@ public interface IndexWrapper {
 	 * @return
 	 */
 	public List<String> getDocTerms (int docid);
+	
+	public Map<Integer, Integer> getDocsByTerm (String term);
 
 }

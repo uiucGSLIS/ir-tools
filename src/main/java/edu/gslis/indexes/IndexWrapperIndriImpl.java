@@ -1,12 +1,17 @@
 package edu.gslis.indexes;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import lemurproject.indri.QueryEnvironment;
 import lemurproject.indri.ScoredExtentResult;
 import lemurproject.lemur.Index;
 import lemurproject.lemur.IndexManager;
+import edu.gslis.docaccumulators.Postings;
+import edu.gslis.docaccumulators.PostingsAggregator;
+import edu.gslis.lucene.indexer.Indexer;
 import edu.gslis.queries.GQuery;
 import edu.gslis.searchhits.SearchHit;
 import edu.gslis.searchhits.SearchHits;
@@ -23,7 +28,7 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 	private QueryEnvironment index;
 	private double vocabularySize = -1.0;
 	private double docLengthAvg   = -1.0;
-	private String timeFieldName  = null;
+	private String timeFieldName  = Indexer.FIELD_EPOCH;
 	
 	public IndexWrapperIndriImpl(String pathToIndex) {
 		index = new QueryEnvironment();
@@ -95,10 +100,16 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 				SearchHit hit = new SearchHit();
 				hit.setDocID(r.document);
 				hit.setScore(r.score);
-
 				if(times != null)  {
 					hit.setMetadataValue(timeFieldName, times[k]);
 				}
+                double length = (double)index.documentLength(r.document);
+                
+                // TODO: Do we need it?
+                //IndriDocument doc = new IndriDocument (index);
+                //FeatureVector fv = doc.getFeatureVector(r.document, null);
+                //hit.setFeatureVector(fv);
+                hit.setLength(length);
 				hit.setDocno(docnos[k++]);
 				hits.add(hit);
 			}
@@ -134,6 +145,9 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 				if(times != null)  {
 					hit.setMetadataValue(timeFieldName, times[k]);
 				}
+                double length = (double)index.documentLength(r.document);
+                hit.setLength(length);
+
 				hit.setDocno(docnos[k++]);
 				hits.add(hit);
 			}
@@ -291,4 +305,41 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
        IndriDocument doc = new IndriDocument(index);
        return doc.getTerms(docid);
    }
+   
+   public Map<Integer, Integer> getDocsByTerm(String term) {
+       
+       Map<Integer, Integer> df = new HashMap<Integer, Integer>();
+       String query = "#band(" + term + ")";           
+          
+       try
+       {
+           ScoredExtentResult[] featureResults = index.expressionList(query);
+        
+           if(featureResults.length==0)
+               return df;
+           
+           // convert expression list to term-doc counts
+           int[] docIds = this.extractDocIds(featureResults);
+           PostingsAggregator postingsAggregator = new PostingsAggregator();
+           Postings postingsForFeature = postingsAggregator.aggregate(docIds);
+           Iterator<Integer> matchingDocIdIterator = postingsForFeature.docIdIterator();
+           while(matchingDocIdIterator.hasNext()) {
+               int docId = matchingDocIdIterator.next();
+               int count = postingsForFeature.lookup(docId);
+               df.put(docId, count);
+           }        
+       } catch (Exception e) {
+           e.printStackTrace();
+       }
+       return df;
+   }
+
+
+    private int[] extractDocIds(ScoredExtentResult[] r) {
+       int[] d = new int[r.length];
+       for(int i=0; i<r.length; i++) {
+           d[i] = r[i].document;
+       }
+       return d;
+    }
 }

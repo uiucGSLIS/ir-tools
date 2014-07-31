@@ -118,7 +118,7 @@ public class LuceneBuildIndex {
         
         Analyzer analyzer = new PerFieldAnalyzerWrapper(defaultAnalyzer, perFieldAnalyzers);
         IndexWriterConfig iwc = new IndexWriterConfig(Indexer.VERSION, analyzer);
-        iwc.setOpenMode(OpenMode.CREATE);
+        iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
         iwc.setRAMBufferSizeMB(256.0);
         iwc.setSimilarity(similarity);
         
@@ -144,17 +144,22 @@ public class LuceneBuildIndex {
             
             String filter = corpusConfig.getFilter();
             File corpusFile = new File(corpusPath);
+            long count = 0;
             if (!StringUtils.isEmpty(filter)) {
                 FileFilter fileFilter = new WildcardFileFilter(filter);
                 File[] files = corpusFile.listFiles(fileFilter);
                 for (File file: files) {
-                    indexer.buildIndex(writer,  fields, file);
+                    count += indexer.buildIndex(writer,  fields, file);
                 }                    
             } else {
-                indexer.buildIndex(writer,  fields, new File(corpusPath));
+                count += indexer.buildIndex(writer,  fields, new File(corpusPath));
             }
+            System.out.println("Indexed " + count + " files");
 
             writeIndexMetadata(indexPath, config);
+        } catch (Exception e) {
+            System.out.println("Fatal: " + e.getMessage());
+            e.printStackTrace();
         } finally {
             writer.close();
         }   

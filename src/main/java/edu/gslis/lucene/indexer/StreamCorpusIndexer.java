@@ -38,20 +38,32 @@ public class StreamCorpusIndexer extends Indexer
      * Recurses files in a directory
      */
     @Override
-    public void buildIndex(IndexWriter writer, Set<FieldConfig> fields,
+    public long buildIndex(IndexWriter writer, Set<FieldConfig> fields,
             File file) throws Exception 
     {
+        long count = 0;
         if (file.isDirectory()) {
             File[] files = file.listFiles();
             for (File f: files) {
-                buildIndex(writer, fields, f);
+                count += buildIndex(writer, fields, f);
+                
+                if ((count % 1000) == 0)
+                    System.out.println(count + " documents indexed");
             }
         }
         else {
-            String name = file.getName();
-            InputStream is = new FileInputStream(file);
-            buildIndex(writer, fields, name, is);
+            try
+            {
+                String name = file.getName();
+                InputStream is = new FileInputStream(file);
+                buildIndex(writer, fields, name, is);
+                count++;
+            } catch (Exception e) {
+                System.out.println("Error processing file " + file.getAbsolutePath());
+                e.printStackTrace();
+            }
         }
+        return count;
 
     }
      
