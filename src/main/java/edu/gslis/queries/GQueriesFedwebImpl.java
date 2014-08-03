@@ -35,7 +35,7 @@ public class GQueriesFedwebImpl extends GQueries {
                 query.setText(fields[1]);
                 query.setFeatureVector(fv);
                 
-                queryList.add(query);            
+                addQuery(query);            
             }
 	    } catch (Exception e) {
 	        e.printStackTrace();
