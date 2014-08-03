@@ -132,6 +132,37 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
         return queryString.toString();
     }
     
+    public String toAndQuery(String query, Stopper stopper) {
+        StringBuilder queryString = new StringBuilder();
+        String[] terms = query.split("\\s+");
+        for (int i=0; i<terms.length; i++) {
+            if (stopper != null && stopper.isStopWord(terms[i]))
+                continue;
+
+            if (i > 0) 
+                queryString.append(" ");
+
+            queryString.append("+" + terms[i]);
+        }        
+        return queryString.toString();
+    }
+    
+    public String toWindowQuery(String query, int window, Stopper stopper) {
+        StringBuilder queryString = new StringBuilder("\"");
+        String[] terms = query.split("\\s+");
+        for (int i=0; i<terms.length; i++) {
+            if (stopper != null && stopper.isStopWord(terms[i]))
+                continue;
+
+            if (i > 0) 
+                queryString.append(" ");
+            queryString.append(terms[i]);
+        }
+        queryString.append("\"~" + window);
+        return queryString.toString();
+    }
+    
+    
     /**
      * Execute a query given a query string against all fields
      * @param q Query string
@@ -670,6 +701,10 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
    {
        File indexDir = new File("/Users/cwillis/dev/uiucGSLIS/indexes/lucene/FT.train");
        IndexWrapper index = new IndexWrapperLuceneImpl(indexDir.getAbsolutePath());
+       
+       
+//       index.runQuery("headline:\"jubilee\" and text:\"financial\" and pub:\"financial\"", 10);
+       index.runQuery("headline:jubilee and financial", 10);
        double dc = index.docCount();
        assert(dc == 53356);
        
@@ -726,7 +761,7 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 
    }
    
-   public Map<Integer, Integer> getDocsByTerm(String term) {
+   public Map<Integer, Integer> getDocsByTerm(String term, Set<Integer> docids) {
        Map<Integer, Integer> df = new HashMap<Integer, Integer>();
        try
        {
@@ -739,7 +774,8 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
                if (de != null) {
                    int doc;
                    while((doc = de.nextDoc()) != DocsEnum.NO_MORE_DOCS) {
-                       df.put(doc,  de.freq());
+                       if (docids.contains(doc))
+                           df.put(doc,  de.freq());
                    }
                }
            }
