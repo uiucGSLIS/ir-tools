@@ -97,6 +97,8 @@ public abstract class GQueries {
                 outputQueryObject.addProperty("querytweettime", query.getMetadata("querytweettime"));           
             if(query.getMetadata("group") != null)
                 outputQueryObject.addProperty("group", query.getMetadata("group"));
+            if(query.getMetadata("timestamp") != null)
+                outputQueryObject.addProperty("timestamp", query.getMetadata("timestamp"));
             
             Iterator<String> fields = metadataFields.iterator();
             while(fields.hasNext()) {

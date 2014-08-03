@@ -67,7 +67,7 @@
 				<executions>
 					<execution>
 						<id>simple-command</id>
-						<phase>package</phase>
+						<phase>deploy</phase>
 						<goals>
 							<goal>attached</goal>
 						</goals>
@@ -82,7 +82,50 @@
                                         <argLine>-Djava.library.path=/usr/local/lib</argLine>
       				</configuration>
     			</plugin>
-		</plugins>
+          <plugin>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>copy-dependencies</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>            
+        </plugins>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.eclipse.m2e</groupId>
+              <artifactId>lifecycle-mapping</artifactId>
+              <version>1.0.0</version>
+              <configuration>
+                <lifecycleMappingMetadata>
+                  <pluginExecutions>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <versionRange>[2.0,)</versionRange>
+                        <goals>
+                          <goal>copy-dependencies</goal>
+                        </goals>
+                     </pluginExecutionFilter>
+                    <action>
+                        <execute />
+                    </action>
+                  </pluginExecution>
+                 </pluginExecutions>
+                </lifecycleMappingMetadata>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>        
+
 	</build>
 	<dependencies>
 		<dependency>
@@ -209,12 +252,12 @@
         <dependency>    
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.2</version>
+            <version>1.5.8</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <version>1.7.2</version>
+            <version>1.5.8</version>
         </dependency>
           
     </dependencies>	

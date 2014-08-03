@@ -22,7 +22,6 @@ public class GQuery {
 	private String text;
 	private Map<String,String> metadata;
 	private FeatureVector featureVector;
-	private long timestamp;
 	
 	public GQuery() {
 		metadata = new HashMap<String,String>();
@@ -86,13 +85,5 @@ public class GQuery {
 	public void setFeatureVector(FeatureVector featureVector) {
 		this.featureVector = featureVector;
 	}
-	
-	public void setTimestamp(long timestamp) {
-	    this.timestamp = timestamp;
-	}
-	
-	public long getTimestamp() {
-	    return timestamp;
-	}
-	
+		
 }

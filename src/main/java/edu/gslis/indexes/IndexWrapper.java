@@ -2,6 +2,7 @@ package edu.gslis.indexes;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import edu.gslis.queries.GQuery;
 import edu.gslis.searchhits.SearchHit;
@@ -43,6 +44,11 @@ public interface IndexWrapper {
 	// really shouldn't use this
 	public Object getActualIndex();
 	
+	/**
+	 * Returns the text for the specified document id
+	 * @param docid
+	 * @return
+	 */
 	public String getDocText(int docid);
 	
 	/**
@@ -54,6 +60,26 @@ public interface IndexWrapper {
 	 */
 	public List<String> getDocTerms (int docid);
 	
-	public Map<Integer, Integer> getDocsByTerm (String term);
+	/**
+	 * Returns a map of docids -> df for the given term
+	 * @param term
+	 * @return
+	 */
+	public Map<Integer, Integer> getDocsByTerm (String term, Set<Integer> docs);
+	
+	/**
+	 * Returns a boolean query for the specified GQuery
+	 * @param query
+	 * @return
+	 */
+	public String toAndQuery(String query, Stopper stopper);
+	
+	/**
+	 * Returns an unordered window query for the specified GQuery
+	 * @param query
+	 * @param window
+	 * @return
+	 */
+    public String toWindowQuery(String query, int window, Stopper stopper);
 
 }

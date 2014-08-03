@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import lemurproject.indri.QueryEnvironment;
 import lemurproject.indri.ScoredExtentResult;
@@ -306,7 +307,7 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
        return doc.getTerms(docid);
    }
    
-   public Map<Integer, Integer> getDocsByTerm(String term) {
+   public Map<Integer, Integer> getDocsByTerm(String term, Set<Integer> docids) {
        
        Map<Integer, Integer> df = new HashMap<Integer, Integer>();
        String query = "#band(" + term + ")";           
@@ -322,12 +323,17 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
            int[] docIds = this.extractDocIds(featureResults);
            PostingsAggregator postingsAggregator = new PostingsAggregator();
            Postings postingsForFeature = postingsAggregator.aggregate(docIds);
+           for (int docid: docids) {
+               int count = postingsForFeature.lookup(docid);
+               df.put(docid, count);
+           }
+           /*
            Iterator<Integer> matchingDocIdIterator = postingsForFeature.docIdIterator();
            while(matchingDocIdIterator.hasNext()) {
                int docId = matchingDocIdIterator.next();
                int count = postingsForFeature.lookup(docId);
                df.put(docId, count);
-           }        
+           } */       
        } catch (Exception e) {
            e.printStackTrace();
        }
@@ -341,5 +347,35 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
            d[i] = r[i].document;
        }
        return d;
+    }
+    
+    public String toAndQuery(String query, Stopper stopper) {
+        StringBuilder queryString = new StringBuilder("#band(");
+        String[] terms = query.split("\\s+");
+        for (int i=0; i<terms.length; i++) {
+            if (stopper != null && stopper.isStopWord(terms[i]))
+                continue;
+            if (i > 0) 
+                queryString.append(" ");
+            queryString.append(terms[i]);
+        }
+        queryString.append(")");
+        return queryString.toString();
+    }
+    
+    public String toWindowQuery(String query, int window, Stopper stopper) {
+        StringBuilder queryString = new StringBuilder("#" + window + "(");
+        String[] terms = query.split("\\s+");
+        for (int i=0; i<terms.length; i++) {
+
+            if (stopper != null && stopper.isStopWord(terms[i]))
+                continue;
+
+            if (i > 0) 
+                queryString.append(" ");
+            queryString.append(terms[i]);
+        }
+        queryString.append(")");
+        return queryString.toString();
     }
 }
