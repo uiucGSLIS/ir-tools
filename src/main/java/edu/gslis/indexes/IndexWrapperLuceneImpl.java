@@ -14,9 +14,13 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.util.StopwordAnalyzerBase;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.DocsAndPositionsEnum;
@@ -38,6 +42,7 @@ import org.apache.lucene.search.similarities.LMDirichletSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.util.Version;
 
 import edu.gslis.docscoring.ScorerDirichlet;
 import edu.gslis.docscoring.support.CollectionStats;
@@ -70,6 +75,8 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 {
     Logger logger = Logger.getLogger(IndexWrapperLuceneImpl.class.getName());
     
+    ClassLoader loader = ClassLoader.getSystemClassLoader();
+
     IndexReader index;
     IndexSearcher searcher;
     Similarity similarity;
@@ -88,9 +95,31 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	    {
 	        index = DirectoryReader.open(FSDirectory.open(new File(pathToIndex))); 
 	        searcher = new IndexSearcher(index);
-	        similarity = new LMDirichletSimilarity();
-	        analyzer = new StandardAnalyzer(Indexer.VERSION);
 	        
+	        // Read the analyzer/similarity class from the index metadata,
+	        // otherwise use defaults.
+	        Map<String,String> indexMetadata = readIndexMetadata(pathToIndex);
+	        
+	        if ( indexMetadata.get("analyzer") != null) {
+	            String analyzerClass = indexMetadata.get("analyzer");
+	            
+	            @SuppressWarnings("rawtypes")
+	            Class analyzerCls = loader.loadClass(analyzerClass);
+
+                @SuppressWarnings({ "rawtypes", "unchecked" })
+                java.lang.reflect.Constructor analyzerConst = analyzerCls.getConstructor(Version.class);
+                analyzer = (StopwordAnalyzerBase)analyzerConst.newInstance(Indexer.VERSION);
+
+	        } else {
+	            analyzer = new StandardAnalyzer(Indexer.VERSION);
+	        }
+	        
+	        if (indexMetadata.get("similarity") != null) {
+	            String similarityClass = indexMetadata.get("similarity");
+	                similarity = (Similarity)loader.loadClass(similarityClass).newInstance();
+	        } else {
+	            similarity = new LMDirichletSimilarity();
+	        }
         } catch (Exception e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -696,7 +725,7 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
        }
        return hit;
    }
-   
+      
    public static void main(String[] args) throws IOException 
    {
        File indexDir = new File("/Users/cwillis/dev/uiucGSLIS/indexes/lucene/FT.train");
@@ -784,4 +813,48 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
        }
        return df;
    }
+   
+   public String stem(String input) {
+       String stemmed = "";
+       try
+       {
+           TokenStream tokenStream = analyzer.tokenStream(null, input);        
+           tokenStream.reset();
+           CharTermAttribute token = tokenStream.getAttribute(CharTermAttribute.class);
+           int i = 0;
+           while (tokenStream.incrementToken()) {
+               if (i > 0)
+                   stemmed += " ";
+               stemmed += token.toString();
+               i++;
+           }           
+           tokenStream.close();
+       } catch (IOException e) {
+           e.printStackTrace();
+       }
+       return stemmed;
+   }
+   
+   private Map<String, String> readIndexMetadata(String indexPath) 
+   {
+       Map<String, String> map = new HashMap<String, String>();
+       try
+       {
+           File metadata = new File(indexPath + File.separator + "index.metadata");
+           List<String> lines = FileUtils.readLines(metadata);
+           for (String line: lines) {
+               String[] fields = line.split("=");
+               map.put(fields[0], fields[1]);            
+           }
+       } catch (IOException e) {
+           // Can't find the index.metadata file, use overrides
+       }
+       return map;
+   }
+   
+   public String toDMQuery(String query, String type, double w1, double w2, double w3)
+   {
+       return null;
+   }
+
 }
