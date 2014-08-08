@@ -1,6 +1,5 @@
 package edu.gslis.queries;
 
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -32,12 +32,14 @@ public abstract class GQueries {
    protected List<GQuery> queryList;
    protected Map<String,Integer> nameToIndex;
    protected Set<String> metadataFields;
+   protected Map<String, String> metadata;
 
    public abstract void read(String pathToQueries);
-		
+		   
 	
    public GQueries() {
        metadataFields = new HashSet<String>();
+       metadata = new TreeMap<String, String>();
    }
 
    public void addQuery(GQuery query) {
@@ -83,6 +85,14 @@ public abstract class GQueries {
         DecimalFormat format = new DecimalFormat("#.##########################");
         JsonObject outputObjects = new JsonObject();
         JsonArray outputJsonArray = new JsonArray();
+
+        JsonObject outputMetadata = new JsonObject();
+        for (String key: metadata.keySet()) {
+            outputMetadata.addProperty(key, metadata.get(key));
+        }
+        outputObjects.add("metadata", outputMetadata);
+
+        
         Iterator<GQuery> queryIterator = queryList.iterator();
         while(queryIterator.hasNext()) {
             GQuery query = queryIterator.next();
@@ -147,5 +157,8 @@ public abstract class GQueries {
         metadataFields.add(fieldName);
     }
 
+    public void setMetadata(String key, String value) {
+        metadata.put(key, value);
+    }
 	
 }
