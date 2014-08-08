@@ -44,6 +44,8 @@ public interface IndexWrapper {
 	// really shouldn't use this
 	public Object getActualIndex();
 	
+	public void setTimeFieldName(String field);
+	
 	/**
 	 * Returns the text for the specified document id
 	 * @param docid
@@ -81,5 +83,5 @@ public interface IndexWrapper {
 	 * @return
 	 */
     public String toWindowQuery(String query, int window, Stopper stopper);
-
+    
 }
