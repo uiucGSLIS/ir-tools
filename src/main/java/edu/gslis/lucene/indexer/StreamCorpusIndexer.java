@@ -4,6 +4,8 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.Term;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.transport.TIOStreamTransport;
 import org.apache.thrift.transport.TTransport;
@@ -99,6 +102,9 @@ public class StreamCorpusIndexer extends Indexer
         inTransport.open();
         try 
         {
+            Charset charset = Charset.forName("UTF-8");
+            CharsetDecoder decoder = charset.newDecoder();
+
             // Run through items in the thrift file
             while (true) 
             {
@@ -115,7 +121,17 @@ public class StreamCorpusIndexer extends Indexer
                     
                 String streamId = item.stream_id;
                 String timestamp = String.valueOf((long)item.getStream_time().getEpoch_ticks());
-                String body = item.body.getClean_visible();
+                String clean_visible = item.getBody().getClean_visible();
+                // Bug in KBA processing leaves some tags
+                clean_visible = clean_visible.replaceAll("<[^>]*>", ""); 
+                String stream_source = item.getSource();
+                        
+                String url = "";
+                if (item.abs_url != null) {
+                    url = decoder.decode(item.abs_url).toString();
+                }
+                        
+                String docnoField = "";
                 
                 for (FieldConfig field: fields) {
                     String source = field.getSource();
@@ -123,15 +139,20 @@ public class StreamCorpusIndexer extends Indexer
                     if (!StringUtils.isEmpty(source))
                     {
                         if (source.equals("doc_id"))  {
+                            docnoField = field.getName();
                             addField(luceneDoc, field, streamId, analyzer);
                         }
                         else if (source.equals("timestamp")) 
                             addField(luceneDoc, field, timestamp, analyzer);
                         else if (source.equals("body")) 
-                            addField(luceneDoc, field, body, analyzer);
+                            addField(luceneDoc, field, clean_visible, analyzer);
+                        else if (source.equals("source")) 
+                            addField(luceneDoc, field, stream_source, analyzer);
+                        else if (source.equals("url")) 
+                            addField(luceneDoc, field, url, analyzer);
                     }
                 }
-                writer.addDocument(luceneDoc);
+                writer.updateDocument(new Term(docnoField, streamId), luceneDoc);
             }
     
         } catch (TTransportException te) {
@@ -141,7 +162,8 @@ public class StreamCorpusIndexer extends Indexer
                 throw te;
             }
         }
-        inTransport.close();   
+        inTransport.close(); 
+        System.out.println("Finished " + name);
     }
     
     /**
