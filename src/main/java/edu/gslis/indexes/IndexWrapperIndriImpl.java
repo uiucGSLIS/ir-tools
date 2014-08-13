@@ -1,5 +1,8 @@
 package edu.gslis.indexes;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -378,4 +381,103 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
         queryString.append(")");
         return queryString.toString();
     }
+    
+    public String stem(String input) {
+        String stemmed = "";
+
+        String[] terms = input.split("\\s");
+        try
+        {
+            int i = 0;
+            for (String term: terms) {        
+                Process proc = Runtime.getRuntime().exec("bin/porter " + term);
+                BufferedReader br = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+                String output = br.readLine();
+                if (i > 0)
+                    stemmed += " ";
+                stemmed += output;
+                i++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return stemmed;
+    }
+    
+    public String toDMQuery(String query, String type, double w0, double w1, double w2)
+    {
+       query = query.trim();
+        
+        String queryT = "#combine( ";
+        String queryO = "#combine(";
+        String queryU = "#combine(";
+        
+        String[] terms = query.split("\\s+");
+        for (String term: terms) {
+            queryT += term + " ";
+        }
+        
+        int numTerms = terms.length;
+        
+        // Skip the rest of the processing if we're just 
+        // interested in term features or if we only have 1 term
+        if (( w1 == 0 && w2 == 0) || numTerms == 1) {
+            queryT += ")";
+            return queryT;
+        }
+        
+        int start =1;
+        if (type.equals("sd")) start =3 ;
+        
+        for (int i=start; i<Math.pow(2, numTerms); i++) {
+            
+            String bin = String.format("%032d", Integer.valueOf(Integer.toBinaryString(i)));  
+            
+            int numExtracted = 0;
+            String extractedTerms = "";
+            
+            // Get query terms corresponding to 'on' bits
+            for (int j=0; j<numTerms; j++) {
+                int len = bin.length();
+                int pos = len + j - numTerms;
+            
+                String bit = bin.substring(pos, pos+1);
+                if (bit.equals("1")) {
+                    extractedTerms += terms[j] + " ";
+                    numExtracted++;
+                }
+            }
+            
+            if (numExtracted == 1) {
+                // skip these, since we already took care of the term features
+                continue;
+            }
+            
+            if (bin.matches("^0+11+[^1]*$")) {
+                queryO += " #1(" + extractedTerms + ") ";
+            }
+            
+            //every subset of terms, unordered features (f_U)
+            queryU += " #uw" + (4*numExtracted) + "(" + extractedTerms + ") "; 
+            
+            if (type.equals("sd")) { i *=2; i--; }
+        }
+        
+        String newQuery = "#weight(";
+        if (w0 != 0 && !queryT.equals("#combine( ")) { 
+            newQuery += " " + w0 + " " + queryT + ")";
+        }
+        if (w1 != 0 && !queryO.equals("#combine(")) { 
+            newQuery += " " + w1 + " " + queryO + ")";
+        }
+        if (w2 != 0 && !queryU.equals("#combine(")) { 
+            newQuery += " " + w2 + " " + queryU + ")";
+        }
+            
+        if (newQuery.equals("#weight(")) { return ""; }
+        
+        newQuery += " )";
+        return newQuery;
+    }
+
 }

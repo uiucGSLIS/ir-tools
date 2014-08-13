@@ -84,4 +84,14 @@ public interface IndexWrapper {
 	 */
     public String toWindowQuery(String query, int window, Stopper stopper);
     
+    /**
+     * Returns dependency model query
+     * @param query
+     * @param w1
+     * @param w2
+     * @param w3
+     * @return
+     */
+    public String toDMQuery(String query, String type, double w1, double w2, double w3);
+    
 }
