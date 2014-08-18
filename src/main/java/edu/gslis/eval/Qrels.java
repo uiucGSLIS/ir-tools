@@ -28,8 +28,6 @@ public class Qrels {
 	private static final int DOCNO_COLUMN = 2;
 	private static final int REL_COLUMN   = 3;
 	
-	private static boolean killRepeats = true;
-
 	/**
 	 * A map of queryName to set_of_rel_docnos
 	 */
@@ -85,6 +83,11 @@ public class Qrels {
 				String query = toks[QUERY_COLUMN];
 				String docno = toks[DOCNO_COLUMN];
 				int r = Integer.parseInt(toks[REL_COLUMN]);
+				
+                if (contains(docno, query))
+                    System.err.println("Warning: input file contains duplicate judgments for ("  +
+                    		query + "," + docno + ")");
+
 				if(r >= minRel) {
 					Set<String> relDocs = null;
 					Map<String, Integer> relDocLevels = null;
@@ -95,38 +98,23 @@ public class Qrels {
 						relDocs = rel.get(query);
 						relDocLevels = relLevels.get(query);
 					}
-
 					
 					relDocs.add(docno);
 					relDocLevels.put(docno, r);
 					rel.put(query, relDocs);
 					relLevels.put(query, relDocLevels);
-				} else {
-					if(killRepeats) {
-						Set<String> relDocs = null;
-						Map<String, Integer> relDocLevels = null;
-						if(!rel.containsKey(query)) {
-							relDocs = new HashSet<String>();
-							relDocLevels = new HashMap<String, Integer>();
-						} else {
-							relDocs = rel.get(query);
-							relDocLevels = relLevels.get(query);
-						}
-						if(relDocs.contains(docno))
-							relDocs.remove(docno);
-						if(relLevels.containsKey(docno))
-							relDocLevels.remove(docno);
-						rel.put(query, relDocs);
-						relLevels.put(query, relDocLevels);
-					}
 					
-					if(storeNonRel) {
+				} else {
+					
+					if(storeNonRel) 
+					{
 						Set<String> nonRelDocs = null;
 						if(!nonRel.containsKey(query)) {
 							nonRelDocs = new HashSet<String>();
 						} else {
 							nonRelDocs = nonRel.get(query);
 						}
+						
 						nonRelDocs.add(docno);
 						nonRel.put(query, nonRelDocs);
 					}
@@ -241,9 +229,9 @@ public class Qrels {
 	}
 	
     public boolean contains(String docno, String query) {
-        if (rel.get(query).contains(docno) || 
-                nonRel.get(query).contains(docno))
-            return true;
+        if ( (rel.get(query) != null&& rel.get(query).contains(docno)) || 
+                (nonRel.get(query) != null && nonRel.get(query).contains(docno)) )
+                return true;
         return false;
     }
 }
