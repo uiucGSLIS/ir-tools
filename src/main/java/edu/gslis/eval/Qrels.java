@@ -229,8 +229,8 @@ public class Qrels {
 	}
 	
     public boolean contains(String docno, String query) {
-        if ( (rel.get(query) != null&& rel.get(query).contains(docno)) || 
-                (nonRel.get(query) != null && nonRel.get(query).contains(docno)) )
+        if ( (rel != null && rel.get(query) != null&& rel.get(query).contains(docno)) || 
+                (nonRel != null && nonRel.get(query) != null && nonRel.get(query).contains(docno)) )
                 return true;
         return false;
     }
