@@ -10,9 +10,12 @@ public class IndexBackedCollectionStats extends CollectionStats {
 	
 	public void setStatSource(String statSource) {
 		this.index = IndexWrapperFactory.getIndexWrapper(statSource);
-		tokCount = index.termCount();
-		docCount = index.docCount();
-		termTypeCount = index.termTypeCount();
+		initialize();
+	}
+	
+	public void setStatSource(IndexWrapper iw) {
+		this.index = iw;
+		initialize();
 	}
 
 	@Override
@@ -23,6 +26,12 @@ public class IndexBackedCollectionStats extends CollectionStats {
 	@Override
 	public double docCount(String term) {
 		return index.docFreq(term);
+	}
+	
+	private void initialize() {
+		tokCount = index.termCount();
+		docCount = index.docCount();
+		termTypeCount = index.termTypeCount();
 	}
 		
 

@@ -1,5 +1,6 @@
 package edu.gslis.docscoring.support;
 
+
 public abstract class CollectionStats {
 	protected double tokCount;
 	protected double docCount;

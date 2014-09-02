@@ -10,9 +10,12 @@ public class IndexBackedCollectionStatsLucene extends CollectionStats {
 	
 	public void setStatSource(String statSource) {
 		this.index = new IndexWrapperLuceneImpl(statSource);
-		tokCount = index.termCount();
-		docCount = index.docCount();
-		termTypeCount = index.termTypeCount();
+		initialize();
+	}
+	
+	public void setStatSource(IndexWrapper iw) {
+		this.index = iw;
+		initialize();
 	}
 
 	@Override
@@ -25,6 +28,12 @@ public class IndexBackedCollectionStatsLucene extends CollectionStats {
 		return index.docFreq(term);
 	}
 		
+	
+	private void initialize() {
+		tokCount = index.termCount();
+		docCount = index.docCount();
+		termTypeCount = index.termTypeCount();
+	}
 
 
 }
