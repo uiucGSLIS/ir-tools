@@ -479,5 +479,15 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
         newQuery += " )";
         return newQuery;
     }
+    
+    public void close() {
+    	try {
+	    	index.close();
+	    	index.delete();
+    	} catch (Exception e) {
+    		System.err.println("Error closing index.");
+    		System.err.println(e.getStackTrace());
+    	}
+    }
 
 }
