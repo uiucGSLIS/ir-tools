@@ -17,10 +17,10 @@ public class FormattedOutputTrecEval {
 	private static FormattedOutputTrecEval formattedOutputTrecEval;
 
 
-	private void setWriter(Writer writer) {
+	public void setWriter(Writer writer) {
 		FormattedOutputTrecEval.writer = writer;
 	}
-	private void setRunId(String runId) {
+	public void setRunId(String runId) {
 		FormattedOutputTrecEval.runId = runId;
 	}
 	public static FormattedOutputTrecEval getInstance(String runId, Writer writer) {
