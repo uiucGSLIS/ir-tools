@@ -32,7 +32,7 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 	private QueryEnvironment index;
 	private double vocabularySize = -1.0;
 	private double docLengthAvg   = -1.0;
-	private String timeFieldName  = Indexer.FIELD_EPOCH;
+	private String timeFieldName  = null;
 	
 	public IndexWrapperIndriImpl(String pathToIndex) {
 		index = new QueryEnvironment();
