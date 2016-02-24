@@ -2,12 +2,11 @@ package edu.gslis.textrepresentation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+import edu.gslis.utils.Stopper;
 import lemurproject.indri.DocumentVector;
 import lemurproject.indri.ParsedDocument;
 import lemurproject.indri.QueryEnvironment;
-import edu.gslis.utils.Stopper;
 
 
 
@@ -137,8 +136,9 @@ public class IndriDocument {
 		} catch (Exception e) {
 			e.printStackTrace();		}
 		if(docIDs==null || docIDs.length==0) {
-			System.err.println("died trying to find the docId of doc " + docno);
-			System.exit(-1);		}
+			System.err.println("couldn't find the docId of doc " + docno);
+			return 0;
+		}
 		return docIDs[0];
 	}
 
