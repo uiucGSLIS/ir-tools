@@ -82,7 +82,7 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 			Iterator<String> qt = query.getFeatureVector().iterator();
 			while(qt.hasNext()) {
 				String term = qt.next();
-				queryString.append(query.getFeatureVector().getFeatureWeight(term) + " " + term + " ");
+				queryString.append(String.format("%.12f", query.getFeatureVector().getFeatureWeight(term)) + " " + term + " ");
 			}
 			queryString.append(")");
 			
