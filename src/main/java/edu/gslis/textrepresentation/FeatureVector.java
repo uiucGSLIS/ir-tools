@@ -343,9 +343,10 @@ public class FeatureVector  {
 		while(features.hasNext()) {
 			String feature = features.next();
 			double weight  = 0.0;
-			if(xWeight > 0) {
+			if(xWeight >= 0 && xWeight <= 1) {
 				weight = xWeight*x.getFeatureWeight(feature) + (1.0-xWeight)*y.getFeatureWeight(feature);
 			} else {
+				System.err.println("Mixing weight is not between 0 and 1. Performing unweighted mixing.");
 				weight = x.getFeatureWeight(feature) + y.getFeatureWeight(feature);
 			}
 			z.addTerm(feature, weight);
