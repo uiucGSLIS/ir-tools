@@ -207,7 +207,7 @@
 		<dependency>
 			<groupId>indri</groupId>
 			<artifactId>indri</artifactId>
-			<version>0.1</version>
+			<version>5.11</version>
 		</dependency>
 		<dependency>
 			<groupId>mallet</groupId>

@@ -9,19 +9,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import lemurproject.indri.QueryEnvironment;
-import lemurproject.indri.ScoredExtentResult;
-import lemurproject.lemur.Index;
-import lemurproject.lemur.IndexManager;
 import edu.gslis.docaccumulators.Postings;
 import edu.gslis.docaccumulators.PostingsAggregator;
-import edu.gslis.lucene.indexer.Indexer;
 import edu.gslis.queries.GQuery;
 import edu.gslis.searchhits.SearchHit;
 import edu.gslis.searchhits.SearchHits;
 import edu.gslis.textrepresentation.FeatureVector;
 import edu.gslis.textrepresentation.IndriDocument;
 import edu.gslis.utils.Stopper;
+import lemurproject.indri.QueryEnvironment;
+import lemurproject.indri.ScoredExtentResult;
 
 
 
@@ -39,7 +36,7 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 		addIndex(pathToIndex);
 		getVocabularySize(pathToIndex);
 	}
-
+	
 
 	private void addIndex(String pathToIndex) {
 		try {
@@ -65,8 +62,7 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
         else
         {
             try {
-                Index lemurIndex = IndexManager.openIndex(pathToIndex);
-                vocabularySize = lemurIndex.termCountUnique();
+                vocabularySize = index.termCountUnique();
             } catch (Exception e) {
                 System.err.println("Error getting vocabulary size: perhaps liblemur library is missing?");
             }         
