@@ -32,11 +32,27 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 	private String timeFieldName  = null;
 	
 	public IndexWrapperIndriImpl(String pathToIndex) {
+		this(pathToIndex, null);
+	}
+	
+	public IndexWrapperIndriImpl(String pathToIndex, Stopper stopper) {
 		index = new QueryEnvironment();
+		if (stopper != null) {
+			addStoplist(stopper);
+		}
 		addIndex(pathToIndex);
 		getVocabularySize(pathToIndex);
 	}
 	
+	private void addStoplist(Stopper stopper) {
+		String[] stopwords = stopper.asSet().toArray(new String[stopper.asSet().size()]);
+		try {
+			index.setStopwords(stopwords);
+		} catch (Exception e) {
+			System.err.println("Error setting stop words.");
+			e.printStackTrace();
+		}
+	}
 
 	private void addIndex(String pathToIndex) {
 		try {
