@@ -21,7 +21,6 @@ public class SearchHit implements Scorable, Comparable<SearchHit> {
 	
 	public SearchHit() {
 		metadata = new HashMap<String,Object>();
-		docVector = new FeatureVector(null);
 	}
 	
 	
