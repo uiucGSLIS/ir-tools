@@ -25,6 +25,7 @@ public class IndexBackedSearchHit extends SearchHit {
 		setDocno(hit.getDocno());
 		setDocID(hit.getDocID());
 		setFeatureVector(hit.getFeatureVector());
+		setScore(hit.getScore());
 		setLength(hit.getLength());
 		setQueryName(hit.getQueryName());
 	}
