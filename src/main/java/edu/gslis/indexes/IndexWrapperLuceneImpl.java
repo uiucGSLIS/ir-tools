@@ -49,6 +49,7 @@ import edu.gslis.docscoring.support.CollectionStats;
 import edu.gslis.docscoring.support.IndexBackedCollectionStatsLucene;
 import edu.gslis.lucene.indexer.Indexer;
 import edu.gslis.queries.GQuery;
+import edu.gslis.searchhits.IndexBackedSearchHit;
 import edu.gslis.searchhits.SearchHit;
 import edu.gslis.searchhits.SearchHits;
 import edu.gslis.textrepresentation.FeatureVector;
@@ -248,7 +249,7 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
             ScoreDoc[] docs = topDocs.scoreDocs;
 
             for (int i=0; i<docs.length; i++) {
-                SearchHit hit = new SearchHit();
+                SearchHit hit = new IndexBackedSearchHit(this);
                 int docid = docs[i].doc;
                                 
                 Document d = index.document(docid, fields);
@@ -712,7 +713,7 @@ public class IndexWrapperLuceneImpl implements IndexWrapper
 	 * @return
 	 */
    public SearchHit getSearchHit(String docno, Stopper stopper) {
-       SearchHit hit = new SearchHit();
+       SearchHit hit = new IndexBackedSearchHit(this);
        FeatureVector dv = getDocVector(docno, stopper);
        int docid = getDocId(docno);
        hit.setFeatureVector(dv);

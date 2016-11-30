@@ -12,6 +12,7 @@ import java.util.Set;
 import edu.gslis.docaccumulators.Postings;
 import edu.gslis.docaccumulators.PostingsAggregator;
 import edu.gslis.queries.GQuery;
+import edu.gslis.searchhits.IndexBackedSearchHit;
 import edu.gslis.searchhits.SearchHit;
 import edu.gslis.searchhits.SearchHits;
 import edu.gslis.textrepresentation.FeatureVector;
@@ -113,7 +114,7 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 
 			int k=0;
 			for(ScoredExtentResult r : res) {
-				SearchHit hit = new SearchHit();
+				SearchHit hit = new IndexBackedSearchHit(this);
 				hit.setDocID(r.document);
 				hit.setScore(r.score);
 				if(times != null)  {
@@ -154,7 +155,7 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 
 			int k=0;
 			for(ScoredExtentResult r : res) {
-				SearchHit hit = new SearchHit();
+				SearchHit hit = new IndexBackedSearchHit(this);
 				hit.setDocID(r.document);
 				hit.setScore(r.score);
 
