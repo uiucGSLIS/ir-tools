@@ -79,4 +79,27 @@ public class SearchHit implements Scorable, Comparable<SearchHit> {
             return docno.compareTo(h.docno);
     }
     
+    @Override
+    public String toString() {
+    	return "Docno: " + getDocno() + "; DocID: " + getDocID(); 
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+    	if (obj == null || !(obj instanceof SearchHit)) {
+    		return false;
+    	}
+    	SearchHit otherHit = (SearchHit) obj;
+    	return (otherHit.getDocID() == getDocID()
+    			&& otherHit.getDocno().equals(getDocno()));
+    }
+    
+    @Override
+    public int hashCode() {
+    	if (getDocno() != null) {
+			return getDocno().hashCode();
+    	}
+    	return getDocID();
+    }
+    
 }
