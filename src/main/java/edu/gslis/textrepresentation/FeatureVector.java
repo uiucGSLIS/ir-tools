@@ -34,7 +34,7 @@ import edu.gslis.utils.Stopper;
  * @author Miles Efron
  *
  */
-public class FeatureVector  {
+public class FeatureVector implements Iterable<String> {
 	private static StandardAnalyzer analyzer;	
 	private Map<String, Double> features;
 	private Stopper stopper;
