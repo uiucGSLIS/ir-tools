@@ -85,5 +85,18 @@ public class GQuery {
 	public void setFeatureVector(FeatureVector featureVector) {
 		this.featureVector = featureVector;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof GQuery)) {
+			return false;
+		}
+		GQuery otherQuery = (GQuery) obj;
+		return otherQuery.getTitle().equals(getTitle());
+	}
 		
+	@Override
+	public int hashCode() {
+		return getTitle().hashCode();
+	}
 }
