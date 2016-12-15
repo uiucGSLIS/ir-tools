@@ -28,7 +28,7 @@ import edu.gslis.utils.ScorableComparator;
  * @author Miles Efron
  *
  */
-public abstract class GQueries {
+public abstract class GQueries implements Iterable<GQuery> {
    protected List<GQuery> queryList;
    protected Map<String,Integer> nameToIndex;
    protected Set<String> metadataFields;
