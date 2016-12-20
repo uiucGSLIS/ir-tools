@@ -53,7 +53,7 @@ public class IndexBackedSearchHit extends SearchHit {
 				return new FeatureVector(null);
 			} else {
 				vector = index.getDocVector(getDocID(), null);
-				setFeatureVector(vector);
+				return vector;
 			}
 		}
 		return vector;
