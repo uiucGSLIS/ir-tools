@@ -38,7 +38,6 @@ import edu.gslis.lucene.indexer.Indexer;
 import edu.gslis.lucene.indexer.StreamCorpusIndexer;
 import edu.gslis.lucene.indexer.TikaIndexer;
 import edu.gslis.lucene.indexer.TrecTextIndexer;
-import edu.gslis.lucene.indexer.WikiTextIndexer;
 import edu.gslis.lucene.main.config.CorpusConfig;
 import edu.gslis.lucene.main.config.FieldConfig;
 import edu.gslis.lucene.main.config.IndexConfig;
@@ -219,9 +218,7 @@ public class LuceneBuildIndex {
                 try
                 {
                     Indexer indexer;
-                    if (corpusType.equals(Indexer.FORMAT_WIKI)) {      
-                        indexer = new WikiTextIndexer();
-                    } else if (corpusType.equals(Indexer.FORMAT_TRECTEXT)){ 
+                    if (corpusType.equals(Indexer.FORMAT_TRECTEXT)){ 
                         indexer = new TrecTextIndexer();
                     } else if (corpusType.equals(Indexer.FORMAT_TIKA)) {
                         indexer = new TikaIndexer();                
