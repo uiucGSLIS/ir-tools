@@ -1,7 +1,6 @@
 package edu.gslis.lucene.main;
 
 import java.io.File;
-
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -14,13 +13,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.analysis.util.StopwordAnalyzerBase;
 import org.apache.lucene.document.Document;
@@ -32,8 +31,10 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.search.similarities.BM25Similarity;
+import org.apache.lucene.search.similarities.DefaultSimilarity;
 import org.apache.lucene.search.similarities.LMDirichletSimilarity;
+import org.apache.lucene.search.similarities.LMJelinekMercerSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
@@ -51,7 +52,9 @@ import edu.gslis.queries.GQueriesJsonImpl;
 import edu.gslis.queries.GQuery;
 import edu.gslis.textrepresentation.FeatureVector;
 
-
+/**
+ * Lucene query runner modeled after the IndriRunQuery executable
+ */
 public class LuceneRunQuery {
     ClassLoader loader = ClassLoader.getSystemClassLoader();
     RunQueryConfig config;
@@ -60,12 +63,13 @@ public class LuceneRunQuery {
         this.config = config;
     }
     
-    public void run() throws Exception {
+    public void run() throws Exception 
+    {
         String indexPath = config.getIndex();
         String docnoField = config.getDocno();
         if (StringUtils.isEmpty(docnoField))
             docnoField = "docno";
-        String similarityClass = config.getSimilarity();
+        String similarityModel = config.getSimilarity();
         String stopwordsPath = config.getStopwords();
         String analyzerClass = config.getAnalyzer();
         StopwordAnalyzerBase defaultAnalyzer;
@@ -73,8 +77,8 @@ public class LuceneRunQuery {
         Map<String, String> indexMetadata = readIndexMetadata(indexPath);
         if (StringUtils.isEmpty(analyzerClass) && indexMetadata.get("analyzer") != null) 
             analyzerClass = indexMetadata.get("analyzer");
-        if (StringUtils.isEmpty(similarityClass) && indexMetadata.get("similarity") != null) 
-            similarityClass = indexMetadata.get("similarity");
+        if (StringUtils.isEmpty(similarityModel) && indexMetadata.get("similarity") != null) 
+        	similarityModel = indexMetadata.get("similarity");
                                 
         if (!StringUtils.isEmpty(analyzerClass))
         {
@@ -98,9 +102,9 @@ public class LuceneRunQuery {
 
 
         // Assumes LM similarity, but can be changed via config file
-        Similarity similarity = new LMDirichletSimilarity();
-        if (!StringUtils.isEmpty(similarityClass))
-            similarity = (Similarity)loader.loadClass(similarityClass).newInstance();
+        
+        Similarity similarity = getSimilarity(similarityModel);
+        
         IndexReader reader = DirectoryReader.open(FSDirectory.open(new File(indexPath)));
         IndexSearcher searcher = new IndexSearcher(reader);
         searcher.setSimilarity(similarity);
@@ -110,8 +114,8 @@ public class LuceneRunQuery {
         String[] fields = field.split(",");
  
 
-         System.err.println("Similarity: " + similarityClass);
-         System.err.println("Analyzer: " + analyzerClass);
+        System.err.println("Similarity model: " + similarityModel);
+        System.err.println("Analyzer: " + analyzerClass);
 
 
         Set<QueryConfig> queries = config.getQueries();        
@@ -266,6 +270,49 @@ public class LuceneRunQuery {
         return queries;
     }
     
+    
+    public Similarity getSimilarity(String model) {
+    	
+    	Similarity similarity = null;
+    	Map<String, String> params = new HashMap<String, String>();
+    	String[] fields = model.split(",");
+    	
+    	// method:dirichlet,mu:1000
+    	for (String field: fields) {
+    		String[] nvpair = field.split(":");
+    		params.put(nvpair[0], nvpair[1]);
+    	}
+    	
+    	String method = params.get("method");
+    	if (method.equals("dir") || method.equals("dirichlet")) {
+    		float mu = 2500;
+    		if (params.get("mu") != null) 
+    			mu = Float.parseFloat(params.get("mu"));
+    		similarity = new LMDirichletSimilarity(mu);    		
+    	}
+    	else if (method.equals("jm") || method.equals("linear")) {
+    		float lambda = 0.5f;
+    		if (params.get("lambda") != null) 
+    			lambda = Float.parseFloat(params.get("lambda"));
+    		similarity = new LMJelinekMercerSimilarity(lambda);    		
+    	}
+    	else if (method.equals("bm25")) {
+    		float k1 = 1.2f;
+    		float b = 0.75f;
+    		if (params.get("k1") != null) 
+    			k1 = Float.parseFloat(params.get("k1"));
+    		if (params.get("b") != null) 
+    			k1 = Float.parseFloat(params.get("b"));
+    		similarity = new BM25Similarity(k1, b);    		
+    	}
+       	else if (method.equals("tfidf")) {
+    		similarity = new DefaultSimilarity();  
+       	} else {
+       		similarity = new LMDirichletSimilarity();
+       	}
+    	
+    	return similarity;
+    }
     
     public static Options createOptions()
     {
