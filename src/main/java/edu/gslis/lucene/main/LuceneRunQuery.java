@@ -2,16 +2,10 @@ package edu.gslis.lucene.main;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -19,38 +13,24 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.analysis.util.CharArraySet;
-import org.apache.lucene.analysis.util.StopwordAnalyzerBase;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.similarities.BM25Similarity;
-import org.apache.lucene.search.similarities.DefaultSimilarity;
-import org.apache.lucene.search.similarities.LMDirichletSimilarity;
-import org.apache.lucene.search.similarities.LMJelinekMercerSimilarity;
-import org.apache.lucene.search.similarities.Similarity;
-import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.Version;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
+import edu.gslis.indexes.IndexWrapper;
+import edu.gslis.indexes.IndexWrapperFactory;
 import edu.gslis.lucene.indexer.Indexer;
-import edu.gslis.lucene.main.config.QueryConfig;
-import edu.gslis.lucene.main.config.QueryFile;
 import edu.gslis.lucene.main.config.RunQueryConfig;
 import edu.gslis.queries.GQueries;
 import edu.gslis.queries.GQueriesFedwebImpl;
 import edu.gslis.queries.GQueriesIndriImpl;
 import edu.gslis.queries.GQueriesJsonImpl;
 import edu.gslis.queries.GQuery;
+import edu.gslis.queries.expansion.Feedback;
+import edu.gslis.queries.expansion.FeedbackRelevanceModel;
+import edu.gslis.searchhits.SearchHit;
+import edu.gslis.searchhits.SearchHits;
 import edu.gslis.textrepresentation.FeatureVector;
+import edu.gslis.utils.Stopper;
 
 /**
  * Lucene query runner modeled after IndriRunQuery
@@ -99,25 +79,33 @@ public class LuceneRunQuery {
             String format = cmd.getOptionValue("format");
             String index = cmd.getOptionValue("index");
             String stopwords = cmd.getOptionValue("stopwords");
+            int fbDocs = Integer.parseInt(cmd.getOptionValue("fbDocs", "0"));
+            int fbTerms = Integer.parseInt(cmd.getOptionValue("fbTerms", "0"));
+            double fbOrigWeight  = Double.parseDouble(cmd.getOptionValue("fbOrigWeight", "0"));
             
-            Set<QueryConfig> queries = new HashSet<QueryConfig>();                    
+            GQueries gqueries = new GQueriesJsonImpl();
             if (!StringUtils.isEmpty(query)) {
-                QueryConfig querycfg = new QueryConfig();
-                querycfg.setNumber(querynum);
-                querycfg.setText(query.replaceAll("'", "\""));
-                queries.add(querycfg);
-            } else if (!StringUtils.isEmpty(queryfile)) {
-                queries = readQueries(queryfile, format);
+            	FeatureVector qv = new FeatureVector(query, null);            	
+            	GQuery gquery = new GQuery();
+            	gquery.setFeatureVector(qv);;
+            	gquery.setText(query);
+            	gquery.setTitle(querynum);
+            	gqueries.addQuery(gquery);
+            } else {
+            	gqueries = readQueries(queryfile, format);
             }
-            
+
             config.setAnalyzer(analyzer);
             config.setField(field);
             config.setIndex(index);
-            config.setQueries(queries);
+            config.setQueries(gqueries);
             config.setDocno(docno);
             config.setSimilarity(similarity);
             config.setStopwords(stopwords);
             config.setRunName(runname);
+            config.setFbDocs(fbDocs);
+            config.setFbTerms(fbTerms);
+            config.setFbOrigWeight(fbOrigWeight);
         }            
         LuceneRunQuery runner = new LuceneRunQuery(config);
         runner.run();
@@ -152,10 +140,8 @@ public class LuceneRunQuery {
      * @return Set of QueryConfig objects
      * @throws IOException 
      */
-    private static Set<QueryConfig> readQueries(String file, String format) throws IOException 
+    private static GQueries readQueries(String file, String format) throws IOException 
     {
-        Set<QueryConfig> queries = new TreeSet<QueryConfig>();
-
         GQueries gqueries = null;
         if (format.equals("fedweb")) {
            gqueries = new GQueriesFedwebImpl();
@@ -168,31 +154,7 @@ public class LuceneRunQuery {
         }
         
         gqueries.read(file);
-
-
-        Iterator<GQuery> it = gqueries.iterator();
-        while(it.hasNext()) {
-            GQuery query = it.next();
-            
-            StringBuffer qstr = new StringBuffer();
-            FeatureVector fv = query.getFeatureVector();
-            Iterator<String> fit = fv.iterator();
-            while (fit.hasNext()) {
-                String feature = fit.next();
-                double weight = fv.getFeatureWeight(feature);
-                qstr.append(feature + "^" + weight);
-                if (fit.hasNext()) 
-                    qstr.append(" ");
-                
-            }
-            
-            QueryConfig qc = new QueryConfig();
-            qc.setText(qstr.toString());
-            qc.setNumber(query.getTitle());
-            queries.add(qc);
-        }
-        
-        return queries;
+        return gqueries;
     }
     
     /**
@@ -207,140 +169,67 @@ public class LuceneRunQuery {
             docnoField = "docno";
         String similarityModel = config.getSimilarity();
         String stopwordsPath = config.getStopwords();
-        String analyzerClass = config.getAnalyzer();
-        StopwordAnalyzerBase defaultAnalyzer;
+        
+        Stopper stopper = null;
+        if (!StringUtils.isEmpty(stopwordsPath))
+        	stopper = new Stopper(stopwordsPath);
         
         Map<String, String> indexMetadata = readIndexMetadata(indexPath);
-        if (StringUtils.isEmpty(analyzerClass) && indexMetadata.get("analyzer") != null) 
-            analyzerClass = indexMetadata.get("analyzer");
         if (StringUtils.isEmpty(similarityModel) && indexMetadata.get("similarity") != null) 
         	similarityModel = indexMetadata.get("similarity");
                                 
-        // Use the specified analyzer
-        if (!StringUtils.isEmpty(analyzerClass))
-        {
-            @SuppressWarnings("rawtypes")
-            Class analyzerCls = loader.loadClass(analyzerClass);
-
-            if (!StringUtils.isEmpty(stopwordsPath))
-            {
-                @SuppressWarnings({ "rawtypes", "unchecked" })
-                java.lang.reflect.Constructor analyzerConst = analyzerCls.getConstructor(Version.class, Reader.class);
-                analyzerConst.setAccessible(true);
-                defaultAnalyzer = (StopwordAnalyzerBase)analyzerConst.newInstance(Indexer.VERSION, new FileReader(stopwordsPath));
-            } else {
-                @SuppressWarnings({ "rawtypes", "unchecked" })
-                java.lang.reflect.Constructor analyzerConst = analyzerCls.getConstructor(Version.class);
-                analyzerConst.setAccessible(true);
-                defaultAnalyzer = (StopwordAnalyzerBase)analyzerConst.newInstance(Indexer.VERSION);
-            }
-        } else {
-            defaultAnalyzer = new StandardAnalyzer(Indexer.VERSION, new CharArraySet(Indexer.VERSION, 0, true));
-        }
-
-        // Construct the configured similarity
-        Similarity similarity = getSimilarity(similarityModel);
+        if (!StringUtils.isEmpty(config.getSimilarity()))
+        	similarityModel = config.getSimilarity();
         
         // Setup the index searcher
-        IndexReader reader = DirectoryReader.open(FSDirectory.open(new File(indexPath)));
-        IndexSearcher searcher = new IndexSearcher(reader);
-        searcher.setSimilarity(similarity);
-        String field = config.getField();
-        if (StringUtils.isEmpty(field))
-            field = "text";
-        String[] fields = field.split(",");
- 
+        IndexWrapper index = IndexWrapperFactory.getIndexWrapper(indexPath);
 
-        System.err.println("Similarity model: " + similarityModel);
-        System.err.println("Analyzer: " + analyzerClass);
-
-
-        // Read the queries
-        Set<QueryConfig> queries = config.getQueries();        
-        if (queries == null)
-            queries = new HashSet<QueryConfig>(); 
-        QueryFile queryFile = config.getQueryFile();
-        if (queryFile != null) {
-            String path = queryFile.getPath();
-            String format = queryFile.getFormat();
-            
-            queries = readQueries(path, format);
-        }
         
         // Run each query
-        for (QueryConfig query: queries) {
-            QueryParser parser = new MultiFieldQueryParser(Indexer.VERSION, fields, defaultAnalyzer);
-            Query q = parser.parse(query.getText());
-            TopDocs topDocs = searcher.search(q, 1000);
-            ScoreDoc[] docs = topDocs.scoreDocs;
-            Set<String> seen = new HashSet<String>();
-            for (int i=0; i<docs.length; i++) {
-                int docid = docs[i].doc;
-                double score = docs[i].score;
-                Document doc = searcher.doc(docid);
-                
-                String docno = doc.getField(docnoField).stringValue();
-                //long doclen = doc.getField(Indexer.FIELD_DOC_LEN).numericValue().longValue();
-
-                if (!seen.contains(docno)) {
-                    System.out.println(query.getNumber() + " Q0 " + docno + " " + i + " "  + score + " " + config.getRunName());
-                    seen.add(docno);
-                }
+        for (int i=0; i<config.getQueries().numQueries(); i++) {
+        	GQuery query = config.getQueries().getIthQuery(i);
+        	if (stopper != null)
+        		query.applyStopper(stopper);
+        	SearchHits hits = index.runQuery(query, 1000, similarityModel);
+            
+            if (config.getFbDocs() > 0 && config.getFbTerms() > 0) {
+            	FeatureVector qv = new FeatureVector(query.getText(), null);
+            	qv.normalize();
+            	
+            	Feedback feedback = new FeedbackRelevanceModel();
+            	feedback.setDocCount(config.getFbDocs());
+            	feedback.setTermCount(config.getFbTerms());
+            	feedback.setRes(hits);
+            	feedback.setIndex(index);
+            	feedback.build();
+            	FeatureVector rm = feedback.asFeatureVector();            	
+            	rm.clip(config.getFbTerms());            	
+            	rm.normalize();
+            	
+            	FeatureVector rm3 = FeatureVector.interpolate(qv, rm, config.getFbOrigWeight());
+            	query.setFeatureVector(rm3);
+            	hits = index.runQuery(query, 1000, similarityModel);
             }
-
+            hits.rank();
+            
+            int rank=0;
+            for (SearchHit hit: hits.hits()) {
+            	System.out.println(query.getTitle() + " Q0 " + hit.getDocno() + " " + rank + " "  + hit.getScore() + " " + config.getRunName());
+            	rank++;
+            }
+            
         }
     }
     
-    
-    /**
-     * Construct a Similarity object based on the model specification
-     * @param model Model specification (e.g., method:dir,mu:2500)
-     * @return Similarity instance
-     */
-    private Similarity getSimilarity(String model) {
-    	
-    	Similarity similarity = null;
-    	Map<String, String> params = new HashMap<String, String>();
-    	String[] fields = model.split(",");
-    	
-    	// Parse the model spec
-    	for (String field: fields) {
-    		String[] nvpair = field.split(":");
-    		params.put(nvpair[0], nvpair[1]);
-    	}
-    	
-    	
-    	String method = params.get("method");
-    	if (method.equals("dir") || method.equals("dirichlet")) {
-    		float mu = 2500;
-    		if (params.get("mu") != null) 
-    			mu = Float.parseFloat(params.get("mu"));
-    		similarity = new LMDirichletSimilarity(mu);    		
-    	}
-    	else if (method.equals("jm") || method.equals("linear")) {
-    		float lambda = 0.5f;
-    		if (params.get("lambda") != null) 
-    			lambda = Float.parseFloat(params.get("lambda"));
-    		similarity = new LMJelinekMercerSimilarity(lambda);    		
-    	}
-    	else if (method.equals("bm25")) {
-    		float k1 = 1.2f;
-    		float b = 0.75f;
-    		if (params.get("k1") != null) 
-    			k1 = Float.parseFloat(params.get("k1"));
-    		if (params.get("b") != null) 
-    			k1 = Float.parseFloat(params.get("b"));
-    		similarity = new BM25Similarity(k1, b);    		
-    	}
-       	else if (method.equals("tfidf")) {
-    		similarity = new DefaultSimilarity();  
-       	} else {
-       		System.err.println("Warning: unknown similarity specified, defaulting to LMDirichlet(mu=2500)");
-       		similarity = new LMDirichletSimilarity(2500);
-       	}
-    	
-    	return similarity;
+    public String getLuceneQueryString(FeatureVector fv) {
+    	StringBuilder queryString = new StringBuilder();
+    	for (String term: fv.getFeatures()) {
+            queryString.append(" ");
+            queryString.append(term+"^"+fv.getFeatureWeight(term));
+        }
+        return queryString.toString();
     }
+
     
     public static Options createOptions()
     {
@@ -356,6 +245,10 @@ public class LuceneRunQuery {
         options.addOption("similarity", true, "Similarity class");
         options.addOption("stopwords", true, "Stopwords list");
         options.addOption("name", true, "Run name");
+        options.addOption("fbDocs", true, "Number of feedback documents");
+        options.addOption("fbTerms", true, "Number of feedback terms");
+        options.addOption("fbOrigWeight", true, "Weight of original query");
+
         return options;
     }
 
