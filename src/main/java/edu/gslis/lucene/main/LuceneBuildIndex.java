@@ -194,10 +194,12 @@ public class LuceneBuildIndex {
                     {
                         @SuppressWarnings({ "rawtypes", "unchecked" })
                         java.lang.reflect.Constructor analyzerConst = analyzerCls.getConstructor(Version.class, Reader.class);
+                        analyzerConst.setAccessible(true);
                         defaultAnalyzer = (StopwordAnalyzerBase)analyzerConst.newInstance(Indexer.VERSION, new FileReader(stopwordsPath));            
                     } else {
                         @SuppressWarnings({ "rawtypes", "unchecked" })
                         java.lang.reflect.Constructor analyzerConst = analyzerCls.getConstructor(Version.class);
+                        analyzerConst.setAccessible(true);                        
                         defaultAnalyzer = (StopwordAnalyzerBase)analyzerConst.newInstance(Indexer.VERSION);            
                     }
                 } else {
