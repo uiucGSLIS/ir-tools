@@ -12,6 +12,7 @@ public class RunQueryConfig {
     String field = "";
     String docno = "";
     QueryFile queryFile;
+    String runname = "";
 
     
     public String getIndex() {
@@ -62,4 +63,11 @@ public class RunQueryConfig {
     public void setQueryFile(QueryFile queryFile) {
         this.queryFile = queryFile;
     }
+	public String getRunName() {
+		return runname;
+	}
+	public void setRunName(String runname) {
+		this.runname = runname;
+	}
+    
 }
