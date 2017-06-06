@@ -137,7 +137,13 @@ public class JSONIndexer extends Indexer {
                 }
                 else if (source.equals(FieldConfig.SOURCE_FILE)) {
                     addField(luceneDoc, field, output, analyzer);
-                }      
+                }    
+                else if (source.equals(FieldConfig.SOURCE_TEXT)) {
+                	// Add the json blob as text
+                	String value = json.toString();
+                	 if (value != null)
+	                        addField(luceneDoc, field, value, analyzer);
+                }
                 else {
                 	// Source is element
                 	String element = field.getElement();
