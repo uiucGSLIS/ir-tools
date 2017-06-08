@@ -82,7 +82,10 @@ public class LuceneDumpIndex
             System.out.println("Fields: \t" + fieldNames);
         }
         else if (cmd.equals("documenttext") || cmd.equals("dt")) {
-            int docId = index.getDocId(docno, arg);
+            int docId = Integer.parseInt(arg);      	
+        	if (!docno.equals("docid")) 
+        		docId = index.getDocId(docno, arg); 
+            System.out.println(docId);
             if (!StringUtils.isEmpty(field))
                 System.out.println(index.getDocText(docId, field));
             else
