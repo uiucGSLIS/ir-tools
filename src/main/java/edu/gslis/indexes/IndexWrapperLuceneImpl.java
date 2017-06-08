@@ -32,9 +32,7 @@ import org.apache.lucene.index.MultiFields;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
-import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
@@ -174,11 +172,11 @@ public class IndexWrapperLuceneImpl implements IndexWrapper {
 	 */
 	public String getLuceneQueryString(GQuery gquery) {
 		StringBuilder queryString = new StringBuilder();
-		Iterator<String> qt = gquery.getFeatureVector().iterator();
-		while (qt.hasNext()) {
-			String term = qt.next();
+		FeatureVector fv = gquery.getFeatureVector();
+		fv.normalize();
+		for (String term: fv.getFeatures()) {
 			queryString.append(" ");
-			queryString.append(term + "^" + gquery.getFeatureVector().getFeatureWeight(term));
+			queryString.append(term + "^" + fv.getFeatureWeight(term));
 		}
 		return queryString.toString();
 	}
@@ -279,13 +277,15 @@ public class IndexWrapperLuceneImpl implements IndexWrapper {
 		fields.add(timeFieldName);
 
 		Similarity similarity = getSimilarity(rule);
-
+		
 		System.err.println("Fields: " + String.join(",", field));
 		System.err.println("Similarity: " + similarity);
 		
 		try {
-			QueryParser parser = new MultiFieldQueryParser(Indexer.VERSION, field, analyzer);
+			//QueryParser parser = new MultiFieldQueryParser(Indexer.VERSION, tmp, analyzer);
+			QueryParser parser = new QueryParser(Indexer.VERSION, "text", analyzer);
 			Query query = parser.parse(q);
+			System.err.println(query.toString());
 			searcher.setSimilarity(similarity);
 			TopDocs topDocs = searcher.search(query, null, count);
 			ScoreDoc[] docs = topDocs.scoreDocs;
@@ -295,7 +295,7 @@ public class IndexWrapperLuceneImpl implements IndexWrapper {
 				int docid = docs[i].doc;
 
 				Document d = index.document(docid, fields);
-				
+
 				//Explanation exp = searcher.explain(query, docid);
 				//System.err.println("Explanation: " + exp.toString());
 
@@ -955,12 +955,12 @@ public class IndexWrapperLuceneImpl implements IndexWrapper {
 			float mu = 2500;
 			if (params.get("mu") != null)
 				mu = Float.parseFloat(params.get("mu"));
-			similarity = new LMDirichletSimilarity(mu);
+			similarity = new LMDirichletSimilarity(mu);	
 		} else if (method.equals("jm") || method.equals("linear")) {
 			float lambda = 0.5f;
 			if (params.get("lambda") != null)
 				lambda = Float.parseFloat(params.get("lambda"));
-			similarity = new LMJelinekMercerSimilarity(lambda);
+			similarity = new LMJelinekMercerSimilarity(lambda);		
 		} else if (method.equals("bm25")) {
 			float k1 = 1.2f;
 			float b = 0.75f;
