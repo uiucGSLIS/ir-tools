@@ -18,7 +18,6 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.util.CharArraySet;
-import org.apache.lucene.util.Version;
 
 import edu.gslis.indexes.IndexWrapper;
 import edu.gslis.utils.KeyValuePair;
@@ -44,11 +43,12 @@ public class FeatureVector  {
 	// CONSTRUCTORS  
 	public FeatureVector(String text, Stopper stopper) {
 		this.stopper = stopper;
+		
 		if(stopper==null || stopper.asSet().size()==0) {
-			analyzer = new StandardAnalyzer(Version.LUCENE_41, CharArraySet.EMPTY_SET);
+			analyzer = new StandardAnalyzer();
 		} else {
-			CharArraySet charArraySet = new CharArraySet(Version.LUCENE_41, stopper.asSet(), true);
-			analyzer = new StandardAnalyzer(Version.LUCENE_41, charArraySet);
+			CharArraySet charArraySet = new CharArraySet(stopper.asSet(), true);
+			analyzer = new StandardAnalyzer(charArraySet);
 		}
 		features = new HashMap<String, Double>();
 		List<String> terms = this.analyze(text);
@@ -69,10 +69,10 @@ public class FeatureVector  {
 	public FeatureVector(Stopper stopper) {
 		this.stopper = stopper;
 		if(stopper==null || stopper.asSet().size()==0) {
-			analyzer = new StandardAnalyzer(Version.LUCENE_41, CharArraySet.EMPTY_SET);
+			analyzer = new StandardAnalyzer();
 		} else {
-			CharArraySet charArraySet = new CharArraySet(Version.LUCENE_41, stopper.asSet(), true);
-			analyzer = new StandardAnalyzer(Version.LUCENE_41, charArraySet);
+			CharArraySet charArraySet = new CharArraySet(stopper.asSet(), true);
+			analyzer = new StandardAnalyzer(charArraySet);
 		}
 		features = new HashMap<String,Double>();
 	}

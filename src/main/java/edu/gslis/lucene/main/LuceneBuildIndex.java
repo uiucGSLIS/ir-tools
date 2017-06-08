@@ -1,12 +1,15 @@
 package edu.gslis.lucene.main;
 
 import java.io.File;
+
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,8 +24,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.analysis.util.CharArraySet;
-import org.apache.lucene.analysis.util.StopwordAnalyzerBase;
+import org.apache.lucene.analysis.StopwordAnalyzerBase;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
@@ -178,8 +180,9 @@ public class LuceneBuildIndex {
             long count = 0;
             try
             {
-                String indexPath = config.getIndexPath() + File.separator + "shard" + id;        
-                Directory dir = FSDirectory.open(new File(indexPath));
+                String indexPath = config.getIndexPath() + File.separator + "shard" + id;    
+    			Path path = FileSystems.getDefault().getPath(indexPath);
+                Directory dir = FSDirectory.open(path);
     
                 // Initialize the analyzer
                 StopwordAnalyzerBase defaultAnalyzer;
@@ -203,7 +206,7 @@ public class LuceneBuildIndex {
                         defaultAnalyzer = (StopwordAnalyzerBase)analyzerConst.newInstance(Indexer.VERSION);            
                     }
                 } else {
-                    defaultAnalyzer = new StandardAnalyzer(Indexer.VERSION, new CharArraySet(Indexer.VERSION, 0, true));
+                    defaultAnalyzer = new StandardAnalyzer();
                 }
                 
                 // Assumes LM similarity, but can be changed via config file
@@ -234,7 +237,7 @@ public class LuceneBuildIndex {
                 }
                 
                 Analyzer analyzer = new PerFieldAnalyzerWrapper(defaultAnalyzer, perFieldAnalyzers);
-                IndexWriterConfig iwc = new IndexWriterConfig(Indexer.VERSION, analyzer);
+                IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
                 iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
                 iwc.setRAMBufferSizeMB(256.0);
                 iwc.setSimilarity(similarity);
@@ -260,8 +263,8 @@ public class LuceneBuildIndex {
         
                     for (File file: files) {
                     	if (count % 100 == 0)
-                    		System.out.println("Indexed " + count + " files");
-                        count += indexer.buildIndex(writer,  fields, file);                
+                    		System.out.println("Indexed " + count + " files"); 
+                		count += indexer.buildIndex(writer,  fields, file);   
                     }
             		System.out.println("Indexed " + count + " files");
                 

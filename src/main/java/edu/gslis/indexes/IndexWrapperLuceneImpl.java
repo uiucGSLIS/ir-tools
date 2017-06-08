@@ -1,7 +1,10 @@
 package edu.gslis.indexes;
 
 import java.io.File;
+
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,15 +23,14 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.analysis.util.StopwordAnalyzerBase;
+import org.apache.lucene.analysis.StopwordAnalyzerBase;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.DocsAndPositionsEnum;
-import org.apache.lucene.index.DocsEnum;
 import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.MultiFields;
+import org.apache.lucene.index.PostingsEnum;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
@@ -38,7 +40,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.similarities.BM25Similarity;
-import org.apache.lucene.search.similarities.DefaultSimilarity;
+import org.apache.lucene.search.similarities.ClassicSimilarity;
 import org.apache.lucene.search.similarities.LMDirichletSimilarity;
 import org.apache.lucene.search.similarities.LMJelinekMercerSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
@@ -97,7 +99,8 @@ public class IndexWrapperLuceneImpl implements IndexWrapper {
 	 */
 	public IndexWrapperLuceneImpl(String pathToIndex) {
 		try {
-			index = DirectoryReader.open(FSDirectory.open(new File(pathToIndex)));
+			Path path = FileSystems.getDefault().getPath(pathToIndex);
+			index = DirectoryReader.open(FSDirectory.open(path));
 			searcher = new IndexSearcher(index);
 
 			// Read the analyzer/similarity class from the index metadata,
@@ -115,7 +118,7 @@ public class IndexWrapperLuceneImpl implements IndexWrapper {
 				analyzer = (StopwordAnalyzerBase) analyzerConst.newInstance(Indexer.VERSION);
 
 			} else {
-				analyzer = new StandardAnalyzer(Indexer.VERSION);
+				analyzer = new StandardAnalyzer();
 			}
 
 			if (indexMetadata.get("similarity") != null) {
@@ -284,11 +287,11 @@ public class IndexWrapperLuceneImpl implements IndexWrapper {
 		
 		try {
 			//QueryParser parser = new MultiFieldQueryParser(Indexer.VERSION, tmp, analyzer);
-			QueryParser parser = new QueryParser(Indexer.VERSION, "text", analyzer);
+			QueryParser parser = new QueryParser("text", analyzer);
 			Query query = parser.parse(q);
 			System.err.println(query.toString());
 			searcher.setSimilarity(similarity);
-			TopDocs topDocs = searcher.search(query, null, count);
+			TopDocs topDocs = searcher.search(query, count);
 			ScoreDoc[] docs = topDocs.scoreDocs;
 
 			for (int i = 0; i < docs.length; i++) {
@@ -545,7 +548,7 @@ public class IndexWrapperLuceneImpl implements IndexWrapper {
 
 			for (Terms terms : termsSet) {
 				if (terms != null) {
-					TermsEnum termsEnum = terms.iterator(null);
+					TermsEnum termsEnum = terms.iterator();
 					while (termsEnum.next() != null) {
 						String term = termsEnum.term().utf8ToString();
 
@@ -581,12 +584,12 @@ public class IndexWrapperLuceneImpl implements IndexWrapper {
 
 				Terms terms = index.getTermVector(docID, field);
 				if (terms != null) {
-					TermsEnum termsEnum = terms.iterator(null);
-					DocsAndPositionsEnum dp = null;
+					TermsEnum termsEnum = terms.iterator();
+					PostingsEnum dp = null;
 					while (termsEnum.next() != null) {
 						String term = termsEnum.term().utf8ToString();
 
-						dp = termsEnum.docsAndPositions(null, dp);
+						dp = termsEnum.postings(dp);
 						dp.nextDoc();
 						int freq = dp.freq();
 						for (int i = 0; i < freq; i++) {
@@ -646,12 +649,12 @@ public class IndexWrapperLuceneImpl implements IndexWrapper {
 			Terms terms = index.getTermVector(docID, field);
 			Map<Integer, String> dv = new TreeMap<Integer, String>();
 			if (terms != null) {
-				TermsEnum termsEnum = terms.iterator(null);
-				DocsAndPositionsEnum dp = null;
+				TermsEnum termsEnum = terms.iterator();
+				PostingsEnum dp = null;
 				while (termsEnum.next() != null) {
 					String term = termsEnum.term().utf8ToString();
 
-					dp = termsEnum.docsAndPositions(null, dp);
+					dp = termsEnum.postings(dp);
 					dp.nextDoc();
 					int freq = dp.freq();
 					for (int i = 0; i < freq; i++) {
@@ -696,7 +699,7 @@ public class IndexWrapperLuceneImpl implements IndexWrapper {
 		try {
 			IndexSearcher searcher = new IndexSearcher(index);
 			Analyzer analyzer = new KeywordAnalyzer();
-			QueryParser parser = new QueryParser(Indexer.VERSION, field, analyzer);
+			QueryParser parser = new QueryParser(field, analyzer);
 			Query q = parser.parse("\"" + value + "\"");
 
 			// TermQuery q = new TermQuery(new Term(field, docno));
@@ -877,11 +880,10 @@ public class IndexWrapperLuceneImpl implements IndexWrapper {
 			Iterator<String> it = fields.iterator();
 			while (it.hasNext()) {
 				String field = it.next();
-				DocsEnum de = MultiFields.getTermDocsEnum(index, MultiFields.getLiveDocs(index), field,
-						new BytesRef(term));
+				PostingsEnum de = MultiFields.getTermDocsEnum(index, field, new BytesRef(term));
 				if (de != null) {
 					int doc;
-					while ((doc = de.nextDoc()) != DocsEnum.NO_MORE_DOCS) {
+					while ((doc = de.nextDoc()) != PostingsEnum.NO_MORE_DOCS) {
 						if (docids.contains(doc))
 							df.put(doc, de.freq());
 					}
@@ -977,7 +979,7 @@ public class IndexWrapperLuceneImpl implements IndexWrapper {
 				k1 = Float.parseFloat(params.get("b"));
 			similarity = new BM25Similarity(k1, b);
 		} else if (method.equals("tfidf")) {
-			similarity = new DefaultSimilarity();
+			similarity = new ClassicSimilarity();
 		} else {
 			System.err.println("Warning: unknown similarity specified, defaulting to LMDirichlet(mu=2500)");
 			similarity = new LMDirichletSimilarity(2500);

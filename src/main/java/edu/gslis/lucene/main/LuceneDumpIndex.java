@@ -10,10 +10,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.collections.Bag;
 import org.apache.commons.collections.bag.TreeBag;
 import org.apache.commons.lang.StringUtils;
-import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.MultiFields;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
@@ -122,7 +120,7 @@ public class LuceneDumpIndex
                 while (it.hasNext()) {
                     String fieldName = it.next();
                     Terms terms = fields.terms(fieldName);
-                    TermsEnum termsEnum = terms.iterator(null);
+                    TermsEnum termsEnum = terms.iterator();
                     BytesRef byteRef = null;
                     while((byteRef = termsEnum.next()) != null) {
                         vocab.add(byteRef.utf8ToString(), termsEnum.docFreq());
@@ -131,7 +129,7 @@ public class LuceneDumpIndex
             }
             else {
                 Terms terms = fields.terms(Indexer.FIELD_TEXT);
-                TermsEnum termsEnum = terms.iterator(null);
+                TermsEnum termsEnum = terms.iterator();
                 BytesRef byteRef = null;
                 while((byteRef = termsEnum.next()) != null) {
                     vocab.add(byteRef.utf8ToString(), termsEnum.docFreq());
