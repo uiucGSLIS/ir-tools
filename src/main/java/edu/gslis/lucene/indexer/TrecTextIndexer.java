@@ -16,6 +16,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.drew.lang.StringUtil;
+
 import edu.gslis.lucene.main.config.FieldConfig;
 
 
@@ -32,11 +34,12 @@ public class TrecTextIndexer extends Indexer
     { 
         Analyzer analyzer = writer.getAnalyzer();
 
-        StringWriter data = new StringWriter();
-        IOUtils.copy(is, data, "UTF-8");
+        String data = IOUtils.toString(is, "UTF-8");
+        data = data.replace("&amp;", "&");
+        data = data.replace("&", "&amp;");
         
         // Add a root element
-        String xml = "<root>" + data.toString() + "</root>";
+        String xml = "<root>" + data + "</root>";
         DocumentBuilderFactory factory =  DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document xmlDoc = builder.parse(new ByteArrayInputStream(xml.getBytes()));

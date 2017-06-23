@@ -15,13 +15,14 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.FieldType;
-import org.apache.lucene.document.IntField;
-import org.apache.lucene.document.LongField;
+import org.apache.lucene.document.LegacyDoubleField;
+import org.apache.lucene.document.LegacyIntField;
+import org.apache.lucene.document.LegacyLongField;
 import org.apache.lucene.document.StringField;
+import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.util.Version;
@@ -33,7 +34,7 @@ import edu.gslis.lucene.main.config.FieldConfig;
  */
 public abstract class Indexer
 {    
-    public static Version VERSION = Version.LUCENE_47;
+    public static Version VERSION = Version.LUCENE_6_6_0;
     
     public static final String FIELD_DOCNO = "docno";
     public static final String FIELD_DOC_LEN = "doclen";
@@ -44,7 +45,8 @@ public abstract class Indexer
     public static final String FORMAT_WIKI = "wiki";
     public static final String FORMAT_TIKA = "tika";
     public static final String FORMAT_STREAMCORPUS = "streamcorpus";
-
+    public static final String FORMAT_JSON = "json";
+    
     public static final String FIELD_TYPE_STRING = "string";
     public static final String FIELD_TYPE_TEXT = "text";
     public static final String FIELD_TYPE_INT = "int";
@@ -73,20 +75,23 @@ public abstract class Indexer
             luceneField = new StringField(fieldName, value, stored);
         }
         else if (type.equals(FieldConfig.TYPE_INT)) {                    
-            luceneField = new IntField(fieldName, Integer.valueOf(value), stored);
+            luceneField = new LegacyIntField(fieldName, Integer.valueOf(value), stored);
         }
         else if (type.equals(FieldConfig.TYPE_LONG)) {                    
-            luceneField = new LongField(fieldName, Long.valueOf(value), stored);
+            luceneField = new LegacyLongField(fieldName, Long.valueOf(value), stored);
         }
         else if (type.equals(FieldConfig.TYPE_DOUBLE)) {                    
-            luceneField = new DoubleField(fieldName, Double.valueOf(value), stored);
+            luceneField = new LegacyDoubleField(fieldName, Double.valueOf(value), stored);
         }
         else if (type.equals(FieldConfig.TYPE_STRING)) { 
             luceneField = new StringField(fieldName, value, stored);                            
         }
         else if (type.equals(FieldConfig.TYPE_TEXT)) {  
             FieldType fieldType = new FieldType();
-            fieldType.setIndexed(fieldConfig.isIndexed());
+            if (fieldConfig.isIndexed())
+            	fieldType.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+            else
+            	fieldType.setIndexOptions(IndexOptions.NONE);
             fieldType.setStored(fieldConfig.isStored());
             fieldType.setStoreTermVectors(fieldConfig.isStoredTermVectors());
             fieldType.setStoreTermVectorPositions(fieldConfig.isStoredTermVectorPositions());
@@ -108,7 +113,7 @@ public abstract class Indexer
                 docLength += docLen.numericValue().longValue();
                 luceneDoc.removeField(FIELD_DOC_LEN);
             }
-            luceneDoc.add(new LongField(FIELD_DOC_LEN, docLength, Store.YES));
+            luceneDoc.add(new LegacyLongField(FIELD_DOC_LEN, docLength, Store.YES));
         }
         else {
             throw new Exception("Unsupported field type: " + type);
@@ -126,7 +131,12 @@ public abstract class Indexer
             for (File f: files) {
                 String name = f.getName();
                 InputStream is = new FileInputStream(f);
-                buildIndex(writer, fields, name, is);
+                try {
+                	buildIndex(writer, fields, name, is);
+            	} catch (Exception e) {
+            		System.err.println("Error processing file: " + f.getName());
+            	}
+
                 count++;
             }
         }

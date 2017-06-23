@@ -17,6 +17,8 @@ public interface IndexWrapper {
 	
 	public SearchHits runQuery(String query, int count);
 	
+	public SearchHits runQuery(GQuery query, int count, String rule);
+	
 	public double docCount();
 
 	public double termCount();

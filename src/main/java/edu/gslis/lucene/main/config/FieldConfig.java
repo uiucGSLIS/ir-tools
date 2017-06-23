@@ -16,6 +16,7 @@ public class FieldConfig {
     public static final String SOURCE_ELEMENT = "element";
     public static final String SOURCE_FILE = "file";
     public static final String SOURCE_FILENAME = "filename";
+    public static final String SOURCE_TEXT = "text";
         
     String element = "";
     String name = "";

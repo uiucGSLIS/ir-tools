@@ -31,6 +31,8 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 	private double docLengthAvg   = -1.0;
 	private String timeFieldName  = null;
 	
+	private String defaultScoringRule = "method:dirichlet,mu:2500";
+	
 	public IndexWrapperIndriImpl(String pathToIndex) {
 		index = new QueryEnvironment();
 		addIndex(pathToIndex);
@@ -68,9 +70,13 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
             }         
         }
     }
+    
+    public SearchHits runQuery(GQuery query, int count) {
+        return runQuery(query, count, defaultScoringRule);
+    }
 
-	public SearchHits runQuery(GQuery query, int count) {
-				
+	public SearchHits runQuery(GQuery query, int count, String scoringRule) {
+		
 		SearchHits hits = new SearchHits();
 		try {
 			// assumes that this gQuery's text member is all formatted and ready to go.
@@ -82,18 +88,23 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 			}
 			queryString.append(")");
 			
-			ScoredExtentResult[] res = index.runQuery(queryString.toString(), count);
-			String[] docnos = index.documentMetadata(res, "docno");
-			String[] timeStrings  = null;
-			double[] times = null;
-			if(timeFieldName != null) {
-				timeStrings = index.documentMetadata(res, timeFieldName);
-				times = new double[timeStrings.length];
-				for(int i=0; i<timeStrings.length; i++) {
-					times[i] = Double.parseDouble(timeStrings[i]);
+            ScoredExtentResult[] res = null;
+            double[] times = null;
+            String[] docnos = null;
+			synchronized(this) {
+				index.setScoringRules(new String[] {scoringRule});
+				res = index.runQuery(queryString.toString(), count);
+				docnos = index.documentMetadata(res, "docno");
+				String[] timeStrings  = null;
+				times = null;
+				if(timeFieldName != null) {
+					timeStrings = index.documentMetadata(res, timeFieldName);
+					times = new double[timeStrings.length];
+					for(int i=0; i<timeStrings.length; i++) {
+						times[i] = Double.parseDouble(timeStrings[i]);
+					}
 				}
 			}
-
 
 			int k=0;
 			for(ScoredExtentResult r : res) {
@@ -105,10 +116,11 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 				}
                 double length = (double)index.documentLength(r.document);
                 
-                // TODO: Do we need it?
-                //IndriDocument doc = new IndriDocument (index);
-                //FeatureVector fv = doc.getFeatureVector(r.document, null);
-                //hit.setFeatureVector(fv);
+                // TODO: This is inefficient if you don't need the document vector for rescoring
+                IndriDocument doc = new IndriDocument (index);
+                FeatureVector fv = doc.getFeatureVector(r.document, null);
+                hit.setFeatureVector(fv);
+                
                 hit.setLength(length);
 				hit.setDocno(docnos[k++]);
 				hits.add(hit);

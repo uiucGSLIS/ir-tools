@@ -1,12 +1,15 @@
 package edu.gslis.lucene.main;
 
 import java.io.File;
+
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,8 +24,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.analysis.util.CharArraySet;
-import org.apache.lucene.analysis.util.StopwordAnalyzerBase;
+import org.apache.lucene.analysis.StopwordAnalyzerBase;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
@@ -35,6 +37,7 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 import edu.gslis.lucene.indexer.Indexer;
+import edu.gslis.lucene.indexer.JSONIndexer;
 import edu.gslis.lucene.indexer.StreamCorpusIndexer;
 import edu.gslis.lucene.indexer.TikaIndexer;
 import edu.gslis.lucene.indexer.TrecTextIndexer;
@@ -44,13 +47,41 @@ import edu.gslis.lucene.main.config.IndexConfig;
 
 
 /**
- * Lucene-backed index builder.  Requires a Yaml-based configuration file.
+ * Lucene index builder: builds a Lucene index given a yaml configuration file.
+ * 
+ * For example:
+ * 
+ * <pre>
+ * indexPath: /path/to/lucene/index
+ * analyzer: org.apache.lucene.analysis.standard.StandardAnalyzer
+ * similarity: method:dir,mu:2500
+ * corpus:
+ * 	 path: /path/to/input/data
+ *   type: json
+ * fields:
+ *  - name: docno
+ *    source: element
+ *    element: DOCNO
+ *    indexed: true
+ *    stored: true
+ *    storedTermVectors: false
+ *    type: string
+ *  - name: text
+ *    source: element
+ *    element: TEXT
+ *    indexed: true
+ *    stored: true
+ *    storedTermVectors: true
+ *    type: text
+ * </pre>
  * 
  * A few things to note:
- * 
- * 1. Analyzer.  This assumes any configurable analyzer is derived from StopwordsAnalyzerBase.
- * 2. Similarity. Assumes DefaultSimilarity
- * 3. 
+ * <ul>
+ * <li> Corpus types include html, trecweb, trectext, etc.
+ * <li> analyzer sets the analyzere class
+ * <li> similarity is a string indicating model and parameters (modeled after IndriRunQuery)
+ * <li> fields object gives fine-grained control over field indexing.
+ * </ul>
  */
 public class LuceneBuildIndex {
     ClassLoader loader = ClassLoader.getSystemClassLoader();
@@ -61,7 +92,7 @@ public class LuceneBuildIndex {
     }
     
     /**
-     * Builds a Lucene index given a Yaml configuration file
+     * Builds a Lucene index given a yaml configuration file
      * @throws Exception
      */
     public void buildIndex() throws Exception {
@@ -107,8 +138,6 @@ public class LuceneBuildIndex {
             i++;
         }        
         
-
-        
         for (Thread thread: threads) {
             thread.join();
         }
@@ -136,7 +165,6 @@ public class LuceneBuildIndex {
     }
     
     private class IndexerThread implements Runnable {
-        
         List<File> files;
         String id;
         
@@ -152,8 +180,9 @@ public class LuceneBuildIndex {
             long count = 0;
             try
             {
-                String indexPath = config.getIndexPath() + File.separator + "shard" + id;        
-                Directory dir = FSDirectory.open(new File(indexPath));
+                String indexPath = config.getIndexPath() + File.separator + "shard" + id;    
+    			Path path = FileSystems.getDefault().getPath(indexPath);
+                Directory dir = FSDirectory.open(path);
     
                 // Initialize the analyzer
                 StopwordAnalyzerBase defaultAnalyzer;
@@ -168,14 +197,16 @@ public class LuceneBuildIndex {
                     {
                         @SuppressWarnings({ "rawtypes", "unchecked" })
                         java.lang.reflect.Constructor analyzerConst = analyzerCls.getConstructor(Version.class, Reader.class);
+                        analyzerConst.setAccessible(true);
                         defaultAnalyzer = (StopwordAnalyzerBase)analyzerConst.newInstance(Indexer.VERSION, new FileReader(stopwordsPath));            
                     } else {
                         @SuppressWarnings({ "rawtypes", "unchecked" })
                         java.lang.reflect.Constructor analyzerConst = analyzerCls.getConstructor(Version.class);
+                        analyzerConst.setAccessible(true);                        
                         defaultAnalyzer = (StopwordAnalyzerBase)analyzerConst.newInstance(Indexer.VERSION);            
                     }
                 } else {
-                    defaultAnalyzer = new StandardAnalyzer(Indexer.VERSION, new CharArraySet(Indexer.VERSION, 0, true));
+                    defaultAnalyzer = new StandardAnalyzer();
                 }
                 
                 // Assumes LM similarity, but can be changed via config file
@@ -206,7 +237,7 @@ public class LuceneBuildIndex {
                 }
                 
                 Analyzer analyzer = new PerFieldAnalyzerWrapper(defaultAnalyzer, perFieldAnalyzers);
-                IndexWriterConfig iwc = new IndexWriterConfig(Indexer.VERSION, analyzer);
+                IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
                 iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
                 iwc.setRAMBufferSizeMB(256.0);
                 iwc.setSimilarity(similarity);
@@ -223,15 +254,19 @@ public class LuceneBuildIndex {
                     } else if (corpusType.equals(Indexer.FORMAT_TIKA)) {
                         indexer = new TikaIndexer();                
                     } else if (corpusType.equals(Indexer.FORMAT_STREAMCORPUS)) {
-                        indexer = new StreamCorpusIndexer();                
+                        indexer = new StreamCorpusIndexer();  
+                    } else if (corpusType.equals(Indexer.FORMAT_JSON)) {
+                        indexer = new JSONIndexer();                         
                     } else {
                         throw new Exception("Unsupported corpus type/format.");                
                     }
         
                     for (File file: files) {
-                        count += indexer.buildIndex(writer,  fields, file);                
+                    	if (count % 100 == 0)
+                    		System.out.println("Indexed " + count + " files"); 
+                		count += indexer.buildIndex(writer,  fields, file);   
                     }
-                    System.out.println("Indexed " + count + " files");
+            		System.out.println("Indexed " + count + " files");
                 
     
                     writeIndexMetadata(indexPath, config);

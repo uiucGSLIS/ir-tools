@@ -11,17 +11,13 @@ public class IndexWrapperFactory {
 
     public static IndexWrapper getIndexWrapper(String path) 
     {
-        File segments = new File(path + File.separator + "segments.gen");
         File manifest = new File(path + File.separator + "manifest");
         
-        if (segments.exists()) {
-            return new IndexWrapperLuceneImpl(path);
-        }
-        else if (manifest.exists()) {
+        if (manifest.exists()) {
             return new IndexWrapperIndriImpl(path);
         }
-        else
-            return null;
+        else {
+            return new IndexWrapperLuceneImpl(path);
+        }
     }
-
 }
