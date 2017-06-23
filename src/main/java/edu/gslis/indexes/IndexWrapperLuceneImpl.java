@@ -958,7 +958,6 @@ public class IndexWrapperLuceneImpl implements IndexWrapper {
 			if (params.get("mu") != null)
 				mu = Float.parseFloat(params.get("mu"));
 			similarity = new LMDirichletSimilarity(mu);	
-		}
 		} else if (method.equals("jm") || method.equals("linear")) {
 			float lambda = 0.5f;
 			if (params.get("lambda") != null)
