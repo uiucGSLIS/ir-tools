@@ -52,7 +52,6 @@ import edu.gslis.docscoring.ScorerDirichlet;
 import edu.gslis.docscoring.support.CollectionStats;
 import edu.gslis.docscoring.support.IndexBackedCollectionStatsLucene;
 import edu.gslis.lucene.indexer.Indexer;
-import edu.gslis.lucene.similarities.OurDirichletSimilarity;
 import edu.gslis.queries.GQuery;
 import edu.gslis.searchhits.SearchHit;
 import edu.gslis.searchhits.SearchHits;
@@ -960,11 +959,6 @@ public class IndexWrapperLuceneImpl implements IndexWrapper {
 				mu = Float.parseFloat(params.get("mu"));
 			similarity = new LMDirichletSimilarity(mu);	
 		}
-		else if (method.equals("our")) {
-			float mu = 2500;
-			if (params.get("mu") != null)
-				mu = Float.parseFloat(params.get("mu"));
-			similarity = new OurDirichletSimilarity(mu);				
 		} else if (method.equals("jm") || method.equals("linear")) {
 			float lambda = 0.5f;
 			if (params.get("lambda") != null)
