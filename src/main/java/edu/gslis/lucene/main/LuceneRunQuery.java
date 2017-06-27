@@ -198,14 +198,7 @@ public class LuceneRunQuery {
             	FeatureVector qv = new FeatureVector(query.getText(), null);
             	qv.normalize();
             	
-            	String similarity = config.getSimilarity();
-        		Map<String, String> params = new HashMap<String, String>();
-        		String[] fields = similarity.split(",");
-        		// Parse the model spec
-        		for (String field : fields) {
-        			String[] nvpair = field.split(":");
-        			params.put(nvpair[0], nvpair[1]);
-        		}
+        		Map<String, String> params = getParamsFromModel(config.getSimilarity());
         		double b= Double.parseDouble(params.get("b"));
         		double k1= Double.parseDouble(params.get("k1"));
             	
@@ -223,6 +216,17 @@ public class LuceneRunQuery {
             }
             
         }
+    }
+    
+    public Map<String, String> getParamsFromModel(String model) {
+		Map<String, String> params = new HashMap<String, String>();
+		String[] fields = model.split(",");
+		// Parse the model spec
+		for (String field : fields) {
+			String[] nvpair = field.split(":");
+			params.put(nvpair[0], nvpair[1]);
+		}
+		return params;
     }
     
     public String getLuceneQueryString(FeatureVector fv) {
