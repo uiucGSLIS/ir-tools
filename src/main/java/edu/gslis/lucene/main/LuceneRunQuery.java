@@ -198,7 +198,18 @@ public class LuceneRunQuery {
             	FeatureVector qv = new FeatureVector(query.getText(), null);
             	qv.normalize();
             	
-            	Rocchio rocchioFb = new Rocchio(config.getFbOrigWeight(), (1-config.getFbOrigWeight()));
+            	String similarity = config.getSimilarity();
+        		Map<String, String> params = new HashMap<String, String>();
+        		String[] fields = similarity.split(",");
+        		// Parse the model spec
+        		for (String field : fields) {
+        			String[] nvpair = field.split(":");
+        			params.put(nvpair[0], nvpair[1]);
+        		}
+        		double b= Double.parseDouble(params.get("b"));
+        		double k1= Double.parseDouble(params.get("k1"));
+            	
+            	Rocchio rocchioFb = new Rocchio(config.getFbOrigWeight(), (1-config.getFbOrigWeight()), b, k1);
             	rocchioFb.expandQuery(index, query, config.getFbDocs(), config.getFbTerms());      	
             	
             	hits = index.runQuery(query, 1000, similarityModel);
