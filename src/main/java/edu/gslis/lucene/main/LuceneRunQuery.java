@@ -18,6 +18,7 @@ import org.yaml.snakeyaml.constructor.Constructor;
 
 import edu.gslis.indexes.IndexWrapper;
 import edu.gslis.indexes.IndexWrapperFactory;
+import edu.gslis.lucene.expansion.Rocchio;
 import edu.gslis.lucene.indexer.Indexer;
 import edu.gslis.lucene.main.config.RunQueryConfig;
 import edu.gslis.queries.GQueries;
@@ -190,24 +191,16 @@ public class LuceneRunQuery {
         	GQuery query = config.getQueries().getIthQuery(i);
         	if (stopper != null)
         		query.applyStopper(stopper);
+        	
         	SearchHits hits = index.runQuery(query, 1000, similarityModel);
             
             if (config.getFbDocs() > 0 && config.getFbTerms() > 0) {
             	FeatureVector qv = new FeatureVector(query.getText(), null);
             	qv.normalize();
             	
-            	Feedback feedback = new FeedbackRelevanceModel();
-            	feedback.setDocCount(config.getFbDocs());
-            	feedback.setTermCount(config.getFbTerms());
-            	feedback.setRes(hits);
-            	feedback.setIndex(index);
-            	feedback.build();
-            	FeatureVector rm = feedback.asFeatureVector();            	
-            	rm.clip(config.getFbTerms());            	
-            	rm.normalize();
+            	Rocchio rocchioFb = new Rocchio(config.getFbOrigWeight(), (1-config.getFbOrigWeight()));
+            	rocchioFb.expandQuery(index, query, config.getFbDocs(), config.getFbTerms());      	
             	
-            	FeatureVector rm3 = FeatureVector.interpolate(qv, rm, config.getFbOrigWeight());
-            	query.setFeatureVector(rm3);
             	hits = index.runQuery(query, 1000, similarityModel);
             }
             hits.rank();
