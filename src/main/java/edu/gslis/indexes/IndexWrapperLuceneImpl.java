@@ -496,8 +496,15 @@ public class IndexWrapperLuceneImpl implements IndexWrapper {
 	 * Returns average document length
 	 */
 	public double docLengthAvg() {
-		// TODO: Not implemented
-		return docLengthAvg;
+		
+		double avgDocLen = 0;
+		try {
+			double docCount = index.numDocs();
+			avgDocLen = index.getSumTotalTermFreq("text") / (double)docCount;
+		} catch (IOException e) {
+			
+		}
+		return avgDocLen;
 	}
 
 	/**
@@ -775,6 +782,7 @@ public class IndexWrapperLuceneImpl implements IndexWrapper {
 	 * @see edu.gslis.lucene.main.LuceneBuildIndex
 	 */
 	public double getDocLength(int docID) {
+		
 		double length = -1;
 		try {
 			Document doc = index.document(docID);
