@@ -281,14 +281,14 @@ public class IndexWrapperLuceneImpl implements IndexWrapper {
 
 		Similarity similarity = getSimilarity(rule);
 		
-		System.err.println("Fields: " + String.join(",", field));
-		System.err.println("Similarity: " + similarity);
+		//System.err.println("Fields: " + String.join(",", field));
+		//System.err.println("Similarity: " + similarity);
 		
 		try {
 			//QueryParser parser = new MultiFieldQueryParser(Indexer.VERSION, tmp, analyzer);
 			QueryParser parser = new QueryParser("text", analyzer);
 			Query query = parser.parse(q);
-			System.err.println(query.toString());
+			//System.err.println(query.toString());
 			searcher.setSimilarity(similarity);
 			TopDocs topDocs = searcher.search(query, count);
 			ScoreDoc[] docs = topDocs.scoreDocs;
