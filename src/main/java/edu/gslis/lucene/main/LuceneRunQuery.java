@@ -34,7 +34,8 @@ import edu.gslis.utils.Stopper;
 /**
  * Lucene query runner modeled after IndriRunQuery
  */
-public class LuceneRunQuery {
+public class LuceneRunQuery 
+{
     ClassLoader loader = ClassLoader.getSystemClassLoader();
     RunQueryConfig config;
     
@@ -70,6 +71,7 @@ public class LuceneRunQuery {
             String field = cmd.getOptionValue("field", Indexer.FIELD_TEXT);
             String querynum = cmd.getOptionValue("querynum", "1");
             String runname = cmd.getOptionValue("name", "default");
+            int numResults = Integer.parseInt(cmd.getOptionValue("numResults", "1000"));
             
             String similarity = cmd.getOptionValue("similarity", Indexer.DEFAULT_SIMILARITY);
 
@@ -105,6 +107,7 @@ public class LuceneRunQuery {
             config.setFbDocs(fbDocs);
             config.setFbTerms(fbTerms);
             config.setFbOrigWeight(fbOrigWeight);
+            config.setNumResults(numResults);
         }            
         LuceneRunQuery runner = new LuceneRunQuery(config);
         runner.run();
@@ -173,6 +176,7 @@ public class LuceneRunQuery {
         if (!StringUtils.isEmpty(stopwordsPath))
         	stopper = new Stopper(stopwordsPath);
         
+        // Read the similarity used during index creation
         Map<String, String> indexMetadata = readIndexMetadata(indexPath);
         if (StringUtils.isEmpty(similarityModel) && indexMetadata.get("similarity") != null) 
         	similarityModel = indexMetadata.get("similarity");
@@ -186,28 +190,28 @@ public class LuceneRunQuery {
         if (config.getFbDocs() > 0 && config.getFbTerms() > 0) {
         	System.err.println("Running Rocchio expansion: " + config.getFbDocs() + "," + config.getFbTerms() + "," + config.getFbOrigWeight());
         }
+        
         // Run each query
         for (int i=0; i<config.getQueries().numQueries(); i++) {
         	GQuery query = config.getQueries().getIthQuery(i);
         	if (stopper != null)
         		query.applyStopper(stopper);
         	
-        	SearchHits hits = index.runQuery(query, 1000, similarityModel);
+        	SearchHits hits = index.runQuery(query, config.getNumResults(), similarityModel);
             
             if (config.getFbDocs() > 0 && config.getFbTerms() > 0) {
             	FeatureVector qv = new FeatureVector(query.getText(), null);
             	qv.normalize();
             	
         		Map<String, String> params = getParamsFromModel(config.getSimilarity());
-        		double b= Double.parseDouble(params.get("b"));
-        		double k1= Double.parseDouble(params.get("k1"));
+        		double b = Double.parseDouble(params.get("b"));
+        		double k1 = Double.parseDouble(params.get("k1"));
             	
             	Rocchio rocchioFb = new Rocchio(config.getFbOrigWeight(), (1-config.getFbOrigWeight()), k1, b);
             	rocchioFb.setStopper(stopper);
             	rocchioFb.expandQuery(index, query, config.getFbDocs(), config.getFbTerms());      	
-            	System.err.println(query.toString());
-            	
-        		hits = index.runQuery(query, 1000, similarityModel);
+            	            	
+        		hits = index.runQuery(query, config.getNumResults(), similarityModel);
             }
             hits.rank();
             
@@ -219,7 +223,12 @@ public class LuceneRunQuery {
         }
     }
     
-    public Map<String, String> getParamsFromModel(String model) {
+    /**
+     * Given a model specification, return a map of key/value pairs.
+     * @param model
+     * @return
+     */
+    private Map<String, String> getParamsFromModel(String model) {
 		Map<String, String> params = new HashMap<String, String>();
 		String[] fields = model.split(",");
 		// Parse the model spec
@@ -228,18 +237,12 @@ public class LuceneRunQuery {
 			params.put(nvpair[0], nvpair[1]);
 		}
 		return params;
-    }
+    }    
     
-    public String getLuceneQueryString(FeatureVector fv) {
-    	StringBuilder queryString = new StringBuilder();
-    	for (String term: fv.getFeatures()) {
-            queryString.append(" ");
-            queryString.append(term+"^"+fv.getFeatureWeight(term));
-        }
-        return queryString.toString();
-    }
-
-    
+    /**
+     * The many command line options
+     * @return
+     */
     public static Options createOptions()
     {
         Options options = new Options();
@@ -257,6 +260,7 @@ public class LuceneRunQuery {
         options.addOption("fbDocs", true, "Number of feedback documents");
         options.addOption("fbTerms", true, "Number of feedback terms");
         options.addOption("fbOrigWeight", true, "Weight of original query");
+        options.addOption("numResults", true, "Number of results (defaults to 10000");
 
         return options;
     }
