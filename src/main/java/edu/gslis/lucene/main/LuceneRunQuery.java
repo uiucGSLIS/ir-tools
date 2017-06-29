@@ -26,8 +26,6 @@ import edu.gslis.queries.GQueriesFedwebImpl;
 import edu.gslis.queries.GQueriesIndriImpl;
 import edu.gslis.queries.GQueriesJsonImpl;
 import edu.gslis.queries.GQuery;
-import edu.gslis.queries.expansion.Feedback;
-import edu.gslis.queries.expansion.FeedbackRelevanceModel;
 import edu.gslis.searchhits.SearchHit;
 import edu.gslis.searchhits.SearchHits;
 import edu.gslis.textrepresentation.FeatureVector;
@@ -171,7 +169,7 @@ public class LuceneRunQuery {
         String similarityModel = config.getSimilarity();
         String stopwordsPath = config.getStopwords();
         
-        Stopper stopper = null;
+        Stopper stopper = new Stopper();
         if (!StringUtils.isEmpty(stopwordsPath))
         	stopper = new Stopper(stopwordsPath);
         
@@ -205,6 +203,7 @@ public class LuceneRunQuery {
         		double k1= Double.parseDouble(params.get("k1"));
             	
             	Rocchio rocchioFb = new Rocchio(config.getFbOrigWeight(), (1-config.getFbOrigWeight()), k1, b);
+            	rocchioFb.setStopper(stopper);
             	rocchioFb.expandQuery(index, query, config.getFbDocs(), config.getFbTerms());      	
             	System.err.println(query.toString());
             	
