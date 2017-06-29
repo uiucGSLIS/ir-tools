@@ -199,9 +199,7 @@ public class LuceneRunQuery
         	
         	SearchHits hits = index.runQuery(query, config.getNumResults(), similarityModel);
             
-            if (config.getFbDocs() > 0 && config.getFbTerms() > 0) {
-            	FeatureVector qv = new FeatureVector(query.getText(), null);
-            	qv.normalize();
+            if (config.getFbDocs() > 0 && config.getFbTerms() > 0) {            	
             	
         		Map<String, String> params = getParamsFromModel(config.getSimilarity());
         		double b = Double.parseDouble(params.get("b"));
