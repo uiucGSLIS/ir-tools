@@ -185,7 +185,9 @@ public class LuceneRunQuery {
         // Setup the index searcher
         IndexWrapper index = IndexWrapperFactory.getIndexWrapper(indexPath);
 
-        
+        if (config.getFbDocs() > 0 && config.getFbTerms() > 0) {
+        	System.err.println("Running Rocchio expansion: " + config.getFbDocs() + "," + config.getFbTerms() + "," + config.getFbOrigWeight());
+        }
         // Run each query
         for (int i=0; i<config.getQueries().numQueries(); i++) {
         	GQuery query = config.getQueries().getIthQuery(i);
@@ -202,10 +204,11 @@ public class LuceneRunQuery {
         		double b= Double.parseDouble(params.get("b"));
         		double k1= Double.parseDouble(params.get("k1"));
             	
-            	Rocchio rocchioFb = new Rocchio(config.getFbOrigWeight(), (1-config.getFbOrigWeight()), b, k1);
+            	Rocchio rocchioFb = new Rocchio(config.getFbOrigWeight(), (1-config.getFbOrigWeight()), k1, b);
             	rocchioFb.expandQuery(index, query, config.getFbDocs(), config.getFbTerms());      	
+            	System.err.println(query.toString());
             	
-            	hits = index.runQuery(query, 1000, similarityModel);
+        		hits = index.runQuery(query, 1000, similarityModel);
             }
             hits.rank();
             
@@ -213,8 +216,7 @@ public class LuceneRunQuery {
             for (SearchHit hit: hits.hits()) {
             	System.out.println(query.getTitle() + " Q0 " + hit.getDocno() + " " + rank + " "  + hit.getScore() + " " + config.getRunName());
             	rank++;
-            }
-            
+            }            
         }
     }
     
