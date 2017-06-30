@@ -35,6 +35,8 @@ import edu.gslis.lucene.main.config.FieldConfig;
 public abstract class Indexer
 {    
     
+	public static Version VERSION = Version.LUCENE_6_5_1;
+
     public static final String FIELD_DOCNO = "docno";
     public static final String FIELD_DOC_LEN = "doclen";
     public static final String FIELD_TEXT = "text"; 
