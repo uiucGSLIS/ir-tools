@@ -114,6 +114,7 @@ public class IndexWrapperLuceneImpl implements IndexWrapper {
 
 				@SuppressWarnings({ "rawtypes", "unchecked" })
 				java.lang.reflect.Constructor analyzerConst = analyzerCls.getConstructor(Version.class);
+                analyzerConst.setAccessible(true);   
 				analyzer = (StopwordAnalyzerBase) analyzerConst.newInstance(Indexer.VERSION);
 
 			} else {
