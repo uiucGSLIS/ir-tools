@@ -16,10 +16,17 @@ public class RunQueryConfig {
     int fbDocs = 0;
     int fbTerms = 0;
     double fbOrigWeight = 0;
+    int numResults = 0;
 
     
     
-    public int getFbDocs() {
+    public int getNumResults() {
+		return numResults;
+	}
+	public void setNumResults(int numResults) {
+		this.numResults = numResults;
+	}
+	public int getFbDocs() {
 		return fbDocs;
 	}
 	public void setFbDocs(int fbDocs) {

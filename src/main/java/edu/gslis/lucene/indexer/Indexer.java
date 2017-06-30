@@ -34,8 +34,9 @@ import edu.gslis.lucene.main.config.FieldConfig;
  */
 public abstract class Indexer
 {    
-    public static Version VERSION = Version.LUCENE_6_6_0;
     
+	public static Version VERSION = Version.LUCENE_6_5_1;
+
     public static final String FIELD_DOCNO = "docno";
     public static final String FIELD_DOC_LEN = "doclen";
     public static final String FIELD_TEXT = "text"; 
@@ -68,6 +69,7 @@ public abstract class Indexer
         String fieldName = fieldConfig.getName();
         String type = fieldConfig.getType();
         
+        value = value.replaceAll(":", "");
         Field luceneField;
         Field.Store stored = fieldConfig.isStored() ? Field.Store.YES : Field.Store.NO;
 
@@ -99,7 +101,7 @@ public abstract class Indexer
             fieldType.setStoreTermVectorPayloads(fieldConfig.isStoredTermVectorPayloads());
             luceneField = new Field(fieldName, value, fieldType);
             
-            // Store the document length
+            // Store the document length            
             TokenStream stream = defaultAnalyzer.tokenStream(fieldName, new StringReader(value));
             stream.reset();                            
             long docLength = 0;                            
