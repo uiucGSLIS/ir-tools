@@ -113,8 +113,8 @@ public class IndexWrapperLuceneImpl implements IndexWrapper {
 				Class analyzerCls = loader.loadClass(analyzerClass);
 
 				@SuppressWarnings({ "rawtypes", "unchecked" })
-				java.lang.reflect.Constructor analyzerConst = analyzerCls.getConstructor();
-				analyzer = (StopwordAnalyzerBase) analyzerConst.newInstance();
+				java.lang.reflect.Constructor analyzerConst = analyzerCls.getConstructor(Version.class);
+				analyzer = (StopwordAnalyzerBase) analyzerConst.newInstance(Indexer.VERSION);
 
 			} else {
 				analyzer = new StandardAnalyzer();
