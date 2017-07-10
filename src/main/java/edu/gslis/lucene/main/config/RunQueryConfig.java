@@ -15,7 +15,8 @@ public class RunQueryConfig {
     String runname = "";
     int fbDocs = 0;
     int fbTerms = 0;
-    double fbOrigWeight = 0;
+    double fbAlpha = 0;
+    double fbBeta = 0;
     int numResults = 0;
 
     
@@ -38,12 +39,18 @@ public class RunQueryConfig {
 	public void setFbTerms(int fbTerms) {
 		this.fbTerms = fbTerms;
 	}
-	public double getFbOrigWeight() {
-		return fbOrigWeight;
+	public double getFbAlpha() {
+		return fbAlpha;
 	}
-	public void setFbOrigWeight(double fbOrigWeight) {
-		this.fbOrigWeight = fbOrigWeight;
+	public void setFbAlpha(double fbAlpha) {
+		this.fbAlpha = fbAlpha;
 	}
+	public double getFbBeta() {
+		return fbBeta;
+	}
+	public void setFbBeta(double fbBeta) {
+		this.fbBeta = fbBeta;
+	}	
 	public String getIndex() {
         return index;
     }
