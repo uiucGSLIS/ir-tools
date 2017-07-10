@@ -1,12 +1,14 @@
 package edu.gslis.lucene.indexer;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.StringWriter;
+import java.io.InputStreamReader;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.lucene.analysis.Analyzer;
@@ -15,8 +17,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import com.drew.lang.StringUtil;
 
 import edu.gslis.lucene.main.config.FieldConfig;
 
@@ -32,14 +32,33 @@ public class TrecTextIndexer extends Indexer
     public void buildIndex(IndexWriter writer, Set<FieldConfig> fields, String name,
             InputStream is) throws Exception 
     { 
+
+      
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        String line = "";
+        StringBuffer xml = new StringBuffer("");
+        int i=0;
+        while ((line = br.readLine()) != null) {
+        	xml.append(line + "\n");
+        	if (line.contains("</DOC>")) {
+        		addDocument(xml.toString(), writer, fields, name);
+        		xml = new StringBuffer("");
+        		System.out.println("Added " + i);
+        		i++;
+        	}
+        }
+    }
+    
+    private void addDocument(String xml, IndexWriter writer, Set<FieldConfig> fields, String name) throws Exception {
+    	        
         Analyzer analyzer = writer.getAnalyzer();
 
-        String data = IOUtils.toString(is, "UTF-8");
-        data = data.replace("&amp;", "&");
-        data = data.replace("&", "&amp;");
-        
+       
+        xml = xml.replace("&amp;", "&");
+        xml = xml.replace("&", "&amp;");
+
         // Add a root element
-        String xml = "<root>" + data + "</root>";
         DocumentBuilderFactory factory =  DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document xmlDoc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
