@@ -102,17 +102,7 @@ public class FeatureVector  {
 	 * @param term
 	 */
 	public void addTerm(String term) {
-		if(stopper != null && stopper.isStopWord(term))
-			return;
-
-		Double freq = ((Double)features.get(term));
-		if(freq == null) {
-			features.put(term, new Double(1.0));
-		} else {
-			double f = freq.doubleValue();
-			features.put(term, new Double(f+1.0));
-		}
-		length += 1.0;
+		this.addTerm(term, 1.0);
 	}
 
 	public void setTerm(String term, double weight) {
@@ -129,6 +119,9 @@ public class FeatureVector  {
 	 * @param weight
 	 */
 	public void addTerm(String term, double weight) {
+		if(stopper != null && stopper.isStopWord(term))
+			return;
+		
 		Double w = ((Double)features.get(term));
 		if(w == null) {
 			features.put(term, new Double(weight));
