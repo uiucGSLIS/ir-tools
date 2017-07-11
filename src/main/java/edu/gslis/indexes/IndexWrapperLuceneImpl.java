@@ -978,7 +978,7 @@ public class IndexWrapperLuceneImpl implements IndexWrapper {
 			if (params.get("k1") != null)
 				k1 = Float.parseFloat(params.get("k1"));
 			if (params.get("b") != null)
-				k1 = Float.parseFloat(params.get("b"));
+				b = Float.parseFloat(params.get("b"));
 			similarity = new BM25Similarity(k1, b);
 		} else if (method.equals("tfidf")) {
 			similarity = new ClassicSimilarity();
