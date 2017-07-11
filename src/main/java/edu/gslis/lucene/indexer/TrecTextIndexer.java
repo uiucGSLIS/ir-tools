@@ -42,9 +42,16 @@ public class TrecTextIndexer extends Indexer
         while ((line = br.readLine()) != null) {
         	xml.append(line + "\n");
         	if (line.contains("</DOC>")) {
-        		addDocument(xml.toString(), writer, fields, name);
+        		try {
+        			addDocument(xml.toString(), writer, fields, name);
+        		} catch (Exception e) {
+        			e.printStackTrace();
+        		}
         		xml = new StringBuffer("");
-        		System.out.println("Added " + i);
+        		
+            	if (i % 1000 == 0)
+            		System.out.println("Added " + i + " files"); 
+
         		i++;
         	}
         }
