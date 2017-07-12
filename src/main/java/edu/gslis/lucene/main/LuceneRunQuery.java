@@ -82,7 +82,8 @@ public class LuceneRunQuery
             String stopwords = cmd.getOptionValue("stopwords");
             int fbDocs = Integer.parseInt(cmd.getOptionValue("fbDocs", "0"));
             int fbTerms = Integer.parseInt(cmd.getOptionValue("fbTerms", "0"));
-            double fbOrigWeight  = Double.parseDouble(cmd.getOptionValue("fbOrigWeight", "0"));
+            double fbAlpha  = Double.parseDouble(cmd.getOptionValue("alpha", "1"));
+            double fbBeta  = Double.parseDouble(cmd.getOptionValue("beta", "1"));
             
             GQueries gqueries = new GQueriesJsonImpl();
             if (!StringUtils.isEmpty(query)) {
@@ -106,7 +107,8 @@ public class LuceneRunQuery
             config.setRunName(runname);
             config.setFbDocs(fbDocs);
             config.setFbTerms(fbTerms);
-            config.setFbOrigWeight(fbOrigWeight);
+            config.setFbAlpha(fbAlpha);
+            config.setFbBeta(fbBeta);
             config.setNumResults(numResults);
         }            
         LuceneRunQuery runner = new LuceneRunQuery(config);
@@ -188,7 +190,8 @@ public class LuceneRunQuery
         IndexWrapper index = IndexWrapperFactory.getIndexWrapper(indexPath);
 
         if (config.getFbDocs() > 0 && config.getFbTerms() > 0) {
-        	System.err.println("Running Rocchio expansion: " + config.getFbDocs() + "," + config.getFbTerms() + "," + config.getFbOrigWeight());
+        	System.err.println("Running Rocchio expansion: " + config.getFbDocs() + "," + config.getFbTerms() +
+        			"," + config.getFbAlpha() + "," + config.getFbBeta());
         }
         
         // Run each query
@@ -205,7 +208,7 @@ public class LuceneRunQuery
         		double b = Double.parseDouble(params.get("b"));
         		double k1 = Double.parseDouble(params.get("k1"));
             	
-            	Rocchio rocchioFb = new Rocchio(config.getFbOrigWeight(), (1-config.getFbOrigWeight()), k1, b);
+            	Rocchio rocchioFb = new Rocchio(config.getFbAlpha(), config.getFbBeta(), k1, b);
             	rocchioFb.setStopper(stopper);
             	rocchioFb.expandQuery(index, query, config.getFbDocs(), config.getFbTerms());      	
             	            	
@@ -257,7 +260,8 @@ public class LuceneRunQuery
         options.addOption("name", true, "Run name");
         options.addOption("fbDocs", true, "Number of feedback documents");
         options.addOption("fbTerms", true, "Number of feedback terms");
-        options.addOption("fbOrigWeight", true, "Weight of original query");
+        options.addOption("alpha", true, "Rocchio alpha");
+        options.addOption("beta", true, "Rocchio beta");
         options.addOption("numResults", true, "Number of results (defaults to 10000");
 
         return options;
