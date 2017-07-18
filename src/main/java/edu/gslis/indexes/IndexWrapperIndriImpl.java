@@ -174,6 +174,15 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
 		return hits;
 	}
 	
+	public void setMu(int mu) {
+		try {
+			index.setScoringRules(new String[] {"method:d,mu:"+mu});
+		} catch (Exception e) {
+			System.err.println("Failed to set smoothing parameter");
+			e.printStackTrace(System.err);
+		}
+	}
+	
 	public void setTimeFieldName(String timeFieldName) {
 		System.err.println("setting time to " + timeFieldName);
 		this.timeFieldName = timeFieldName;
