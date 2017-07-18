@@ -12,24 +12,23 @@ import edu.gslis.searchhits.SearchHits;
 
 public class FormattedOutputTrecEval {
 
-	private static Writer writer;
-	private static String runId;
-	private static FormattedOutputTrecEval formattedOutputTrecEval;
-
+	private Writer writer;
+	private String runId;
 
 	public void setWriter(Writer writer) {
-		FormattedOutputTrecEval.writer = writer;
+		this.writer = writer;
 	}
+
 	public void setRunId(String runId) {
-		FormattedOutputTrecEval.runId = runId;
+		this.runId = runId;
 	}
+	
+	// For backwards compatibility
 	public static FormattedOutputTrecEval getInstance(String runId, Writer writer) {
-		if(formattedOutputTrecEval==null) {
-			formattedOutputTrecEval = new FormattedOutputTrecEval();
-			formattedOutputTrecEval.setRunId(runId);
-			formattedOutputTrecEval.setWriter(writer);
-		}
-		return formattedOutputTrecEval;		
+		FormattedOutputTrecEval output = new FormattedOutputTrecEval();
+		output.setRunId(runId);
+		output.setWriter(writer);
+		return output;
 	}
 
     public void write(SearchHits results, String queryName) {
@@ -67,7 +66,6 @@ public class FormattedOutputTrecEval {
 		try {
 			writer.flush();
 			writer.close();
-			formattedOutputTrecEval = null;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
