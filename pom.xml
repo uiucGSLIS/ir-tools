@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>edu.illinois.lis</groupId>
   <artifactId>ir-utils</artifactId>
-  <version>0.2.0</version>
+  <version>0.2.0-SNAPSHOT</version>
   <name>IR Utils</name>
   <description>IR Utils</description>
   <url>https://github.com/uiucGSLIS/ir-utils</url>
@@ -13,6 +13,36 @@
     <connection>scm:git:git:git@github.com:uiucGSLIS/ir-utils.git</connection>
     <developerConnection>scm:git:git@github.com:uiucGSLIS/ir-utils.git</developerConnection>
   </scm>
+  
+  <licenses>
+    <license>
+      <name>MIT</name>
+      <url>https://opensource.org/licenses/MIT</url>
+    </license>
+  </licenses>
+  
+  <developers>
+    <developer>
+      <name>Craig Willis</name>
+      <email>willis8@illinois.edu</email>
+      <organization>National Data Service</organization>
+      <organizationUrl>http://www.nationaldataservice.org/</organizationUrl>
+    </developer>
+  
+    <developer>
+      <name>Garrick Sherman</name>
+      <email>gsherma2@illinois.edu</email>
+      <organization>University of Illinois</organization>
+      <organizationUrl>http://ischool.illinois.edu/</organizationUrl>
+    </developer>
+    
+    <developer>
+      <name>Miles Efron</name>
+      <email>mefron@illinois.edu</email>
+      <organization>University of Illinois</organization>
+      <organizationUrl>http://ischool.illinois.edu/</organizationUrl>
+    </developer>
+  </developers>
   
   <parent>
     <groupId>org.sonatype.oss</groupId>
@@ -124,6 +154,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.19</version>
         <configuration>
           <skipTests>${skipTests}</skipTests>
           <argLine>-Djava.library.path=/usr/local/lib</argLine>
@@ -150,6 +181,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.3</version>
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
