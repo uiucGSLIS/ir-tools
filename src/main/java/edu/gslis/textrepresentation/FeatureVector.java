@@ -77,10 +77,13 @@ public class FeatureVector  {
 		features = new HashMap<String,Double>();
 	}
 
-
-
-
-
+	public void applyStopper(Stopper stopper) {
+		for (String term : getFeatures()) {
+			if (stopper.isStopWord(term)) {
+				removeTerm(term);
+			}
+		}
+	}
 
 	// MUTATORS
 
@@ -108,6 +111,7 @@ public class FeatureVector  {
 	public void setTerm(String term, double weight) {
 		if(stopper != null && stopper.isStopWord(term))
 			return;
+		length -= getFeatureWeight(term); // remove any weight currently attributed to this term
 		length += weight;
 		features.put(term, new Double(weight));
 		
@@ -339,14 +343,14 @@ public class FeatureVector  {
 			if(xWeight >= 0 && xWeight <= 1) {
 				weight = xWeight*x.getFeatureWeight(feature) + (1.0-xWeight)*y.getFeatureWeight(feature);
 			} else {
-				System.err.println("Mixing weight is not between 0 and 1. Performing unweighted mixing.");
-				weight = x.getFeatureWeight(feature) + y.getFeatureWeight(feature);
+				System.err.println("Mixing weight is not between 0 and 1. Setting weights to " + xWeight + " and 1.0.");
+				weight = xWeight*x.getFeatureWeight(feature) + y.getFeatureWeight(feature);
 			}
 			z.addTerm(feature, weight);
 		}
 		return z;
 	}
-
+	
 	public FeatureVector deepCopy() {
 		FeatureVector copy = new FeatureVector(null);
 		Iterator<String> terms = features.keySet().iterator();
@@ -357,20 +361,44 @@ public class FeatureVector  {
 		}
 		return copy;
 	}
-
-	public static void main(String[] args) {
-		String text = "four score seven years ago forefathers fathers mothers kids";
-
-		Stopper stopper = new Stopper();
-		stopper.addStopword("this");
-		stopper.addStopword("is");
-		stopper.addStopword("better");
+	
+	/**
+	 * Hopefully a clearer way to interpolate two FeatureVectors using (a version of) the Builder pattern.
+	 * 
+	 * <p>Usage:
+	 *   <pre> {@code
+	 *     FeatureVector interpolated = FeatureVector.Interpolate(original)
+	 *     		.with(other)
+	 *     		.weightOriginal(0.6)
+	 *     		.create()
+	 *   }</pre>
+	 * 
+	 * @author Garrick
+	 */
+	public static class Interpolate {
 		
-		FeatureVector featureVector = new FeatureVector(text, stopper);
-		System.out.println(featureVector.getFeatureCount());
-		featureVector.clip(5);
-		System.out.println(featureVector.getFeatureCount());
-	}
+		private FeatureVector original = new FeatureVector(null);
+		private FeatureVector other = new FeatureVector(null);
+		private double origWeight = 0.5;
+		
+		public Interpolate(FeatureVector original) {
+			this.original = original;
+		}
+		
+		public Interpolate with(FeatureVector other) {
+			this.other = other;
+			return this;
+		}
+		
+		public Interpolate weightOriginal(double origWeight) {
+			this.origWeight = origWeight;
+			return this;
+		}
+		
+		public FeatureVector create() {
+			return FeatureVector.interpolate(original, other, origWeight);
+		}
 
+	}
 
 }
