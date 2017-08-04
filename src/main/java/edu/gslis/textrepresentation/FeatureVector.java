@@ -377,7 +377,7 @@ public class FeatureVector  {
 	 */
 	public static class Interpolate {
 		
-		private FeatureVector original = new FeatureVector(null);
+		private FeatureVector original;
 		private FeatureVector other = new FeatureVector(null);
 		private double origWeight = 0.5;
 		
