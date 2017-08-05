@@ -13,9 +13,17 @@ public class Stopper {
 	public static final Pattern SPACE_PATTERN = Pattern.compile(" ", Pattern.DOTALL);
 	private Set<String> stopwords;
 
+    /** Default constructor */
 	public Stopper() {
 		stopwords = new HashSet<String>();
 	}
+	
+	/** Copy constructor */
+    public Stopper(Stopper original) {
+        stopwords = new HashSet<String>(original.asSet());
+    }
+    
+    /** Path constructor */
 	public Stopper(String pathToStoplist) {
 		try {
 			stopwords = new HashSet<String>();
