@@ -78,6 +78,11 @@ public class FeatureVector  {
 	}
 
 	public void applyStopper(Stopper stopper) {
+		if (stopper == null) {
+			System.err.println("Warning: Applying a null stopper. Feature vector is unchanged.");
+			return;
+		}
+
 		for (String term : getFeatures()) {
 			if (stopper.isStopWord(term)) {
 				removeTerm(term);
