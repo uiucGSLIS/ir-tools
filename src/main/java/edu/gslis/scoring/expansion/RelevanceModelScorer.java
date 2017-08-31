@@ -1,35 +1,39 @@
 package edu.gslis.scoring.expansion;
 
+import edu.gslis.queries.GQuery;
 import edu.gslis.scoring.DocScorer;
+import edu.gslis.scoring.DocScorerWithDocumentPrior;
+import edu.gslis.scoring.queryscoring.QueryLikelihoodQueryScorer;
 import edu.gslis.searchhits.SearchHit;
 
 /**
  * Computes the relevance model score for a given term.
+ * 
+ * <p>This class misuses {@link DocScorerWithDocumentPrior} as its superclass by treating the query likelihood as a "document prior".
+ * For this reason, you will need to instantiate a new RelevanceModelScorer for each query.
+ * 
  * @author Garrick
  *
  */
-public class RelevanceModelScorer implements DocScorer{
+public class RelevanceModelScorer extends DocScorerWithDocumentPrior {
 	
-	private DocScorer termScorer;
-	private double queryWeight;
+	private QueryLikelihoodQueryScorer queryScorer;
+	private GQuery query;
 	
 	/**
 	 * @param termScorer Some DocScorer capable of producing P(w|D).
-	 * @param queryWeight The query weight, P(Q|D), probably given by a QueryScorer. Careful not to provide a logarithm!
+	 * @param queryScorer A QueryLikelihoodQueryScorer to produce P(Q|D).
+	 * @param query A query
 	 */
-	public RelevanceModelScorer(DocScorer termScorer, double queryWeight) {
-		this.termScorer = termScorer;
-		this.queryWeight = queryWeight;
+	public RelevanceModelScorer(DocScorer termScorer, QueryLikelihoodQueryScorer queryScorer, GQuery query) {
+		super(termScorer);
+		this.queryScorer = queryScorer;
+		this.query = query;
 	}
-
-	/**
-	 * Score the term in the document
-	 * 
-	 * <p>
-	 */
+	
 	@Override
-	public double scoreTerm(String term, SearchHit document) {
-		return termScorer.scoreTerm(term, document) * queryWeight;
+	public double getPrior(SearchHit document) {
+		return Math.exp(queryScorer.scoreQuery(query, document));
 	}
 
 }

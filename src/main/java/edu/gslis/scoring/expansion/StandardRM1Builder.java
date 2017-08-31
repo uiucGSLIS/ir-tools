@@ -7,7 +7,6 @@ import edu.gslis.queries.GQuery;
 import edu.gslis.scoring.DirichletDocScorer;
 import edu.gslis.scoring.DocScorer;
 import edu.gslis.scoring.queryscoring.QueryLikelihoodQueryScorer;
-import edu.gslis.scoring.queryscoring.QueryScorer;
 import edu.gslis.searchhits.SearchHit;
 import edu.gslis.searchhits.SearchHits;
 import edu.gslis.textrepresentation.FeatureVector;
@@ -59,6 +58,11 @@ public class StandardRM1Builder implements RM1Builder {
 
 	@Override
 	public FeatureVector buildRelevanceModel(GQuery query, SearchHits initialResults, Stopper stopper) {
+		// Prep the scorers
+		QueryLikelihoodQueryScorer queryScorer = new QueryLikelihoodQueryScorer(docScorer);
+		DocScorer rmScorer = new RelevanceModelScorer(zeroMuDocScorer, queryScorer, query);
+
+		// Where we'll store the RM
 		FeatureVector termScores = new FeatureVector(stopper);
 		
 		int i = 0;
@@ -66,11 +70,6 @@ public class StandardRM1Builder implements RM1Builder {
 		while (hitIt.hasNext() && i < feedbackDocs) {
 			SearchHit hit = hitIt.next();
 			i++;
-			
-			// Prep the scorers
-			QueryScorer queryScorer = new QueryLikelihoodQueryScorer(docScorer);
-			DocScorer rmScorer = new RelevanceModelScorer(zeroMuDocScorer,
-					Math.exp(queryScorer.scoreQuery(query, hit)));
 				
 			// Score each term
 			for (String term : hit.getFeatureVector().getFeatures()) {
