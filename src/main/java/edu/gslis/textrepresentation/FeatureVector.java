@@ -78,9 +78,13 @@ public class FeatureVector implements Iterable<String> {
 	}
 
 
-
-
-
+	public void applyStopper(Stopper stopper) {
+		for (String term : getFeatures().toArray(new String[features.size()])) {
+			if (stopper.isStopWord(term)) {
+				removeTerm(term);
+			}
+		}
+	}
 
 	// MUTATORS
 
@@ -147,13 +151,17 @@ public class FeatureVector implements Iterable<String> {
 		
 		Map<String,Double> newMap = new HashMap<String,Double>(k);
 		int i=0;
+		double lastScore = Double.NEGATIVE_INFINITY; // track the most recent value so we don't cut off prematurely
 		length = 0;
 		while(it.hasNext()) {
-			if(i++ >= k)
-				break;
 			KeyValuePair kvp = it.next();
-			length += kvp.getScore();
-			newMap.put((String)kvp.getKey(), kvp.getScore());
+			double currentScore = kvp.getScore();
+			if(i++ >= k) {// && lastScore != currentScore) { // only break if we've both exceeded the clip size and don't have a tie for this score
+				break;
+			}
+			lastScore = currentScore;
+			length += currentScore;
+			newMap.put((String)kvp.getKey(), currentScore);
 		}
 
 		features = (HashMap<String, Double>) newMap;
