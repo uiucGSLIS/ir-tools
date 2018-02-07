@@ -26,8 +26,10 @@ public class StandardRM1Builder implements RM1Builder {
 	private int feedbackDocs;
 	private int feedbackTerms;
 	
-	private DirichletDocScorer docScorer; 
-	private DirichletDocScorer zeroMuDocScorer; 
+	protected DocScorer docScorer;
+	protected DocScorer zeroMuDocScorer;
+
+	protected CollectionStats collectionStats;
 	
 	public StandardRM1Builder(CollectionStats collectionStats) {
 		this(DEFAULT_FEEDBACK_DOCS, DEFAULT_FEEDBACK_TERMS, collectionStats);
@@ -36,10 +38,10 @@ public class StandardRM1Builder implements RM1Builder {
 	public StandardRM1Builder(int feedbackDocs, int feedbackTerms, CollectionStats collectionStats) {
 		setFeedbackDocs(feedbackDocs);
 		setFeedbackTerms(feedbackTerms);
-		createDocScorers(collectionStats);
+		this.collectionStats = collectionStats;
 	}
 
-	private void createDocScorers(CollectionStats collectionStats) {
+	protected void createDocScorers() {
 		docScorer = new DirichletDocScorer(collectionStats);
 		zeroMuDocScorer = new DirichletDocScorer(0, collectionStats);
 	}
@@ -59,6 +61,12 @@ public class StandardRM1Builder implements RM1Builder {
 
 	@Override
 	public FeatureVector buildRelevanceModel(GQuery query, SearchHits initialResults, Stopper stopper) {
+		if (docScorer == null) {
+			createDocScorers();
+		}
+
+		QueryScorer queryScorer = new QueryLikelihoodQueryScorer(docScorer);
+
 		FeatureVector termScores = new FeatureVector(stopper);
 		
 		int i = 0;
@@ -68,7 +76,6 @@ public class StandardRM1Builder implements RM1Builder {
 			i++;
 			
 			// Prep the scorers
-			QueryScorer queryScorer = new QueryLikelihoodQueryScorer(docScorer);
 			DocScorer rmScorer = new RelevanceModelScorer(zeroMuDocScorer,
 					Math.exp(queryScorer.scoreQuery(query, hit)));
 				
@@ -77,7 +84,7 @@ public class StandardRM1Builder implements RM1Builder {
 				if (stopper != null && stopper.isStopWord(term)) {
 					continue;
 				}
-				termScores.addTerm(term, rmScorer.scoreTerm(term, hit) / initialResults.size());
+				termScores.addTerm(term, rmScorer.scoreTerm(term, hit) / Math.min(initialResults.size(), feedbackDocs));
 			}
 		}
 		termScores.clip(feedbackTerms);

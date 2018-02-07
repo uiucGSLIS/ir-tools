@@ -22,13 +22,19 @@ public class RM3Builder {
 			RM1Builder rm1,
 			double originalQueryWeight,
 			Stopper stopper) {
-		query.getFeatureVector().normalize(); // very important
+
+		query.getFeatureVector().normalize(); // very important (maybe?)
 
 		FeatureVector rmVector = rm1.buildRelevanceModel(query, initialResults, stopper);
-		rmVector.normalize(); // very important
 
-		return FeatureVector.interpolate(query.getFeatureVector(),
-				rmVector, originalQueryWeight);
+		return buildRelevanceModel(query, rmVector, originalQueryWeight);
+	}
+
+	public FeatureVector buildRelevanceModel(GQuery query, FeatureVector rmVector, double originalQueryWeight) {
+		query.getFeatureVector().normalize(); // very important
+		rmVector.normalize(); // also very important
+
+		return FeatureVector.interpolate(query.getFeatureVector(), rmVector, originalQueryWeight);
 	}
 
 }
