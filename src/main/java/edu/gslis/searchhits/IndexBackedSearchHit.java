@@ -1,9 +1,9 @@
 package edu.gslis.searchhits;
 
-import java.lang.ref.SoftReference;
-
 import edu.gslis.indexes.IndexWrapper;
 import edu.gslis.textrepresentation.FeatureVector;
+
+import java.lang.ref.SoftReference;
 
 /**
  * A <code>SearchHit</code> object backed by an index.
@@ -24,8 +24,8 @@ public class IndexBackedSearchHit extends SearchHit {
 	 * Using <code>SoftReference</code> to store the feature vector should help
 	 * with garbage collection and memory usage issues.
 	 */
-	private SoftReference<FeatureVector> vector = new SoftReference<FeatureVector>(null);
-	
+	private FeatureVector vector;
+
 	/**
 	 * Creates a new <code>IndexBackedSearchHit</code> backed by the specified index
 	 * and with values copied from another type of <code>SearchHit</code>
@@ -76,15 +76,13 @@ public class IndexBackedSearchHit extends SearchHit {
 
 	@Override
 	public FeatureVector getFeatureVector() {
-		FeatureVector vector = this.vector.get();
+		FeatureVector vector = this.vector;
 		if (vector == null) {
 			if (getDocID() == 0) {
 				System.err.println("SearchHit has no identification. Giving empty FeatureVector.");
-				return new FeatureVector(null);
+				vector = new FeatureVector(null);
 			} else {
 				vector = index.getDocVector(getDocID(), null);
-				setFeatureVector(vector);
-				return vector;
 			}
 		}
 		return vector;
@@ -92,6 +90,6 @@ public class IndexBackedSearchHit extends SearchHit {
 	
 	@Override
 	public void setFeatureVector(FeatureVector vector) {
-		this.vector = new SoftReference<FeatureVector>(vector);
+		this.vector = vector;
 	}
 }

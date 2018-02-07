@@ -134,9 +134,9 @@ public class IndexWrapperIndriImpl implements IndexWrapper{
                 double length = (double)index.documentLength(r.document);
                 
                 // TODO: This is inefficient if you don't need the document vector for rescoring
-                IndriDocument doc = new IndriDocument (index);
+                /*IndriDocument doc = new IndriDocument (index);
                 FeatureVector fv = doc.getFeatureVector(r.document, null);
-                hit.setFeatureVector(fv);
+                hit.setFeatureVector(fv);*/
                 
                 hit.setLength(length);
 				hit.setDocno(docnos[k++]);
