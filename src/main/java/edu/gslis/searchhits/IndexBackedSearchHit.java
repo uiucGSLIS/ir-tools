@@ -3,8 +3,6 @@ package edu.gslis.searchhits;
 import edu.gslis.indexes.IndexWrapper;
 import edu.gslis.textrepresentation.FeatureVector;
 
-import java.lang.ref.SoftReference;
-
 /**
  * A <code>SearchHit</code> object backed by an index.
  * 
