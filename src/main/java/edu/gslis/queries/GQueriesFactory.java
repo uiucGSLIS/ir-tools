@@ -23,19 +23,14 @@ public class GQueriesFactory {
 		GQueries queries = new GQueriesJsonImpl();
 		
         String[] pieces = path.split("\\.");
-    	if (pieces.length > 1 && pieces[1].equals("json")) {
-    		System.err.println("Detected JSON file.");
-		} else {
+    	if (pieces.length > 1 && !pieces[1].equals("json")) {
         	try {
         		BufferedReader reader = new BufferedReader(new FileReader(path));
         		String firstLine = reader.readLine();
         		reader.close();
         		
         		if (firstLine.contains("<parameters>")) {
-        			System.err.println("Detected Indri file.");
         			queries = new GQueriesIndriImpl();
-        		} else if (firstLine.contains("{")) {
-        			System.err.println("Detected JSON file.");
         		}
         	} catch (FileNotFoundException e) {
         		System.err.println("Query file not found at " + path);
