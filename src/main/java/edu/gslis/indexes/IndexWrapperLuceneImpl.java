@@ -1,6 +1,7 @@
 package edu.gslis.indexes;
 
 import java.io.File;
+
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -18,11 +19,11 @@ import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.StopwordAnalyzerBase;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.StopwordAnalyzerBase;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.Fields;
@@ -52,7 +53,6 @@ import edu.gslis.docscoring.support.CollectionStats;
 import edu.gslis.docscoring.support.IndexBackedCollectionStatsLucene;
 import edu.gslis.lucene.indexer.Indexer;
 import edu.gslis.queries.GQuery;
-import edu.gslis.searchhits.IndexBackedSearchHit;
 import edu.gslis.searchhits.SearchHit;
 import edu.gslis.searchhits.SearchHits;
 import edu.gslis.textrepresentation.FeatureVector;
@@ -272,140 +272,59 @@ public class IndexWrapperLuceneImpl implements IndexWrapper {
 	 *            Number of hits
 	 * @return SearchHits
 	 */
+	public SearchHits runQuery(String q, String[] field, int count, String rule) {
 
-    public SearchHits runQuery(GQuery gquery, String[] fields, int count) {
-    	String queryString = getLuceneQueryString(gquery);
-    	return runQuery(queryString, fields, count);
-    }
-    
-    /**
-     * Convert GQuery to Lucene query
-     * @param query        Query
-     */
-    public String getLuceneQueryString(GQuery gquery) {
-    	StringBuilder queryString = new StringBuilder();
-        Iterator<String> qt = gquery.getFeatureVector().iterator();
-        while(qt.hasNext()) {
-            String term = qt.next();
-            queryString.append(" ");
-            queryString.append(term+"^"+gquery.getFeatureVector().getFeatureWeight(term));
-        }
-        return queryString.toString();
-    }
-    
-    public String toAndQuery(String query, Stopper stopper) {
-        StringBuilder queryString = new StringBuilder();
-        String[] terms = query.split("\\s+");
-        for (int i=0; i<terms.length; i++) {
-            if (stopper != null && stopper.isStopWord(terms[i]))
-                continue;
+		SearchHits hits = new SearchHits();
+		Set<String> fields = new HashSet<String>();
+		fields.add(Indexer.FIELD_DOCNO);
+		fields.add(Indexer.FIELD_DOC_LEN);
+		fields.add(timeFieldName);
 
-            if (i > 0) 
-                queryString.append(" ");
+		Similarity similarity = getSimilarity(rule);
+		
+		//System.err.println("Fields: " + String.join(",", field));
+		//System.err.println("Similarity: " + similarity);
+		
+		try {
+			//QueryParser parser = new MultiFieldQueryParser(Indexer.VERSION, tmp, analyzer);
+			QueryParser parser = new QueryParser("text", analyzer);
+			Query query = parser.parse(q);
+			//System.err.println(query.toString());
+			searcher.setSimilarity(similarity);
+			TopDocs topDocs = searcher.search(query, count);
+			ScoreDoc[] docs = topDocs.scoreDocs;
 
-            queryString.append("+" + terms[i]);
-        }        
-        return queryString.toString();
-    }
-    
-    public String toWindowQuery(String query, int window, Stopper stopper) {
-        StringBuilder queryString = new StringBuilder("\"");
-        String[] terms = query.split("\\s+");
-        for (int i=0; i<terms.length; i++) {
-            if (stopper != null && stopper.isStopWord(terms[i]))
-                continue;
+			for (int i = 0; i < docs.length; i++) {
+				SearchHit hit = new SearchHit();
+				int docid = docs[i].doc;
 
-            if (i > 0) 
-                queryString.append(" ");
-            queryString.append(terms[i]);
-        }
-        queryString.append("\"~" + window);
-        return queryString.toString();
-    }
-    
-    
-    /**
-     * Execute a query given a query string against all fields
-     * @param q Query string
-     * @param count Number of hits
-     */
-    public SearchHits runQuery(String q, int count) {
+				Document d = index.document(docid, fields);
 
-        SearchHits hits = new SearchHits();
-        try {
-            List<String> fieldNames = new ArrayList<String>();
-            Fields fields = MultiFields.getFields(index);
-            Iterator<String> it = fields.iterator();
-            while (it.hasNext()) {
-                String fieldName = it.next();
-                fieldNames.add(fieldName);
-            }
-            hits = runQuery(q, fieldNames.toArray(new String[0]), count);
-            
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
-        }    
-        return hits;
-    }
-    
-    /**
-     * Execute a query given a query string against the specified field
-     * @param q   Query string
-     * @param field  Field to be queried
-     * @param count Number of hits
-     */    
-    public SearchHits runQuery(String q, String field, int count) {
-        return runQuery(q, new String[] { field } , count);
-    }
+				//Explanation exp = searcher.explain(query, docid);
+				//System.err.println("Explanation: " + exp.toString());
 
-    /**
-     * Execute a query given a query string against the specified fields
-     * @param q   Query string
-     * @param field  Field to be queried
-     * @param count Number of hits
-     */
-	public SearchHits runQuery(String q, String[] field, int count) {
-				
-	    SearchHits hits = new SearchHits();
-	    Set<String> fields = new HashSet<String>();
-	    fields.add(Indexer.FIELD_DOCNO);
-	    fields.add(Indexer.FIELD_DOC_LEN);
-	    fields.add(timeFieldName);
-	    try
-	    {            
-            QueryParser parser = new MultiFieldQueryParser(Indexer.VERSION, field, analyzer);
-            Query query = parser.parse(q);
-            searcher.setSimilarity(similarity);
-            TopDocs topDocs = searcher.search(query,  null, count);
-            ScoreDoc[] docs = topDocs.scoreDocs;
+				String docno = d.get(Indexer.FIELD_DOCNO);
+				hit.setDocID(docid);
+				hit.setDocno(docno);
+				hit.setScore(docs[i].score);
+				IndexableField dl = d.getField(Indexer.FIELD_DOC_LEN);
+				if (dl != null)
+					hit.setLength(dl.numericValue().longValue());
+				if (timeFieldName != null) {
+					String timeString = d.get(timeFieldName);
+					if (timeString != null) {
+						double time = Double.parseDouble(timeString);
+						hit.setMetadataValue(timeFieldName, time);
+					}
+				}
 
-            for (int i=0; i<docs.length; i++) {
-                SearchHit hit = new IndexBackedSearchHit(this);
-                int docid = docs[i].doc;
-                                
-                Document d = index.document(docid, fields);
-                
-                String docno = d.get(Indexer.FIELD_DOCNO);
-                hit.setDocID(docid);
-                hit.setDocno(docno);
-                hit.setScore(docs[i].score);
-                IndexableField dl = d.getField(Indexer.FIELD_DOC_LEN);
-                if (dl != null) 
-                    hit.setLength(dl.numericValue().longValue());
-                if(timeFieldName != null) {
-                    String timeString = d.get(timeFieldName);
-                    if (timeString != null) {
-                        double time = Double.parseDouble(timeString);
-                        hit.setMetadataValue(timeFieldName, time);
-                    }
-                }
-
-                hits.add(hit);                
-            }
-	    } catch (Exception e) {
-	        logger.log(Level.SEVERE, e.getMessage(), e);
-	    }
-	    return hits;
+				hits.add(hit);
+			}
+			hits.rank();
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, e.getMessage(), e);
+		}
+		return hits;
 	}
 
 	/**
@@ -883,151 +802,192 @@ public class IndexWrapperLuceneImpl implements IndexWrapper {
 	 * @param stopper
 	 * @return
 	 */
+	public SearchHit getSearchHit(String docno, Stopper stopper) {
+		SearchHit hit = new SearchHit();
+		FeatureVector dv = getDocVector(docno, stopper);
+		int docid = getDocId(docno);
+		hit.setFeatureVector(dv);
+		hit.setDocID(docid);
 
-   public SearchHit getSearchHit(String docno, Stopper stopper) {
-       SearchHit hit = new IndexBackedSearchHit(this);
-       FeatureVector dv = getDocVector(docno, stopper);
-       int docid = getDocId(docno);
-       hit.setFeatureVector(dv);
-       hit.setDocID(docid);
-        
-       String timeString = getMetadataValue(docno, timeFieldName);
-       if (timeString != null) {
-           double time = Double.parseDouble(timeString);
-           hit.setMetadataValue(timeFieldName, time);
-       }
-       return hit;
-   }
-      
-   public static void main(String[] args) throws IOException 
-   {
-       File indexDir = new File("/Users/cwillis/dev/uiucGSLIS/indexes/lucene/FT.train");
-       IndexWrapper index = new IndexWrapperLuceneImpl(indexDir.getAbsolutePath());
-       
-       
-//       index.runQuery("headline:\"jubilee\" and text:\"financial\" and pub:\"financial\"", 10);
-       index.runQuery("headline:jubilee and financial", 10);
-       double dc = index.docCount();
-       assert(dc == 53356);
-       
-       double df = index.docFreq("cranwell");
-       assert (df == 2);
-       //double dlavg = index.docLengthAvg();
-       int docid = index.getDocId("FT911-1");
-       FeatureVector fv1 = index.getDocVector(docid, null);       
-       assert(fv1.getFeatureWeight("the") == 12);
-       
-       double tc = index.termCount();
-       assert(tc == 22058714);
-       double tf = index.termFreq("the");
-       assert(tf == 1425270);
-       
-       FeatureVector qv = new FeatureVector(null);
-       qv.addTerm("raf", 0.8);  
-       qv.addTerm("cranwell", 0.5);       
+		String timeString = getMetadataValue(docno, timeFieldName);
+		if (timeString != null) {
+			double time = Double.parseDouble(timeString);
+			hit.setMetadataValue(timeFieldName, time);
+		}
+		return hit;
+	}
 
-       GQuery query = new GQuery();
-       query.setText("raf cranwell");
-       query.setFeatureVector(qv);
-       
-       double ttc = index.termTypeCount();
-       assert (ttc == 163279);
-//       FeatureVector fv2 = index.getDocVector("test-docno2", null);
-//       String epoch = index.getMetadataValue("test-docno1", "epoch");
-       // -6.68693  FT911-382   0   1510
-       // -6.80837    FT911-1 0   217
-       SearchHits hits = index.runQuery(query, 88);
-       assert(hits.size() == 88);
-       ScorerDirichlet scorer = new ScorerDirichlet();
-       scorer.setParameter("mu", 2000);
-       scorer.setQuery(query);
+	public static void main(String[] args) throws IOException {
+		File indexDir = new File("/Users/cwillis/dev/uiucGSLIS/indexes/lucene/FT.train");
+		IndexWrapper index = new IndexWrapperLuceneImpl(indexDir.getAbsolutePath());
 
-       CollectionStats stat = new IndexBackedCollectionStatsLucene();
-       stat.setStatSource(indexDir.getAbsolutePath());
-       scorer.setCollectionStats(stat);
-       
-       hits.rank();
-       for (int i=0; i<hits.size(); i++) {
-           SearchHit hit = hits.getHit(i);
-           double score = scorer.score(hit);
-           hit.setScore(score);
-//           System.out.println(hit.getDocno() + "\t" + hit.getScore() + "\t" + score);
-       }
-       hits.rank();
-       for (int i=0; i<hits.size(); i++) {
-           SearchHit hit = hits.getHit(i);
-           double score = scorer.score(hit);
-           hit.setScore(score);
-           System.out.println(hit.getDocno() + "\t" + hit.getScore());
-       }
+		// index.runQuery("headline:\"jubilee\" and text:\"financial\" and
+		// pub:\"financial\"", 10);
+		index.runQuery("headline:jubilee and financial", 10);
+		double dc = index.docCount();
+		assert (dc == 53356);
 
-   }
-   
-   public Map<Integer, Integer> getDocsByTerm(String term, Set<Integer> docids) {
-       Map<Integer, Integer> df = new HashMap<Integer, Integer>();
-       try
-       {
-           Fields fields = MultiFields.getFields(index);
-           Iterator<String> it = fields.iterator();
-           while (it.hasNext()) {
-               String field = it.next();
-               DocsEnum de =  MultiFields.getTermDocsEnum(index, MultiFields.getLiveDocs(index), 
-                       field, new BytesRef(term));
-               if (de != null) {
-                   int doc;
-                   while((doc = de.nextDoc()) != DocsEnum.NO_MORE_DOCS) {
-                       if (docids.contains(doc))
-                           df.put(doc,  de.freq());
-                   }
-               }
-           }
-       } catch (Exception e) {
-           e.printStackTrace();
-       }
-       return df;
-   }
-   
-   public String stem(String input) {
-       String stemmed = "";
-       try
-       {
-           TokenStream tokenStream = analyzer.tokenStream(null, input);        
-           tokenStream.reset();
-           CharTermAttribute token = tokenStream.getAttribute(CharTermAttribute.class);
-           int i = 0;
-           while (tokenStream.incrementToken()) {
-               if (i > 0)
-                   stemmed += " ";
-               stemmed += token.toString();
-               i++;
-           }           
-           tokenStream.close();
-       } catch (IOException e) {
-           e.printStackTrace();
-       }
-       return stemmed;
-   }
-   
-   private Map<String, String> readIndexMetadata(String indexPath) 
-   {
-       Map<String, String> map = new HashMap<String, String>();
-       try
-       {
-           File metadata = new File(indexPath + File.separator + "index.metadata");
-           List<String> lines = FileUtils.readLines(metadata);
-           for (String line: lines) {
-               String[] fields = line.split("=");
-               map.put(fields[0], fields[1]);            
-           }
-       } catch (IOException e) {
-           // Can't find the index.metadata file, use overrides
-       }
-       return map;
-   }
-   
-   public String toDMQuery(String query, String type, double w1, double w2, double w3)
-   {
-       return null;
-   }
+		double df = index.docFreq("cranwell");
+		assert (df == 2);
+		// double dlavg = index.docLengthAvg();
+		int docid = index.getDocId("FT911-1");
+		FeatureVector fv1 = index.getDocVector(docid, null);
+		assert (fv1.getFeatureWeight("the") == 12);
+
+		double tc = index.termCount();
+		assert (tc == 22058714);
+		double tf = index.termFreq("the");
+		assert (tf == 1425270);
+
+		FeatureVector qv = new FeatureVector(null);
+		qv.addTerm("raf", 0.8);
+		qv.addTerm("cranwell", 0.5);
+
+		GQuery query = new GQuery();
+		query.setText("raf cranwell");
+		query.setFeatureVector(qv);
+
+		double ttc = index.termTypeCount();
+		assert (ttc == 163279);
+		// FeatureVector fv2 = index.getDocVector("test-docno2", null);
+		// String epoch = index.getMetadataValue("test-docno1", "epoch");
+		// -6.68693 FT911-382 0 1510
+		// -6.80837 FT911-1 0 217
+		SearchHits hits = index.runQuery(query, 88);
+		assert (hits.size() == 88);
+		ScorerDirichlet scorer = new ScorerDirichlet();
+		scorer.setParameter("mu", 2000);
+		scorer.setQuery(query);
+
+		CollectionStats stat = new IndexBackedCollectionStatsLucene();
+		stat.setStatSource(indexDir.getAbsolutePath());
+		scorer.setCollectionStats(stat);
+
+		hits.rank();
+		for (int i = 0; i < hits.size(); i++) {
+			SearchHit hit = hits.getHit(i);
+			double score = scorer.score(hit);
+			hit.setScore(score);
+			// System.out.println(hit.getDocno() + "\t" + hit.getScore() + "\t"
+			// + score);
+		}
+		hits.rank();
+		for (int i = 0; i < hits.size(); i++) {
+			SearchHit hit = hits.getHit(i);
+			double score = scorer.score(hit);
+			hit.setScore(score);
+			System.out.println(hit.getDocno() + "\t" + hit.getScore());
+		}
+
+	}
+
+	public Map<Integer, Integer> getDocsByTerm(String term, Set<Integer> docids) {
+		Map<Integer, Integer> df = new HashMap<Integer, Integer>();
+		try {
+			Fields fields = MultiFields.getFields(index);
+			Iterator<String> it = fields.iterator();
+			while (it.hasNext()) {
+				String field = it.next();
+				PostingsEnum de = MultiFields.getTermDocsEnum(index, field, new BytesRef(term));
+				if (de != null) {
+					int doc;
+					while ((doc = de.nextDoc()) != PostingsEnum.NO_MORE_DOCS) {
+						if (docids.contains(doc))
+							df.put(doc, de.freq());
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return df;
+	}
+
+	public String stem(String input) {
+		String stemmed = "";
+		try {
+			TokenStream tokenStream = analyzer.tokenStream(null, input);
+			tokenStream.reset();
+			CharTermAttribute token = tokenStream.getAttribute(CharTermAttribute.class);
+			int i = 0;
+			while (tokenStream.incrementToken()) {
+				if (i > 0)
+					stemmed += " ";
+				stemmed += token.toString();
+				i++;
+			}
+			tokenStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return stemmed;
+	}
+
+	private Map<String, String> readIndexMetadata(String indexPath) {
+		Map<String, String> map = new HashMap<String, String>();
+		try {
+			File metadata = new File(indexPath + File.separator + "index.metadata");
+			List<String> lines = FileUtils.readLines(metadata);
+			for (String line : lines) {
+				String[] fields = line.split("=");
+				map.put(fields[0], fields[1]);
+			}
+		} catch (IOException e) {
+			// Can't find the index.metadata file, use overrides
+		}
+		return map;
+	}
+
+	public String toDMQuery(String query, String type, double w1, double w2, double w3) {
+		return null;
+	}
+
+	/**
+	 * Construct a Similarity object based on the model specification
+	 * 
+	 * @param model
+	 *            Model specification (e.g., method:dir,mu:2500)
+	 * @return Similarity instance
+	 */
+	private Similarity getSimilarity(String model) {
+
+		Similarity similarity = null;
+		Map<String, String> params = new HashMap<String, String>();
+		String[] fields = model.split(",");
+
+		// Parse the model spec
+		for (String field : fields) {
+			String[] nvpair = field.split(":");
+			params.put(nvpair[0], nvpair[1]);
+		}
+
+		String method = params.get("method");
+		if (method.equals("dir") || method.equals("dirichlet")) {
+			float mu = 2500;
+			if (params.get("mu") != null)
+				mu = Float.parseFloat(params.get("mu"));
+			similarity = new LMDirichletSimilarity(mu);	
+		} else if (method.equals("jm") || method.equals("linear")) {
+			float lambda = 0.5f;
+			if (params.get("lambda") != null)
+				lambda = Float.parseFloat(params.get("lambda"));
+			similarity = new LMJelinekMercerSimilarity(lambda);		
+		} else if (method.equals("bm25")) {
+			float k1 = 1.2f;
+			float b = 0.75f;
+			if (params.get("k1") != null)
+				k1 = Float.parseFloat(params.get("k1"));
+			if (params.get("b") != null)
+				b = Float.parseFloat(params.get("b"));
+			similarity = new BM25Similarity(k1, b);
+		} else if (method.equals("tfidf")) {
+			similarity = new ClassicSimilarity();
+		} else {
+			System.err.println("Warning: unknown similarity specified, defaulting to LMDirichlet(mu=2500)");
+			similarity = new LMDirichletSimilarity(2500);
+		}
+
+		return similarity;
+	}
 
 }

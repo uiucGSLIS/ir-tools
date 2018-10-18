@@ -82,6 +82,7 @@ public class IndexBackedSearchHit extends SearchHit {
 			} else {
 				vector = index.getDocVector(getDocID(), null);
 			}
+			setFeatureVector(vector);
 		}
 		return vector;
 	}
