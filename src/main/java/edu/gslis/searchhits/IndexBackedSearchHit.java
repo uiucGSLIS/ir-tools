@@ -68,6 +68,9 @@ public class IndexBackedSearchHit extends SearchHit {
 				docID = index.getDocId(getDocno());
 				setDocID(docID);
 			}
+			if (docID == -1) {
+				System.err.println("The index does not recognize this docno: " + getDocno() + ". Giving docID of -1. This may crash your program.");
+			}
 		}
 		return docID;
 	}
@@ -76,7 +79,7 @@ public class IndexBackedSearchHit extends SearchHit {
 	public FeatureVector getFeatureVector() {
 		FeatureVector vector = this.vector;
 		if (vector == null) {
-			if (getDocID() == 0) {
+			if (getDocID() <= 0) {
 				System.err.println("SearchHit has no identification. Giving empty FeatureVector.");
 				vector = new FeatureVector(null);
 			} else {
