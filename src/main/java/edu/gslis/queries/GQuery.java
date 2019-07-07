@@ -18,6 +18,8 @@ import edu.gslis.utils.Stopper;
  *
  */
 public class GQuery {
+	public static String OOV_TERM = "OOVterm";
+
 	private String name;
 	private String text;
 	private Map<String,String> metadata;
@@ -50,9 +52,12 @@ public class GQuery {
 		Iterator<String> it = featureVector.iterator();
 		while(it.hasNext()) {
 			String feature = it.next();
-			if(stopper.isStopWord(feature))
+			if(stopper.isStopWord(feature)) {
 				continue;
-			temp.addTerm(feature, featureVector.getFeatureWeight(feature));
+				//temp.addTerm(OOV_TERM, featureVector.getFeatureWeight(feature));
+			} else {
+				temp.addTerm(feature, featureVector.getFeatureWeight(feature));
+			}
 		}
 		featureVector = temp;
 	}
@@ -85,5 +90,18 @@ public class GQuery {
 	public void setFeatureVector(FeatureVector featureVector) {
 		this.featureVector = featureVector;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof GQuery)) {
+			return false;
+		}
+		GQuery otherQuery = (GQuery) obj;
+		return otherQuery.getTitle().equals(getTitle());
+	}
 		
+	@Override
+	public int hashCode() {
+		return getTitle().hashCode();
+	}
 }

@@ -8,7 +8,7 @@ import java.util.List;
 import edu.gslis.utils.ScorableComparator;
 
 
-public class SearchHits {
+public class SearchHits implements Iterable<SearchHit> {
 	private List<SearchHit> hits;
 	private Iterator<SearchHit> iter;
 	
@@ -21,7 +21,6 @@ public class SearchHits {
 	
 	public SearchHits() {
 		hits = new LinkedList<SearchHit>();	
-		
 	}
 	
 	public SearchHits(List<SearchHit> hits) {
